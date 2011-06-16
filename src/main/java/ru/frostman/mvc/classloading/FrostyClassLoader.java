@@ -1,7 +1,11 @@
 package ru.frostman.mvc.classloading;
 
+import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.Frosty;
 
+import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AllPermission;
@@ -9,6 +13,7 @@ import java.security.CodeSource;
 import java.security.Permissions;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -16,6 +21,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author slukjanov aka Frostman
  */
 public class FrostyClassLoader extends ClassLoader {
+    private static final Logger log = LoggerFactory.getLogger(FrostyClassLoader.class);
+
     /**
      * FrostyClassLoader instances counter
      */
@@ -53,7 +60,17 @@ public class FrostyClassLoader extends ClassLoader {
 
 
     public void loadAllClasses() {
+        long start = System.currentTimeMillis();
 
+        for (String name : classes.keySet()) {
+            try {
+                loadClass(name);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        log.debug("All application classes loaded successfully ({}ms)", System.currentTimeMillis() - start);
     }
 
     @Override
@@ -78,9 +95,35 @@ public class FrostyClassLoader extends ClassLoader {
         return super.loadClass(name, resolve);
     }
 
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        return super.findClass(name);
+    private Class<?> loadApplicationClass(String name) {
+        long start = System.currentTimeMillis();
+        FrostyClass frostyClass = classes.get(name);
+
+        if (frostyClass == null) {
+            return null;
+        }
+
+        final byte[] enhancedBytecode = frostyClass.getEnhancedBytecode();
+        Class<?> clazz = defineClass(name, enhancedBytecode, 0, enhancedBytecode.length, protectionDomain);
+        resolveClass(clazz);
+
+        frostyClass.setJavaClass(clazz);
+
+        log.debug("Application class defined and resolved: {} ({}ms)", name, System.currentTimeMillis() - start);
+
+        return clazz;
+    }
+
+    public List<Class> getClassesAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<Class> result = Lists.newLinkedList();
+        for (Map.Entry<String, FrostyClass> entry : classes.entrySet()) {
+            final Class<?> javaClass = entry.getValue().getJavaClass();
+            if (javaClass != null && javaClass.getAnnotation(annotation) != null) {
+                result.add(javaClass);
+            }
+        }
+
+        return result;
     }
 
     public long getId() {

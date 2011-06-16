@@ -8,7 +8,7 @@ import ru.frostman.mvc.classloading.FrostyClass;
 public class Enhancer {
 
     public static void enhance(FrostyClass frostyClass) {
-
+        frostyClass.setEnhancedBytecode(frostyClass.getBytecode());
     }
 
 }

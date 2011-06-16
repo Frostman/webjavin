@@ -35,8 +35,10 @@ public class FrostyClasses {
     /**
      * Scan class path for classes in base packages and iff class added,
      * changed or removed than new ClassLoader will be created.
+     *
+     * @return true iff class loader changed
      */
-    public void update() {
+    public boolean update() {
         //todo check that update runs not each 10 ms, synchronize it staticly
 
         boolean needReload = false;
@@ -101,9 +103,18 @@ public class FrostyClasses {
             log.debug("Application class removed: {}", removedClassName);
         }
 
-        if(needReload) {
-            classLoader = new FrostyClassLoader(ImmutableMap.copyOf(classes));
-            classLoader.loadAllClasses();
+        if (needReload) {
+            FrostyClassLoader newClassLoader = new FrostyClassLoader(ImmutableMap.copyOf(classes));
+            newClassLoader.loadAllClasses();
+            this.classLoader = newClassLoader;
+
+            log.info("Application classes successfully reloaded");
         }
+
+        return needReload;
+    }
+
+    public FrostyClassLoader getClassLoader() {
+        return classLoader;
     }
 }

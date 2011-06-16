@@ -1,5 +1,7 @@
 package ru.frostman.mvc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.classloading.FrostyClasses;
 
 import javax.servlet.ServletContextEvent;
@@ -10,6 +12,8 @@ import java.util.Arrays;
  * @author slukjanov aka Frostman
  */
 public class FrostyContextListener implements ServletContextListener {
+    private static final Logger log = LoggerFactory.getLogger(FrostyContextListener.class);
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         Frosty.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
@@ -19,32 +23,13 @@ public class FrostyContextListener implements ServletContextListener {
         Frosty.setBasePackages(Arrays.asList(sce.getServletContext().getInitParameter("basePackages").split(":")));
         Frosty.setClasses(new FrostyClasses());
 
-        //todo remove it
-        new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    try {
-                        Frosty.getClasses().update();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }.start();
-
-        System.out.println("Inited");
+        log.info("Frosty context initialized successfully");
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         //todo impl
-        System.out.println("Destroyed");
+
+        log.info("Frosty context destroyed successfully");
     }
 }
