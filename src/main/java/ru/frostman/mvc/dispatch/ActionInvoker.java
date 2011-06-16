@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author slukjanov aka Frostman
  */
-public class ActionInvoker implements Runnable {
+public abstract class ActionInvoker implements Runnable {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
 
@@ -33,6 +33,7 @@ public class ActionInvoker implements Runnable {
 
     @Override
     public void run() {
+        //Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
     }
 }

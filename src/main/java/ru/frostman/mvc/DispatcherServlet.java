@@ -1,7 +1,6 @@
 package ru.frostman.mvc;
 
 import ru.frostman.mvc.dispatch.ActionInvoker;
-import ru.frostman.mvc.dispatch.Dispatcher;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,7 +13,6 @@ import java.io.IOException;
  * @author slukjanov aka Frostman
  */
 public class DispatcherServlet extends HttpServlet {
-    private boolean asyncApiSupported;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -26,17 +24,12 @@ public class DispatcherServlet extends HttpServlet {
 
         //dispatch static content on /static for example :)
 
-        //think about not modified
+        //think about not modified (http cache)
 
-        ActionInvoker actionInvoker = new Dispatcher().dispatch(request, response);
+        ActionInvoker actionInvoker = Frosty.getDispatcher().dispatch(request, response);
         actionInvoker.invoke();
 
         //we can load the hole page from cache, i think it's cool
 
-    }
-
-    @Override
-    protected long getLastModified(HttpServletRequest req) {
-        return 100;
     }
 }

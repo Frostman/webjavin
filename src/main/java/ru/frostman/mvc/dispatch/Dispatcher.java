@@ -12,4 +12,7 @@ public class Dispatcher {
         return new ActionInvoker(request, response);
     }
 
+    public void registerAction() {
+        //todo impl
+    }
 }
