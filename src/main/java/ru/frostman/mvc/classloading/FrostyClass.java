@@ -15,6 +15,8 @@ public class FrostyClass {
 
     private Class javaClass;
 
+    private boolean generated;
+
     public FrostyClass() {
     }
 
@@ -64,5 +66,13 @@ public class FrostyClass {
 
     public void setJavaClass(Class javaClass) {
         this.javaClass = javaClass;
+    }
+
+    public boolean isGenerated() {
+        return generated;
+    }
+
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
     }
 }

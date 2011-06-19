@@ -2,6 +2,8 @@ package ru.frostman.mvc;
 
 import ru.frostman.mvc.classloading.FrostyClasses;
 import ru.frostman.mvc.dispatch.Dispatcher;
+import ru.frostman.mvc.secure.FrostySecurityManager;
+import ru.frostman.mvc.util.FrostyInvoker;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  *
  * @author slukjanov aka Frostman
  */
-public class Frosty {
+public final class Frosty {
     /**
      * Major version of the Servlet API that current servlet container supports
      */
@@ -42,7 +44,18 @@ public class Frosty {
     /**
      * Request dispatcher
      */
-    private static Dispatcher dispatcher;
+    //todo think about default value
+    private static Dispatcher dispatcher = new Dispatcher();
+
+    /**
+     * Security manager
+     */
+    private static FrostySecurityManager securityManager;
+
+    /**
+     * Executor
+     */
+    private static FrostyInvoker invoker;
 
     /**
       * @return true iff current servlet container supports async api
@@ -79,6 +92,20 @@ public class Frosty {
         return dispatcher;
     }
 
+    /**
+     * @return security manager
+     */
+    public static FrostySecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    /**
+     * @return executor
+     */
+    public static FrostyInvoker getInvoker() {
+        return invoker;
+    }
+
     static void setServletApiMajorVersion(int servletApiMajorVersion) {
         Frosty.servletApiMajorVersion = servletApiMajorVersion;
     }
@@ -97,5 +124,17 @@ public class Frosty {
 
     static void setApplicationPath(String applicationPath) {
         Frosty.applicationPath = applicationPath;
+    }
+
+    public static void setDispatcher(Dispatcher dispatcher) {
+        Frosty.dispatcher = dispatcher;
+    }
+
+    public static void setSecurityManager(FrostySecurityManager securityManager) {
+        Frosty.securityManager = securityManager;
+    }
+
+    public static void setInvoker(FrostyInvoker invoker) {
+        Frosty.invoker = invoker;
     }
 }

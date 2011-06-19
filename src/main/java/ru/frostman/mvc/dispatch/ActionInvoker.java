@@ -2,6 +2,7 @@ package ru.frostman.mvc.dispatch;
 
 import ru.frostman.mvc.Frosty;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -9,8 +10,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author slukjanov aka Frostman
  */
 public abstract class ActionInvoker implements Runnable {
-    private final HttpServletRequest request;
-    private final HttpServletResponse response;
+    protected final HttpServletRequest request;
+    protected final HttpServletResponse response;
+    protected AsyncContext asyncContext;
+    protected boolean async = isAsync();
 
     public ActionInvoker(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
@@ -21,19 +24,49 @@ public abstract class ActionInvoker implements Runnable {
     public void invoke() {
         //todo если очередь не переполнилась и это long_action то в фоне иначе прям тут
 
-        if (Frosty.isAsyncApiSupported()) {
-            // add to queue
+        //todo remove hard code
+        if (async && Frosty.isAsyncApiSupported() && Frosty.getInvoker().getQueueSize() < 100) {
+            asyncContext = request.startAsync(request, response);
+            //todo think about async listener
+            Frosty.getInvoker().execute(this);
         } else {
-            // run here
+            async = false;
             run();
         }
     }
 
-    //todo generate invokers for each Action
-
     @Override
     public void run() {
-        //Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+        Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
+        try {
+            before();
+
+            try {
+                action();
+            } catch (Throwable actionThrowable) {
+                catchError(actionThrowable);
+            }
+
+            after();
+        } catch (Throwable th) {
+            //todo impl http error send
+            th.printStackTrace();
+        }
+
+        if (async) {
+            asyncContext.complete();
+        }
     }
+
+    protected abstract void before();
+
+    protected abstract void action();
+
+    protected abstract void after();
+
+    protected abstract void catchError(Throwable throwable);
+
+    protected abstract boolean isAsync();
+
 }

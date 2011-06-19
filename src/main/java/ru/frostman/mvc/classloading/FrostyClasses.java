@@ -1,6 +1,7 @@
 package ru.frostman.mvc.classloading;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ public class FrostyClasses {
 
         Set<String> existedClassNames = Sets.newHashSet(classes.keySet());
         Set<String> foundClassNames = Sets.newHashSet();
+        List<String> classesToEnhance = Lists.newLinkedList();
         for (ClassFile classFile : foundClasses) {
             final String className = classFile.getClassName();
             foundClassNames.add(className);
@@ -64,7 +66,7 @@ public class FrostyClasses {
                 newClass.setBytecode(classFile.getBytes());
                 classes.put(className, newClass);
 
-                Enhancer.enhance(newClass);
+                classesToEnhance.add(className);
 
                 log.debug("Application class added: {}", className);
             } else {
@@ -86,7 +88,7 @@ public class FrostyClasses {
                     changedClass.setBytecode(classFile.getBytes());
                     classes.put(className, changedClass);
 
-                    Enhancer.enhance(changedClass);
+                    classesToEnhance.add(className);
 
                     log.debug("Application class changed: {}", className);
                 }
@@ -104,6 +106,10 @@ public class FrostyClasses {
         }
 
         if (needReload) {
+            for (String className : classesToEnhance) {
+                Enhancer.enhance(classes, classes.get(className));
+            }
+
             FrostyClassLoader newClassLoader = new FrostyClassLoader(ImmutableMap.copyOf(classes));
             newClassLoader.loadAllClasses();
             this.classLoader = newClassLoader;

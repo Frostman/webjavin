@@ -21,6 +21,8 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/plain");
+        //response.setHeader("Transfer-Encoding", "chunked")
 
         //dispatch static content on /static for example :)
 
