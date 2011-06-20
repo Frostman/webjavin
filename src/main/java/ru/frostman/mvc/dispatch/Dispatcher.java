@@ -10,7 +10,11 @@ import java.util.List;
  * @author slukjanov aka Frostman
  */
 public class Dispatcher {
-    private final List<ActionDefinition> actions = Lists.newLinkedList();
+    private final List<ActionDefinition> actions;
+
+    public Dispatcher(List<ActionDefinition> actions) {
+        this.actions = Lists.newLinkedList(actions);
+    }
 
     public ActionInvoker dispatch(HttpServletRequest request, HttpServletResponse response) {
         final String requestUrl = request.getRequestURI();
@@ -23,10 +27,5 @@ public class Dispatcher {
 
         //todo replace it with default handlers may be
         return null;
-    }
-
-    public void registerAction(ActionDefinition definition) {
-        //todo impl
-        actions.add(definition);
     }
 }

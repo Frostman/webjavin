@@ -3,10 +3,13 @@ package ru.frostman.mvc.classloading.enhance;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.NotFoundException;
 import ru.frostman.mvc.classloading.FrostyClass;
 import ru.frostman.mvc.classloading.FrostyClasses;
+import ru.frostman.mvc.dispatch.ActionDefinition;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,7 +23,13 @@ public class Enhancer {
         classPool.appendSystemPath();
     }
 
-    public static void enhance(Map<String, FrostyClass> classes, FrostyClass frostyClass) {
+    public static void enhance(Map<String, FrostyClass> classes, FrostyClass frostyClass,
+                               List<ActionDefinition> actionDefinitions) {
+        if (frostyClass.isGenerated() || frostyClass.getEnhancedBytecode() != null) {
+            //todo think about generated classes
+            return;
+        }
+
         CtClass ctClass;
         try {
             ctClass = classPool.makeClass(new ByteArrayInputStream(frostyClass.getBytecode()));
@@ -29,8 +38,18 @@ public class Enhancer {
             throw new RuntimeException(e);
         }
 
-        //...
-        ActionsEnhancer.enhance(classes, classPool, ctClass);
+        try {
+            CtClass superclass = ctClass.getSuperclass();
+            if (classes.containsKey(superclass.getName())) {
+                //todo think about recursion (stack overflow exception)
+                Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions);
+            }
+        } catch (NotFoundException e) {
+            //todo impl
+            throw new RuntimeException(e);
+        }
+
+        ActionsEnhancer.enhance(classes, classPool, ctClass, actionDefinitions);
 
         SecurityEnhancer.enhance(classPool, ctClass);
 

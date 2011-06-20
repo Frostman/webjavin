@@ -15,7 +15,7 @@ public @interface Param {
     /**
      * @return parameter name
      */
-    String name();
+    String value();
 
     /**
      * @return true if param required

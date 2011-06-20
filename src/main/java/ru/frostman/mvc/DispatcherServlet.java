@@ -28,7 +28,10 @@ public class DispatcherServlet extends HttpServlet {
 
         //think about not modified (http cache)
 
-        ActionInvoker actionInvoker = Frosty.getDispatcher().dispatch(request, response);
+        //todo iff dev mode
+        Frosty.getClasses().update();
+
+        ActionInvoker actionInvoker = Frosty.getClasses().getDispatcher().dispatch(request, response);
         actionInvoker.invoke();
 
         //we can load the hole page from cache, i think it's cool

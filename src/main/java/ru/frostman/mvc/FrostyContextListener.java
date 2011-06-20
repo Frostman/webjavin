@@ -3,7 +3,6 @@ package ru.frostman.mvc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.classloading.FrostyClasses;
-import ru.frostman.mvc.secure.FrostySecurityManager;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -17,17 +16,21 @@ public class FrostyContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        Frosty.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
-        Frosty.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
+        try {
+            Frosty.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
+            Frosty.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
 
-        Frosty.setApplicationPath(sce.getServletContext().getRealPath("/"));
-        Frosty.setBasePackages(Arrays.asList(sce.getServletContext().getInitParameter("basePackages").split(":")));
-        Frosty.setClasses(new FrostyClasses());
+            Frosty.setApplicationPath(sce.getServletContext().getRealPath("/"));
+            Frosty.setBasePackages(Arrays.asList(sce.getServletContext().getInitParameter("basePackages").split(":")));
+            Frosty.setClasses(new FrostyClasses());
 
-        //todo remove it
-        Frosty.setSecurityManager(new FrostySecurityManager());
+            log.info("Frosty context initialized successfully");
+        } catch (Throwable th) {
+            log.error("Initialization failed with: ", th);
 
-        log.info("Frosty context initialized successfully");
+            //todo impl shutdown context
+            throw new RuntimeException();
+        }
     }
 
     @Override

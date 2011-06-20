@@ -1,8 +1,6 @@
 package ru.frostman.mvc;
 
 import ru.frostman.mvc.classloading.FrostyClasses;
-import ru.frostman.mvc.dispatch.Dispatcher;
-import ru.frostman.mvc.secure.FrostySecurityManager;
 import ru.frostman.mvc.util.FrostyInvoker;
 
 import java.util.Collections;
@@ -42,17 +40,6 @@ public final class Frosty {
     private static FrostyClasses classes;
 
     /**
-     * Request dispatcher
-     */
-    //todo think about default value
-    private static Dispatcher dispatcher = new Dispatcher();
-
-    /**
-     * Security manager
-     */
-    private static FrostySecurityManager securityManager;
-
-    /**
      * Executor
      */
     private static FrostyInvoker invoker;
@@ -86,20 +73,6 @@ public final class Frosty {
     }
 
     /**
-     * @return request dispatcher
-     */
-    public static Dispatcher getDispatcher() {
-        return dispatcher;
-    }
-
-    /**
-     * @return security manager
-     */
-    public static FrostySecurityManager getSecurityManager() {
-        return securityManager;
-    }
-
-    /**
      * @return executor
      */
     public static FrostyInvoker getInvoker() {
@@ -124,14 +97,6 @@ public final class Frosty {
 
     static void setApplicationPath(String applicationPath) {
         Frosty.applicationPath = applicationPath;
-    }
-
-    public static void setDispatcher(Dispatcher dispatcher) {
-        Frosty.dispatcher = dispatcher;
-    }
-
-    public static void setSecurityManager(FrostySecurityManager securityManager) {
-        Frosty.securityManager = securityManager;
     }
 
     public static void setInvoker(FrostyInvoker invoker) {

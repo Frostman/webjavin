@@ -45,6 +45,8 @@ public abstract class ActionInvoker implements Runnable {
             try {
                 action();
             } catch (Throwable actionThrowable) {
+                //todo move this try into the action method
+                //todo may be throw specific exception from action that needed to catched by catchError
                 catchError(actionThrowable);
             }
 

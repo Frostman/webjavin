@@ -11,22 +11,28 @@ import java.lang.reflect.Constructor;
  */
 public class ActionDefinition {
     private final UrlPattern urlPattern;
-    private final Class<? extends ActionInvoker> invokerClass;
-    private final Constructor<? extends ActionInvoker> invokerClassConstructor;
+    private final String invokerClassName;
+    private Class<? extends ActionInvoker> invokerClass;
+    private Constructor<? extends ActionInvoker> invokerClassConstructor;
 
-    public ActionDefinition(UrlPattern urlPattern, Class<? extends ActionInvoker> invokerClass) {
+    public ActionDefinition(UrlPattern urlPattern, String invokerClassName) {
         this.urlPattern = urlPattern;
-        this.invokerClass = invokerClass;
+        this.invokerClassName = invokerClassName;
+    }
 
+    @SuppressWarnings({"unchecked"})
+    public void init(ClassLoader classLoader) {
         try {
+            invokerClass = (Class<? extends ActionInvoker>) classLoader.loadClass(invokerClassName);
             invokerClassConstructor = invokerClass.getConstructor(HttpServletRequest.class, HttpServletResponse.class);
-        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
             //todo impl
             throw new RuntimeException(e);
         }
     }
 
-    public boolean matches(String url){
+    public boolean matches(String url) {
+        //todo impl http methods checking
         return urlPattern.matches(url);
     }
 
@@ -34,9 +40,25 @@ public class ActionDefinition {
         //todo may be generate one big class that contains ActionInvoker and ActionDefinition
         try {
             return invokerClassConstructor.newInstance(request, response);
-        } catch (Exception e){
+        } catch (Exception e) {
             //todo impl
             throw new RuntimeException(e);
         }
+    }
+
+    public UrlPattern getUrlPattern() {
+        return urlPattern;
+    }
+
+    public String getInvokerClassName() {
+        return invokerClassName;
+    }
+
+    public Class<? extends ActionInvoker> getInvokerClass() {
+        return invokerClass;
+    }
+
+    public Constructor<? extends ActionInvoker> getInvokerClassConstructor() {
+        return invokerClassConstructor;
     }
 }

@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.Frosty;
 import ru.frostman.mvc.classloading.enhance.Enhancer;
+import ru.frostman.mvc.dispatch.ActionDefinition;
+import ru.frostman.mvc.dispatch.Dispatcher;
+import ru.frostman.mvc.secure.FrostySecurityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +20,7 @@ import java.util.Set;
  * @author slukjanov aka Frostman
  */
 public class FrostyClasses {
-    private static final Logger log = LoggerFactory.getLogger(FrostyClass.class);
+    private static final Logger log = LoggerFactory.getLogger(FrostyClasses.class);
 
     /**
      * All application classes stored by name
@@ -29,8 +32,19 @@ public class FrostyClasses {
      */
     private FrostyClassLoader classLoader;
 
+    /**
+     * Request dispatcher
+     */
+    private Dispatcher dispatcher;
+
+    /**
+     * Security manager
+     */
+    private FrostySecurityManager securityManager;
+
     public FrostyClasses() {
-        update();
+        //todo do update iff prod mode enabled
+        // update();
     }
 
     /**
@@ -41,6 +55,9 @@ public class FrostyClasses {
      */
     public boolean update() {
         //todo check that update runs not each 10 ms, synchronize it staticly
+
+        log.debug("Searching for new, changed or removed classes");
+        long start = System.currentTimeMillis();
 
         boolean needReload = false;
 
@@ -98,6 +115,11 @@ public class FrostyClasses {
         existedClassNames.removeAll(foundClassNames);
 
         for (String removedClassName : existedClassNames) {
+            if (removedClassName.contains("$action$")) {
+                //todo impl skip generated classes
+                continue;
+            }
+
             classes.remove(removedClassName);
 
             needReload = true;
@@ -105,16 +127,50 @@ public class FrostyClasses {
             log.debug("Application class removed: {}", removedClassName);
         }
 
+        //todo find all log.debug with System.currentTimeMillis and wrap them with if(debug)
+        if (log.isDebugEnabled()) {
+            log.debug("Application classes scan completed ({}ms)", System.currentTimeMillis() - start);
+        }
+
         if (needReload) {
+            //todo trying to update without reload (using hot swap)
+
+            log.debug("Application classes is need to reload");
+            start = System.currentTimeMillis();
+
+            for (FrostyClass frostyClass : Lists.newLinkedList(classes.values())) {
+                frostyClass.setEnhancedBytecode(null);
+
+                if (frostyClass.isGenerated()) {
+                    classes.remove(frostyClass.getName());
+                }
+            }
+
+            //todo посортировать классы так чтобы они энчансились в нужном порядке (суперклассы раньше потомков) мб рекурсивно
+
+            List<ActionDefinition> actionDefinitions = Lists.newLinkedList();
+            //todo think about enhancing all classes or not (classesToEnhance)
+            classesToEnhance = Lists.newLinkedList(classes.keySet());
             for (String className : classesToEnhance) {
-                Enhancer.enhance(classes, classes.get(className));
+                Enhancer.enhance(classes, classes.get(className), actionDefinitions);
             }
 
             FrostyClassLoader newClassLoader = new FrostyClassLoader(ImmutableMap.copyOf(classes));
             newClassLoader.loadAllClasses();
-            this.classLoader = newClassLoader;
 
-            log.info("Application classes successfully reloaded");
+            for (ActionDefinition definition : actionDefinitions) {
+                definition.init(newClassLoader);
+            }
+
+            this.classLoader = newClassLoader;
+            this.dispatcher = new Dispatcher(actionDefinitions);
+
+            //todo impl it
+            this.securityManager = new FrostySecurityManager();
+
+            log.info("Application classes successfully reloaded ({}ms)", System.currentTimeMillis() - start);
+        } else {
+            log.debug("Application classes is up to date");
         }
 
         return needReload;
@@ -122,5 +178,13 @@ public class FrostyClasses {
 
     public FrostyClassLoader getClassLoader() {
         return classLoader;
+    }
+
+    public Dispatcher getDispatcher() {
+        return dispatcher;
+    }
+
+    public FrostySecurityManager getSecurityManager() {
+        return securityManager;
     }
 }
