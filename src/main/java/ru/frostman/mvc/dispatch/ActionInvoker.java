@@ -44,10 +44,8 @@ public abstract class ActionInvoker implements Runnable {
 
             try {
                 action();
-            } catch (Throwable actionThrowable) {
-                //todo move this try into the action method
-                //todo may be throw specific exception from action that needed to catched by catchError
-                catchError(actionThrowable);
+            } catch (ActionException e) {
+                catchError(e.getCause());
             }
 
             after();
@@ -63,11 +61,11 @@ public abstract class ActionInvoker implements Runnable {
 
     protected abstract void before();
 
-    protected abstract void action();
+    protected abstract void action() throws ActionException;
 
     protected abstract void after();
 
-    protected abstract void catchError(Throwable throwable);
+    protected abstract void catchError(Throwable throwable) throws Throwable;
 
     protected abstract boolean isAsync();
 

@@ -1,10 +1,7 @@
 package ru.frostman.mvc.classloading.enhance;
 
 import javassist.*;
-import ru.frostman.mvc.annotation.Action;
-import ru.frostman.mvc.annotation.After;
-import ru.frostman.mvc.annotation.Before;
-import ru.frostman.mvc.annotation.Param;
+import ru.frostman.mvc.annotation.*;
 import ru.frostman.mvc.classloading.FrostyClass;
 import ru.frostman.mvc.dispatch.ActionDefinition;
 import ru.frostman.mvc.dispatch.url.UrlPatternType;
@@ -135,7 +132,7 @@ public class ActionsEnhancer {
             } else if (parameterType.equals(getCtClass(classPool, ASYNC_CONTEXT))) {
                 body.append(ASYNC_CONTEXT).append(" $param$").append(idx).append(" = asyncContext;");
             } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
-                if(!parameterType.equals(getCtClass(classPool, "java.lang.String"))){
+                if (!parameterType.equals(getCtClass(classPool, "java.lang.String"))) {
                     //todo impl auto converting or exception
                 }
 
@@ -155,9 +152,11 @@ public class ActionsEnhancer {
             idx++;
         }
 
-        body.append(INSTANCE).append(".").append(actionMethod.getName()).append("(").append(parameters).append(");}");
+        body.append("try{");
+        body.append(INSTANCE).append(".").append(actionMethod.getName()).append("(").append(parameters).append(");");
+        body.append("}catch(Throwable th){throw new ru.frostman.mvc.dispatch.ActionException(th);}");
 
-        method.setBody(body.toString());
+        method.setBody(body.append("}").toString());
 
         actionInvoker.addMethod(method);
     }
@@ -174,11 +173,32 @@ public class ActionsEnhancer {
     }
 
     private static void generateActionInvokerCatchError(ClassPool classPool, CtClass actionInvoker, CtClass controller)
-            throws CannotCompileException {
+            throws CannotCompileException, NotFoundException {
         CtMethod method = new CtMethod(CtClass.voidType, "catchError",
                 new CtClass[]{getCtClass(classPool, "java.lang.Throwable")}, actionInvoker);
 
-        method.setBody("{System.out.println(\"catch: " + actionInvoker.getName() + "\");}");
+        List<CtMethod> methods = getMethodsAnnotatedWith(Catch.class, controller);
+
+        StringBuilder body = new StringBuilder("{");
+        for (CtMethod invokeMethod : methods) {
+            if (invokeMethod.getReturnType() != CtClass.voidType) {
+                //todo impl
+                throw new RuntimeException("!=void type");
+            }
+
+            //todo add parameters resolving
+            body.append("{").append(INSTANCE).append(".")
+                    .append(invokeMethod.getName())
+                    .append("($1);")
+                    .append("}");
+        }
+
+        if (methods.size() == 0) {
+            //todo think about this
+            body.append("{throw new RuntimeException($1);}");
+        }
+
+        method.setBody(body.append("}").toString());
 
         actionInvoker.addMethod(method);
     }
