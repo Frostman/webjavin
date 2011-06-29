@@ -1,6 +1,7 @@
 package ru.frostman.mvc.dispatch;
 
 import ru.frostman.mvc.Frosty;
+import ru.frostman.mvc.ModelAndView;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
@@ -13,17 +14,17 @@ public abstract class ActionInvoker implements Runnable {
     protected final HttpServletRequest request;
     protected final HttpServletResponse response;
     protected AsyncContext asyncContext;
+    protected ModelAndView mav;
     protected boolean async = isAsync();
 
     public ActionInvoker(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
+
+        this.mav = new ModelAndView(request, response);
     }
 
-    //todo add callback
     public void invoke() {
-        //todo если очередь не переполнилась и это long_action то в фоне иначе прям тут
-
         //todo remove hard code
         if (async && Frosty.isAsyncApiSupported() && Frosty.getInvoker().getQueueSize() < 100) {
             asyncContext = request.startAsync(request, response);
@@ -49,6 +50,9 @@ public abstract class ActionInvoker implements Runnable {
             }
 
             after();
+
+            //todo process ModelAndView, but before it, check for nit null
+            mav.process(response.getWriter());
         } catch (Throwable th) {
             //todo impl http error send
             th.printStackTrace();

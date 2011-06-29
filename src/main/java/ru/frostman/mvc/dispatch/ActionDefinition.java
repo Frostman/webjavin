@@ -37,7 +37,6 @@ public class ActionDefinition {
     }
 
     public ActionInvoker initInvoker(HttpServletRequest request, HttpServletResponse response) {
-        //todo may be generate one big class that contains ActionInvoker and ActionDefinition
         try {
             return invokerClassConstructor.newInstance(request, response);
         } catch (Exception e) {

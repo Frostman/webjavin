@@ -1,4 +1,4 @@
-package ru.frostman.mvc.util;
+package ru.frostman.mvc;
 
 /**
  * @author slukjanov aka Frostman

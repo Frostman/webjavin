@@ -3,10 +3,11 @@ package ru.frostman.mvc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.classloading.FrostyClasses;
+import ru.frostman.mvc.util.FrostyConfig;
+import ru.frostman.mvc.view.FrostyViews;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.Arrays;
 
 /**
  * @author slukjanov aka Frostman
@@ -17,12 +18,15 @@ public class FrostyContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
+            freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
+
             Frosty.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
             Frosty.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
 
             Frosty.setApplicationPath(sce.getServletContext().getRealPath("/"));
-            Frosty.setBasePackages(Arrays.asList(sce.getServletContext().getInitParameter("basePackages").split(":")));
             Frosty.setClasses(new FrostyClasses());
+            Frosty.setViews(new FrostyViews());
+            Frosty.setMode(FrostyConfig.getMode());
 
             log.info("Frosty context initialized successfully");
         } catch (Throwable th) {

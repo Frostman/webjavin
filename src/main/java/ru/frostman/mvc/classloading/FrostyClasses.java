@@ -11,6 +11,7 @@ import ru.frostman.mvc.classloading.enhance.Enhancer;
 import ru.frostman.mvc.dispatch.ActionDefinition;
 import ru.frostman.mvc.dispatch.Dispatcher;
 import ru.frostman.mvc.secure.FrostySecurityManager;
+import ru.frostman.mvc.util.FrostyConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class FrostyClasses {
     /**
      * All application classes stored by name
      */
-    private Map<String, FrostyClass> classes = Maps.newLinkedHashMap();
+    private final Map<String, FrostyClass> classes = Maps.newLinkedHashMap();
 
     /**
      * Current class loader instance
@@ -43,8 +44,9 @@ public class FrostyClasses {
     private FrostySecurityManager securityManager;
 
     public FrostyClasses() {
-        //todo do update iff prod mode enabled
-        // update();
+        if (Frosty.getMode().isProductionMode()) {
+            update();
+        }
     }
 
     /**
@@ -54,14 +56,14 @@ public class FrostyClasses {
      * @return true iff class loader changed
      */
     public boolean update() {
-        //todo check that update runs not each 10 ms, synchronize it staticly
+        //todo check that update runs not each 10 ms, synchronize it static
 
         log.debug("Searching for new, changed or removed classes");
         long start = System.currentTimeMillis();
 
-        boolean needReload = false;
+        boolean needReload = FrostyConfig.update();
 
-        List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(Frosty.getBasePackages());
+        List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(FrostyConfig.getApplicationPackages());
 
         Set<String> existedClassNames = Sets.newHashSet(classes.keySet());
         Set<String> foundClassNames = Sets.newHashSet();
@@ -145,8 +147,6 @@ public class FrostyClasses {
                     classes.remove(frostyClass.getName());
                 }
             }
-
-            //todo посортировать классы так чтобы они энчансились в нужном порядке (суперклассы раньше потомков) мб рекурсивно
 
             List<ActionDefinition> actionDefinitions = Lists.newLinkedList();
             //todo think about enhancing all classes or not (classesToEnhance)

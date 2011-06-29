@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class FrostyThreadFactory implements ThreadFactory {
 
-    private AtomicInteger threadNumber = new AtomicInteger();
-    private ThreadGroup group;
+    private final AtomicInteger threadNumber = new AtomicInteger();
+    private final ThreadGroup group;
     private final String threadNamePrefix;
 
     public FrostyThreadFactory(String poolName) {

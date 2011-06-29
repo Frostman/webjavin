@@ -11,9 +11,9 @@ import java.security.NoSuchAlgorithmException;
 /**
  * @author slukjanov aka Frostman
  */
-public class ClassFile {
-    private String className;
-    private File file;
+class ClassFile {
+    private final String className;
+    private final File file;
     private byte[] bytes;
 
     public ClassFile(String className, File file) {

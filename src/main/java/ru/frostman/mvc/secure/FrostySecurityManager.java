@@ -7,6 +7,6 @@ import java.util.Arrays;
  */
 public class FrostySecurityManager {
     public <T> void check(Class<T> clazz, String method, String expression, Object[] args) {
-        System.out.println("SECURE - CHECK: " + clazz.getName() + "#" + method + " :: " + expression + "\nargs:" + Arrays.toString(args));
+        System.out.println("SECURE - CHECK: " + clazz.getName() + "#" + method + " :: " + expression + "\n args:" + Arrays.toString(args));
     }
 }

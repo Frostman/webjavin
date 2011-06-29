@@ -2,9 +2,7 @@ package ru.frostman.mvc;
 
 import ru.frostman.mvc.classloading.FrostyClasses;
 import ru.frostman.mvc.util.FrostyInvoker;
-
-import java.util.Collections;
-import java.util.List;
+import ru.frostman.mvc.view.FrostyViews;
 
 /**
  * Main class of Frosty framework, that encapsulates most of all
@@ -14,6 +12,12 @@ import java.util.List;
  * @author slukjanov aka Frostman
  */
 public final class Frosty {
+
+    /**
+     * Current application mode
+     */
+    private static FrostyMode mode;
+
     /**
      * Major version of the Servlet API that current servlet container supports
      */
@@ -30,19 +34,26 @@ public final class Frosty {
     private static String applicationPath;
 
     /**
-     * Base packages, where application classes will find
-     */
-    private static List<String> basePackages;
-
-    /**
      * Application classes and tools to update and use them, such as class loader
      */
     private static FrostyClasses classes;
 
     /**
+     * Application views, like templates and codec
+     */
+    private static FrostyViews views;
+
+    /**
      * Executor
      */
     private static FrostyInvoker invoker;
+
+    /**
+     * @return current application mode
+     */
+    public static FrostyMode getMode() {
+        return mode;
+    }
 
     /**
       * @return true iff current servlet container supports async api
@@ -52,17 +63,17 @@ public final class Frosty {
     }
 
     /**
-     * @return base packages, where application classes will find
-     */
-    public static List<String> getBasePackages() {
-        return basePackages;
-    }
-
-    /**
      * @return application classes and tools to update and use them
      */
     public static FrostyClasses getClasses() {
         return classes;
+    }
+
+    /**
+     * @return application views
+     */
+    public static FrostyViews getViews() {
+        return views;
     }
 
     /**
@@ -79,6 +90,10 @@ public final class Frosty {
         return invoker;
     }
 
+    static void setMode(FrostyMode mode) {
+        Frosty.mode = mode;
+    }
+
     static void setServletApiMajorVersion(int servletApiMajorVersion) {
         Frosty.servletApiMajorVersion = servletApiMajorVersion;
     }
@@ -87,16 +102,16 @@ public final class Frosty {
         Frosty.servletApiMinorVersion = servletApiMinorVersion;
     }
 
-    static void setBasePackages(List<String> basePackages) {
-        Frosty.basePackages = Collections.unmodifiableList(basePackages);
-    }
-
     static void setClasses(FrostyClasses classes) {
         Frosty.classes = classes;
     }
 
     static void setApplicationPath(String applicationPath) {
         Frosty.applicationPath = applicationPath;
+    }
+
+    static void setViews(FrostyViews views) {
+        Frosty.views = views;
     }
 
     public static void setInvoker(FrostyInvoker invoker) {

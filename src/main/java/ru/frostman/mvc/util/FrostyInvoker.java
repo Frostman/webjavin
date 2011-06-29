@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  */
 public class FrostyInvoker {
     //todo remove hard code
-    private ThreadPoolExecutor executor = new ThreadPoolExecutor(
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
             Runtime.getRuntime().availableProcessors() - 1, Runtime.getRuntime().availableProcessors() - 1,
             10, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>(), new FrostyThreadFactory("frosty-executor")
     );

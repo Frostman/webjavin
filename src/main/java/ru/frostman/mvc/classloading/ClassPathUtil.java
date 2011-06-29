@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * @author slukjanov aka Frostman
  */
-public class ClassPathUtil {
+class ClassPathUtil {
     private static final Logger log = LoggerFactory.getLogger(ClassPathUtil.class);
     private static final String CLASS = ".class";
 
