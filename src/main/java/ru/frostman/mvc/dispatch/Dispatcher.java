@@ -1,6 +1,7 @@
 package ru.frostman.mvc.dispatch;
 
 import com.google.common.collect.Lists;
+import ru.frostman.mvc.util.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,9 +19,10 @@ public class Dispatcher {
 
     public ActionInvoker dispatch(HttpServletRequest request, HttpServletResponse response) {
         final String requestUrl = request.getRequestURI();
+        final HttpMethod requestMethod = HttpMethod.valueOf(request.getMethod());
 
         for (ActionDefinition definition : actions) {
-            if (definition.matches(requestUrl)) {
+            if (definition.matches(requestUrl, requestMethod)) {
                 return definition.initInvoker(request, response);
             }
         }

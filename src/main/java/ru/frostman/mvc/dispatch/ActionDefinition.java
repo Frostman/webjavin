@@ -1,6 +1,7 @@
 package ru.frostman.mvc.dispatch;
 
 import ru.frostman.mvc.dispatch.url.UrlPattern;
+import ru.frostman.mvc.util.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,9 +32,8 @@ public class ActionDefinition {
         }
     }
 
-    public boolean matches(String url) {
-        //todo impl http methods checking
-        return urlPattern.matches(url);
+    public boolean matches(String url, HttpMethod method) {
+        return urlPattern.matches(url, method);
     }
 
     public ActionInvoker initInvoker(HttpServletRequest request, HttpServletResponse response) {

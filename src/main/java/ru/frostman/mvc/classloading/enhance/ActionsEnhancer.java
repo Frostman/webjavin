@@ -1,10 +1,12 @@
 package ru.frostman.mvc.classloading.enhance;
 
+import com.google.common.collect.Sets;
 import javassist.*;
 import ru.frostman.mvc.annotation.*;
 import ru.frostman.mvc.classloading.FrostyClass;
 import ru.frostman.mvc.dispatch.ActionDefinition;
 import ru.frostman.mvc.dispatch.url.UrlPatternType;
+import ru.frostman.mvc.util.HttpMethod;
 
 import java.util.List;
 import java.util.Map;
@@ -35,11 +37,11 @@ class ActionsEnhancer {
             try {
                 Action actionAnnotation = (Action) actionMethod.getAnnotation(Action.class);
                 String[] urls = actionAnnotation.value();
-                //todo: HttpMethod[] methods = actionAnnotation.method();
+                HttpMethod[] methods = actionAnnotation.method();
                 boolean async = actionAnnotation.async();
 
                 //todo check actionMethod here
-                if(CtClass.voidType == actionMethod.getReturnType()) {
+                if (CtClass.voidType == actionMethod.getReturnType()) {
                     throw new RuntimeException();
                 }
 
@@ -53,9 +55,9 @@ class ActionsEnhancer {
                 classes.put(actionInvoker.getName(), generated);
 
                 for (String url : urls) {
-                    //todo impl http methods checking
-                    actionDefinitions.add(new ActionDefinition(UrlPatternType.get(url, UrlPatternType.SERVLET),
-                            actionInvoker.getName()));
+                    //todo impl using regex url pattern type
+                    actionDefinitions.add(new ActionDefinition(UrlPatternType.get(url, UrlPatternType.SERVLET,
+                            Sets.newHashSet(methods)), actionInvoker.getName()));
                 }
             } catch (Exception e) {
                 //todo impl
