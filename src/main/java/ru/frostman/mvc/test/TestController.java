@@ -12,7 +12,7 @@ import java.io.IOException;
 public class TestController {
     @Action("/*")
     public String test2(Model model, @Param("a") String param) throws IOException {
-        model.put("testParam", param);
+        model.getAndPut("testParam", param);
 
         return "test.ftl";
     }

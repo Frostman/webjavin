@@ -20,13 +20,13 @@ public class FrostyContextListener implements ServletContextListener {
         try {
             freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
 
+            Frosty.setMode(FrostyConfig.getMode());
             Frosty.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
             Frosty.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
 
             Frosty.setApplicationPath(sce.getServletContext().getRealPath("/"));
             Frosty.setClasses(new FrostyClasses());
             Frosty.setViews(new FrostyViews());
-            Frosty.setMode(FrostyConfig.getMode());
 
             log.info("Frosty context initialized successfully");
         } catch (Throwable th) {

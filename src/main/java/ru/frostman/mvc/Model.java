@@ -48,19 +48,35 @@ public class Model {
         return map.get(key);
     }
 
-    public Object put(String key, Object value) {
+    public Object getAndPut(String key, Object value) {
         return map.put(key, value);
     }
 
-    public Object remove(String key) {
+    public Model get(String key, Object value) {
+        map.put(key, value);
+
+        return this;
+    }
+
+    public Object getAndRemove(String key) {
         return map.remove(key);
     }
 
-    public void putAll(Map<? extends String, ?> m) {
-        map.putAll(m);
+    public Model remove(String key) {
+        map.remove(key);
+
+        return this;
     }
 
-    public void clear() {
+    public Model putAll(Map<? extends String, ?> m) {
+        map.putAll(m);
+
+        return this;
+    }
+
+    public Model clear() {
         map.clear();
+
+        return this;
     }
 }

@@ -9,6 +9,10 @@ public class Controllers {
         //todo impl
     }
 
+    public static void forward(String url) {
+        //todo impl
+    }
+
     public static <T> T getController(Class<T> controllerClass) {
         //todo impl
         return null;

@@ -15,6 +15,7 @@ public class FrostyConfig {
     private static FrostyMode mode;
     private static List<String> applicationPackages;
     private static String templatesPath;
+    private static long updateInterval;
 
     static {
         update();
@@ -35,6 +36,8 @@ public class FrostyConfig {
             mode = FrostyMode.parseMode(properties.getProperty("frosty.mode"));
             applicationPackages = Arrays.asList(properties.getProperty("base.packages", "").split(":"));
             templatesPath = properties.getProperty("templates.path", "templates");
+
+            updateInterval = Long.parseLong(properties.getProperty("frosty.updateInterval", "1000"));
         } catch (Exception e) {
             //todo impl
             throw new RuntimeException(e);
@@ -53,5 +56,9 @@ public class FrostyConfig {
 
     public static String getTemplatesPath() {
         return templatesPath;
+    }
+
+    public static long getUpdateInterval() {
+        return updateInterval;
     }
 }
