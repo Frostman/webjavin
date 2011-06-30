@@ -52,6 +52,12 @@ public class Model {
         return map.put(key, value);
     }
 
+    public Model put(String key, Object value) {
+        map.put(key, value);
+
+        return this;
+    }
+
     public Model get(String key, Object value) {
         map.put(key, value);
 
@@ -70,6 +76,29 @@ public class Model {
 
     public Model putAll(Map<? extends String, ?> m) {
         map.putAll(m);
+
+        return this;
+    }
+
+    //todo check this method
+    public Model putAll(Object... args) {
+        if (args.length % 2 != 0) {
+            //todo replace with Preconditions
+            throw new RuntimeException();
+        }
+
+        String name = null;
+        int idx = 0;
+        for (Object arg : args) {
+            if (idx % 2 == 0) {
+                //todo check type
+                name = (String) arg;
+            } else {
+                put(name, arg);
+            }
+
+            idx++;
+        }
 
         return this;
     }

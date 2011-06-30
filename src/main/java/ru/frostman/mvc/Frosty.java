@@ -56,7 +56,7 @@ public final class Frosty {
     }
 
     /**
-      * @return true iff current servlet container supports async api
+     * @return true iff current servlet container supports async api
      */
     public static boolean isAsyncApiSupported() {
         return servletApiMajorVersion >= 3;

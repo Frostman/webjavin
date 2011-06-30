@@ -67,12 +67,12 @@ public class FrostyClasses {
      * @return true iff class loader changed
      */
     public boolean update() {
-        UPDATE_LOCK.lock();
-
         if (System.currentTimeMillis() - lastUpdate < FrostyConfig.getUpdateInterval()) {
             return false;
         }
 
+        //todo think about sync
+        UPDATE_LOCK.lock();
         try {
             log.debug("Searching for new, changed or removed classes");
             long start = System.currentTimeMillis();

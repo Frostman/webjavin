@@ -30,6 +30,7 @@ class ActionsEnhancer {
     private static final String MODEL = "ru.frostman.mvc.Model";
     private static final String MODEL_AND_VIEW = "ru.frostman.mvc.ModelAndView";
     private static final String JAVA_LANG_STRING = "java.lang.String";
+    private static final String THROWABLE = "java.lang.Throwable";
 
     public static void enhance(Map<String, FrostyClass> classes, ClassPool classPool, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
@@ -40,8 +41,8 @@ class ActionsEnhancer {
                 HttpMethod[] methods = actionAnnotation.method();
                 boolean async = actionAnnotation.async();
 
-                //todo check actionMethod here
                 if (CtClass.voidType == actionMethod.getReturnType()) {
+                    //todo impl
                     throw new RuntimeException();
                 }
 
@@ -55,7 +56,6 @@ class ActionsEnhancer {
                 classes.put(actionInvoker.getName(), generated);
 
                 for (String url : urls) {
-                    //todo impl using regex url pattern type
                     actionDefinitions.add(new ActionDefinition(UrlPatternType.get(url, UrlPatternType.SERVLET,
                             Sets.newHashSet(methods)), actionInvoker.getName()));
                 }
@@ -80,7 +80,6 @@ class ActionsEnhancer {
 
         generateActionInvokerConstructor(classPool, actionInvoker, controller);
 
-        //todo check that all methods are public non static
         generateActionInvokerBefore(classPool, actionInvoker, controller);
         generateActionInvokerAction(classPool, actionInvoker, controller, actionMethod);
         generateActionInvokerAfter(classPool, actionInvoker, controller);
@@ -92,7 +91,7 @@ class ActionsEnhancer {
     }
 
     private static void generateActionInvokerConstructor(ClassPool classPool, CtClass actionInvoker, CtClass controller)
-            throws CannotCompileException {
+            throws CannotCompileException, ClassNotFoundException, NotFoundException {
         CtConstructor constructor = new CtConstructor(new CtClass[]{
                 getCtClass(classPool, "javax.servlet.http.HttpServletRequest"),
                 getCtClass(classPool, "javax.servlet.http.HttpServletResponse")
@@ -101,8 +100,14 @@ class ActionsEnhancer {
         StringBuilder body = new StringBuilder();
         body.append("{super($$);");
 
-        //todo impl constructor parameters injection
-        body.append(INSTANCE).append(" = new ").append(controller.getName()).append("();}");
+        CtConstructor[] constructors= controller.getConstructors();
+        if(constructors.length!=1) {
+            //todo impl
+            throw new RuntimeException("Only one constructor must be in controller");
+        }
+
+        StringBuilder parameters = resolveParameters(classPool, constructors[0], body);
+        body.append(INSTANCE).append(" = new ").append(controller.getName()).append("(").append(parameters).append(");}");
 
         constructor.setBody(body.toString());
 
@@ -110,12 +115,12 @@ class ActionsEnhancer {
     }
 
     private static void generateActionInvokerBefore(ClassPool classPool, CtClass actionInvoker, CtClass controller)
-            throws CannotCompileException, NotFoundException {
+            throws CannotCompileException, NotFoundException, ClassNotFoundException {
         CtMethod method = new CtMethod(CtClass.voidType, "before", new CtClass[]{}, actionInvoker);
 
         List<CtMethod> methodList = getMethodsAnnotatedWith(Before.class, controller);
 
-        generateActionInvokerMethodInvocations(method, methodList);
+        generateActionInvokerMethodInvocations(classPool, method, methodList);
 
         actionInvoker.addMethod(method);
     }
@@ -123,6 +128,12 @@ class ActionsEnhancer {
     private static void generateActionInvokerAction(ClassPool classPool, CtClass actionInvoker, CtClass controller,
                                                     CtMethod actionMethod)
             throws CannotCompileException, NotFoundException, ClassNotFoundException {
+
+        if (!isPublicAndNonStatic(actionMethod)) {
+            //todo impl
+            throw new RuntimeException();
+        }
+
         CtMethod method = new CtMethod(CtClass.voidType, "action", new CtClass[]{}, actionInvoker);
 
         StringBuilder body = new StringBuilder("{");
@@ -156,34 +167,48 @@ class ActionsEnhancer {
     }
 
     private static void generateActionInvokerAfter(ClassPool classPool, CtClass actionInvoker, CtClass controller)
-            throws CannotCompileException, NotFoundException {
+            throws CannotCompileException, NotFoundException, ClassNotFoundException {
         CtMethod method = new CtMethod(CtClass.voidType, "after", new CtClass[]{}, actionInvoker);
 
         List<CtMethod> methodList = getMethodsAnnotatedWith(After.class, controller);
 
-        generateActionInvokerMethodInvocations(method, methodList);
+        generateActionInvokerMethodInvocations(classPool, method, methodList);
 
         actionInvoker.addMethod(method);
     }
 
     private static void generateActionInvokerCatchError(ClassPool classPool, CtClass actionInvoker, CtClass controller)
-            throws CannotCompileException, NotFoundException {
+            throws CannotCompileException, NotFoundException, ClassNotFoundException {
         CtMethod method = new CtMethod(CtClass.voidType, "catchError",
                 new CtClass[]{getCtClass(classPool, "java.lang.Throwable")}, actionInvoker);
 
         List<CtMethod> methods = getMethodsAnnotatedWith(Catch.class, controller);
+        if (methods.size() > 1) {
+            //todo think about this
+            //todo impl
+            throw new RuntimeException();
+        }
 
         StringBuilder body = new StringBuilder("{");
         for (CtMethod invokeMethod : methods) {
             if (invokeMethod.getReturnType() != CtClass.voidType) {
                 //todo impl
                 throw new RuntimeException("!=void type");
+            } else if (!isPublicAndNonStatic(invokeMethod)) {
+                //todo impl
+                throw new RuntimeException("static || non public");
+            } else if (invokeMethod.getParameterTypes().length < 1 ||
+                    (!invokeMethod.getParameterTypes()[0].getName().equals(THROWABLE))) {
+                //todo impl
+                throw new RuntimeException("First arg isn't throwable");
             }
 
-            //todo add parameters resolving
+
+            StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
+
             body.append("{").append(INSTANCE).append(".")
                     .append(invokeMethod.getName())
-                    .append("($1);")
+                    .append("($1,").append(parameters).append(");")
                     .append("}");
         }
 
@@ -206,30 +231,35 @@ class ActionsEnhancer {
         actionInvoker.addMethod(method);
     }
 
-    private static void generateActionInvokerMethodInvocations(CtMethod method, List<CtMethod> methods)
-            throws NotFoundException, CannotCompileException {
+    private static void generateActionInvokerMethodInvocations(ClassPool classPool, CtMethod method, List<CtMethod> methods)
+            throws NotFoundException, CannotCompileException, ClassNotFoundException {
         StringBuilder body = new StringBuilder("{");
         for (CtMethod invokeMethod : methods) {
             if (invokeMethod.getReturnType() != CtClass.voidType) {
                 //todo impl
                 throw new RuntimeException("!=void type");
+            } else if (!isPublicAndNonStatic(invokeMethod)) {
+                //todo impl
+                throw new RuntimeException("static || non public");
             }
 
-            //todo add parameters resolving
+            StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
+
             body.append("{").append(INSTANCE).append(".")
                     .append(invokeMethod.getName())
-                    .append("();")
+                    .append("(").append(parameters).append(");")
                     .append("}");
         }
 
         method.setBody(body.append("}").toString());
     }
 
-    private static StringBuilder resolveParameters(ClassPool classPool, CtMethod actionMethod, StringBuilder body) throws ClassNotFoundException, NotFoundException {
-        Object[][] annotations = actionMethod.getParameterAnnotations();
+    private static StringBuilder resolveParameters(ClassPool classPool, CtBehavior behavior, StringBuilder body)
+            throws ClassNotFoundException, NotFoundException {
+        Object[][] annotations = behavior.getParameterAnnotations();
         int idx = 0;
         StringBuilder parameters = new StringBuilder();
-        for (CtClass parameterType : actionMethod.getParameterTypes()) {
+        for (CtClass parameterType : behavior.getParameterTypes()) {
             //todo add comments for each generated line of code
             if (parameterType.equals(getCtClass(classPool, HTTP_SERVLET_REQUEST))) {
                 body.append(HTTP_SERVLET_REQUEST).append(" $param$").append(idx).append(" = request;");
@@ -246,15 +276,21 @@ class ActionsEnhancer {
             } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
                 if (!parameterType.equals(getCtClass(classPool, "java.lang.String"))) {
                     //todo impl auto converting or exception
+                    //todo impl
+                    throw new RuntimeException("Currently unsupported");
                 }
 
                 Param paramAnnotation = isAnnotatedWith(annotations[idx], Param.class);
-                //todo check iff required
                 body.append("String $param$").append(idx).append(" = request.getParameter(\"")
                         .append(paramAnnotation.value()).append("\");");
+                if (paramAnnotation.required()) {
+                    body.append("if($param$").append(idx).append(" == null) {" +
+                            //todo impl new exception
+                            "throw new RuntimeException(\"required\");"
+                            + "}");
+                }
             } else {
-                //todo unsupported param, check that this param required
-                throw new RuntimeException("Unsupported parameter type!!");
+                throw new RuntimeException("Unsupported parameter type!! (and not marked as @Param)");
             }
 
             parameters.append("$param$").append(idx);
@@ -265,4 +301,11 @@ class ActionsEnhancer {
         }
         return parameters;
     }
+
+    private static boolean isPublicAndNonStatic(CtMethod method) {
+        int mod = method.getModifiers();
+
+        return Modifier.isPublic(mod) && (!Modifier.isStatic(mod));
+    }
 }
+

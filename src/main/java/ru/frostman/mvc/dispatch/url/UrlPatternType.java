@@ -25,7 +25,7 @@ public enum UrlPatternType {
         }
     }
 
-    private static abstract class BaseUrlPattern implements UrlPattern{
+    private static abstract class BaseUrlPattern implements UrlPattern {
         private final Set<HttpMethod> methods;
 
         public BaseUrlPattern(Set<HttpMethod> methods) {
@@ -37,7 +37,7 @@ public enum UrlPatternType {
         }
     }
 
-    private static class ServletStyleUrlPattern extends BaseUrlPattern{
+    private static class ServletStyleUrlPattern extends BaseUrlPattern {
         private final String pattern;
         private final Type type;
 
@@ -62,7 +62,7 @@ public enum UrlPatternType {
             Preconditions.checkNotNull(url, "Url can't be null");
             Preconditions.checkNotNull(method, "HttpMethod can't be null");
 
-            if(!matchesMethod(method)) {
+            if (!matchesMethod(method)) {
                 return false;
             }
 
@@ -81,7 +81,7 @@ public enum UrlPatternType {
         }
     }
 
-    private static class RegexStyleUrlPattern extends BaseUrlPattern{
+    private static class RegexStyleUrlPattern extends BaseUrlPattern {
         private final Pattern pattern;
 
         public RegexStyleUrlPattern(String pattern, Set<HttpMethod> methods) {
