@@ -2,6 +2,8 @@ package ru.frostman.mvc.dispatch;
 
 import ru.frostman.mvc.Frosty;
 import ru.frostman.mvc.ModelAndView;
+import ru.frostman.mvc.thr.FrostyRuntimeException;
+import ru.frostman.mvc.util.FrostyConfig;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +27,7 @@ public abstract class ActionInvoker implements Runnable {
     }
 
     public void invoke() {
-        //todo remove hard code
-        if (async && Frosty.isAsyncApiSupported() && Frosty.getInvoker().getQueueSize() < 100) {
+        if (async && Frosty.isAsyncApiSupported() && Frosty.getInvoker().getQueueSize() < FrostyConfig.getAsyncQueueLength()) {
             asyncContext = request.startAsync(request, response);
             //todo think about async listener
             Frosty.getInvoker().execute(this);
@@ -51,7 +52,9 @@ public abstract class ActionInvoker implements Runnable {
 
             after();
 
-            //todo process ModelAndView, but before it, check for nit null
+            if (mav == null || mav.getModel() == null || mav.getView() == null) {
+                throw new FrostyRuntimeException("ModelAndView or Model or View are undefined after action invoked");
+            }
             mav.process(response.getWriter());
         } catch (Throwable th) {
             //todo impl http error send

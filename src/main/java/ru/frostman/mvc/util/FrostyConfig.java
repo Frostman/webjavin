@@ -1,9 +1,15 @@
 package ru.frostman.mvc.util;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.InputSupplier;
 import ru.frostman.mvc.FrostyMode;
+import ru.frostman.mvc.thr.FrostyRuntimeException;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -12,38 +18,65 @@ import java.util.Properties;
  * @author slukjanov aka Frostman
  */
 public class FrostyConfig {
+    private static String prevHashCode = "";
+
     private static FrostyMode mode;
     private static List<String> applicationPackages;
     private static String templatesPath;
     private static long updateInterval;
+    private static int asyncQueueLength;
 
     static {
         update();
     }
 
-    public static boolean update() {
-
-        //todo impl return true iff changed
+    public synchronized static boolean update() {
         try {
+
             Properties properties = new Properties();
-            final InputStream propertiesStream = FrostyConfig.class.getResourceAsStream("/frosty.conf");
+            final InputStream propertiesStream = getConfigStream();
             if (propertiesStream == null) {
-                //todo impl
-                throw new RuntimeException("Can't find properties file");
+                throw new FrostyRuntimeException("Can't find properties file");
             }
             properties.load(propertiesStream);
+            String currHashCode = getConfigHashCode();
 
             mode = FrostyMode.parseMode(properties.getProperty("frosty.mode"));
             applicationPackages = Arrays.asList(properties.getProperty("base.packages", "").split(":"));
             templatesPath = properties.getProperty("templates.path", "templates");
 
             updateInterval = Long.parseLong(properties.getProperty("frosty.updateInterval", "1000"));
+            asyncQueueLength = Integer.parseInt(properties.getProperty("frosty.async.queueLength", "100"));
+
+            if (!currHashCode.equals(prevHashCode)) {
+                prevHashCode = currHashCode;
+                return true;
+            }
+            return false;
         } catch (Exception e) {
-            //todo impl
+            throw new FrostyRuntimeException("Can't load framework configuration");
+        }
+    }
+
+    private static InputStream getConfigStream() {
+        return FrostyConfig.class.getResourceAsStream("/frosty.conf");
+    }
+
+    private static String getConfigHashCode() {
+        //todo need to cache MessageDigest
+
+        try {
+            return Hex.encode(ByteStreams.getDigest(new InputSupplier<InputStream>() {
+                @Override
+                public InputStream getInput() throws IOException {
+                    return getConfigStream();
+                }
+            }, MessageDigest.getInstance("sha-1")));
+        } catch (IOException e) {
+            throw new RuntimeException("Can't read file: ", e);
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-
-        return false;
     }
 
     public static FrostyMode getMode() {
@@ -60,5 +93,9 @@ public class FrostyConfig {
 
     public static long getUpdateInterval() {
         return updateInterval;
+    }
+
+    public static int getAsyncQueueLength() {
+        return asyncQueueLength;
     }
 }

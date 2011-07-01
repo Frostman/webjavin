@@ -1,6 +1,7 @@
 package ru.frostman.mvc.dispatch;
 
 import ru.frostman.mvc.dispatch.url.UrlPattern;
+import ru.frostman.mvc.thr.ActionInitializationException;
 import ru.frostman.mvc.util.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,8 +28,8 @@ public class ActionDefinition {
             invokerClass = (Class<? extends ActionInvoker>) classLoader.loadClass(invokerClassName);
             invokerClassConstructor = invokerClass.getConstructor(HttpServletRequest.class, HttpServletResponse.class);
         } catch (Exception e) {
-            //todo impl
-            throw new RuntimeException(e);
+            throw new ActionInitializationException("Can't initialize ActionDefinition for ActionInvoker: "
+                    + invokerClass.getName());
         }
     }
 
@@ -40,8 +41,7 @@ public class ActionDefinition {
         try {
             return invokerClassConstructor.newInstance(request, response);
         } catch (Exception e) {
-            //todo impl
-            throw new RuntimeException(e);
+            throw new ActionInitializationException("Can't initialize ActionInvoker: " + invokerClass.getName());
         }
     }
 

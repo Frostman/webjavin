@@ -228,10 +228,10 @@ class ActionsEnhancer {
         for (CtMethod invokeMethod : methods) {
             if (invokeMethod.getReturnType() != CtClass.voidType) {
                 throw new ActionEnhancerException("Method marked with @After or @Before should return void: "
-                +invokeMethod.getLongName());
+                        + invokeMethod.getLongName());
             } else if (!isPublicAndNonStatic(invokeMethod)) {
                 throw new ActionEnhancerException("Method marked with @After or @Before should be public and non static: "
-                +invokeMethod.getLongName());
+                        + invokeMethod.getLongName());
             }
 
             StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
@@ -266,8 +266,8 @@ class ActionsEnhancer {
                 body.append(MODEL).append(" $param$").append(idx).append(" = mav.getModel();");
             } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
                 if (!parameterType.equals(getCtClass(classPool, "java.lang.String"))) {
-                    throw new ActionEnhancerException("Auto converted method argument type "+parameterType.getName()
-                            + " is currently unsupported: "+behavior.getLongName());
+                    throw new ActionEnhancerException("Auto converted method argument type " + parameterType.getName()
+                            + " is currently unsupported: " + behavior.getLongName());
                 }
 
                 Param paramAnnotation = isAnnotatedWith(annotations[idx], Param.class);
@@ -279,8 +279,8 @@ class ActionsEnhancer {
                             + "}");
                 }
             } else {
-                throw new ActionEnhancerException("Unsupported auto injected method argument type "+parameterType
-                        +": "+behavior.getLongName());
+                throw new ActionEnhancerException("Unsupported auto injected method argument type " + parameterType
+                        + ": " + behavior.getLongName());
             }
 
             parameters.append("$param$").append(idx);

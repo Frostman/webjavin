@@ -146,8 +146,6 @@ public class FrostyClasses {
             }
 
             if (needReload) {
-                //todo trying to update without reload (using hot swap)
-
                 log.debug("Application classes is need to reload");
                 if (log.isInfoEnabled()) {
                     start = System.currentTimeMillis();

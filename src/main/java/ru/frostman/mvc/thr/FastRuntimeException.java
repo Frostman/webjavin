@@ -3,7 +3,7 @@ package ru.frostman.mvc.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class FastRuntimeException extends RuntimeException{
+public class FastRuntimeException extends RuntimeException {
     public FastRuntimeException() {
     }
 

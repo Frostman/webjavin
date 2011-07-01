@@ -3,7 +3,7 @@ package ru.frostman.mvc.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class DefaultActionCatch extends FrostyRuntimeException{
+public class DefaultActionCatch extends FrostyRuntimeException {
     public DefaultActionCatch() {
     }
 

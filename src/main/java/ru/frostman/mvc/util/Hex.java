@@ -23,9 +23,4 @@ public final class Hex {
 
         return new String(result);
     }
-
-    public static byte[] decode(String hex) {
-        //todo impl
-        throw new AssertionError("Not implemented");
-    }
 }

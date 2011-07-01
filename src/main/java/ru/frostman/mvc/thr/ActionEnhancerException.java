@@ -3,7 +3,7 @@ package ru.frostman.mvc.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class ActionEnhancerException extends FrostyRuntimeException{
+public class ActionEnhancerException extends BytecodeManipulationException {
     public ActionEnhancerException() {
     }
 

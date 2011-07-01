@@ -5,6 +5,7 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import ru.frostman.mvc.Frosty;
 import ru.frostman.mvc.annotation.Secure;
+import ru.frostman.mvc.thr.BytecodeManipulationException;
 
 /**
  * @author slukjanov aka Frostman
@@ -20,7 +21,7 @@ public class SecurityEnhancer {
                         + ((Secure) method.getAnnotation(Secure.class)).value()
                         + "\", $args);}");
             } catch (Exception e) {
-                throw new EnhancerUtil.BytecodeManipulationException("Error in enhancing @Secure method", e);
+                throw new BytecodeManipulationException("Error in enhancing @Secure method", e);
             }
         }
     }

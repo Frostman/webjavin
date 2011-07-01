@@ -3,7 +3,7 @@ package ru.frostman.mvc.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyRuntimeException extends RuntimeException{
+public class FrostyRuntimeException extends RuntimeException {
     public FrostyRuntimeException() {
     }
 

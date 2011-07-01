@@ -5,6 +5,7 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
+import ru.frostman.mvc.thr.BytecodeManipulationException;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -13,8 +14,6 @@ import java.util.List;
  * @author slukjanov aka Frostman
  */
 public class EnhancerUtil {
-
-    //todo add Preconditions to check states and params
 
     public static CtClass createCtClass(ClassPool classPool, String superClassName, String genClassName
             , String... interfaces) throws BytecodeManipulationException {
@@ -74,7 +73,8 @@ public class EnhancerUtil {
      *
      * @return list of annotated methods including inherited
      *
-     * @throws BytecodeManipulationException iff any error
+     * @throws ru.frostman.mvc.thr.BytecodeManipulationException
+     *          iff any error
      */
     public static List<CtMethod> getMethodsAnnotatedWith(Class<? extends Annotation> annotation
             , CtClass ctClass) throws BytecodeManipulationException {
@@ -110,20 +110,4 @@ public class EnhancerUtil {
         return null;
     }
 
-    public static class BytecodeManipulationException extends RuntimeException {
-        public BytecodeManipulationException() {
-        }
-
-        public BytecodeManipulationException(String message) {
-            super(message);
-        }
-
-        public BytecodeManipulationException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public BytecodeManipulationException(Throwable cause) {
-            super(cause);
-        }
-    }
 }

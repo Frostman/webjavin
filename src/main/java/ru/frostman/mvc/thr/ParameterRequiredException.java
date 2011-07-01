@@ -3,7 +3,7 @@ package ru.frostman.mvc.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class ParameterRequiredException extends RuntimeException{
+public class ParameterRequiredException extends RuntimeException {
     public ParameterRequiredException() {
     }
 
