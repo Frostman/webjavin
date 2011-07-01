@@ -7,6 +7,8 @@ import javassist.NotFoundException;
 import ru.frostman.mvc.classloading.FrostyClass;
 import ru.frostman.mvc.classloading.FrostyClasses;
 import ru.frostman.mvc.dispatch.ActionDefinition;
+import ru.frostman.mvc.thr.EnhancerException;
+import ru.frostman.mvc.thr.FrostyRuntimeException;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -26,7 +28,6 @@ public class Enhancer {
     public static void enhance(Map<String, FrostyClass> classes, FrostyClass frostyClass,
                                List<ActionDefinition> actionDefinitions) {
         if (frostyClass.isGenerated() || frostyClass.getEnhancedBytecode() != null) {
-            //todo think about generated classes
             return;
         }
 
@@ -34,8 +35,7 @@ public class Enhancer {
         try {
             ctClass = classPool.makeClass(new ByteArrayInputStream(frostyClass.getBytecode()));
         } catch (Exception e) {
-            //todo impl
-            throw new RuntimeException(e);
+            throw new EnhancerException(e);
         }
 
         try {
@@ -45,8 +45,7 @@ public class Enhancer {
                 Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions);
             }
         } catch (NotFoundException e) {
-            //todo impl
-            throw new RuntimeException(e);
+            throw new FrostyRuntimeException(e);
         }
 
         ActionsEnhancer.enhance(classes, classPool, ctClass, actionDefinitions);
@@ -56,8 +55,7 @@ public class Enhancer {
         try {
             frostyClass.setEnhancedBytecode(ctClass.toBytecode());
         } catch (Exception e) {
-            //todo impl
-            throw new RuntimeException(e);
+            throw new EnhancerException(e);
         }
 
         ctClass.defrost();

@@ -13,5 +13,4 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Catch {
-    //todo check that @catch method is only one
 }

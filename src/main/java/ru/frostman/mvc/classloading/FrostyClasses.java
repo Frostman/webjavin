@@ -71,11 +71,13 @@ public class FrostyClasses {
             return false;
         }
 
-        //todo think about sync
         UPDATE_LOCK.lock();
         try {
-            log.debug("Searching for new, changed or removed classes");
-            long start = System.currentTimeMillis();
+            long start = 0;
+            if (log.isDebugEnabled()) {
+                log.debug("Searching for new, changed or removed classes");
+                start = System.currentTimeMillis();
+            }
 
             boolean needReload = FrostyConfig.update();
 
@@ -83,7 +85,6 @@ public class FrostyClasses {
 
             Set<String> existedClassNames = Sets.newHashSet(classes.keySet());
             Set<String> foundClassNames = Sets.newHashSet();
-            List<String> classesToEnhance = Lists.newLinkedList();
             for (ClassFile classFile : foundClasses) {
                 final String className = classFile.getClassName();
                 foundClassNames.add(className);
@@ -100,8 +101,6 @@ public class FrostyClasses {
                     newClass.setHashCode(classFile.getHashCode());
                     newClass.setBytecode(classFile.getBytes());
                     classes.put(className, newClass);
-
-                    classesToEnhance.add(className);
 
                     log.debug("Application class added: {}", className);
                 } else {
@@ -123,8 +122,6 @@ public class FrostyClasses {
                         changedClass.setBytecode(classFile.getBytes());
                         classes.put(className, changedClass);
 
-                        classesToEnhance.add(className);
-
                         log.debug("Application class changed: {}", className);
                     }
                 }
@@ -134,7 +131,6 @@ public class FrostyClasses {
 
             for (String removedClassName : existedClassNames) {
                 if (removedClassName.contains("$action$")) {
-                    //todo impl skip generated classes
                     continue;
                 }
 
@@ -145,7 +141,6 @@ public class FrostyClasses {
                 log.debug("Application class removed: {}", removedClassName);
             }
 
-            //todo find all log.debug with System.currentTimeMillis and wrap them with if(debug)
             if (log.isDebugEnabled()) {
                 log.debug("Application classes scan completed ({}ms)", System.currentTimeMillis() - start);
             }
@@ -154,7 +149,9 @@ public class FrostyClasses {
                 //todo trying to update without reload (using hot swap)
 
                 log.debug("Application classes is need to reload");
-                start = System.currentTimeMillis();
+                if (log.isInfoEnabled()) {
+                    start = System.currentTimeMillis();
+                }
 
                 for (FrostyClass frostyClass : Lists.newLinkedList(classes.values())) {
                     frostyClass.setEnhancedBytecode(null);
@@ -165,9 +162,7 @@ public class FrostyClasses {
                 }
 
                 List<ActionDefinition> actionDefinitions = Lists.newLinkedList();
-                //todo think about enhancing all classes or not (classesToEnhance)
-                classesToEnhance = Lists.newLinkedList(classes.keySet());
-                for (String className : classesToEnhance) {
+                for (String className : Lists.newLinkedList(classes.keySet())) {
                     Enhancer.enhance(classes, classes.get(className), actionDefinitions);
                 }
 
@@ -180,11 +175,11 @@ public class FrostyClasses {
 
                 this.classLoader = newClassLoader;
                 this.dispatcher = new Dispatcher(actionDefinitions);
-
-                //todo impl it
                 this.securityManager = new FrostySecurityManager();
 
-                log.info("Application classes successfully reloaded ({}ms)", System.currentTimeMillis() - start);
+                if (log.isInfoEnabled()) {
+                    log.info("Application classes successfully reloaded ({}ms)", System.currentTimeMillis() - start);
+                }
             } else {
                 log.debug("Application classes is up to date");
             }

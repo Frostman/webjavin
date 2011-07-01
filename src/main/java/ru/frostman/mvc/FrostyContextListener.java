@@ -3,6 +3,7 @@ package ru.frostman.mvc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.classloading.FrostyClasses;
+import ru.frostman.mvc.thr.FastRuntimeException;
 import ru.frostman.mvc.util.FrostyConfig;
 import ru.frostman.mvc.view.FrostyViews;
 
@@ -32,15 +33,12 @@ public class FrostyContextListener implements ServletContextListener {
         } catch (Throwable th) {
             log.error("Initialization failed with: ", th);
 
-            //todo impl shutdown context
-            throw new RuntimeException();
+            throw new FastRuntimeException("Initialization failed");
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        //todo impl
-
         log.info("Frosty context destroyed successfully");
     }
 }

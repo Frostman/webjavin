@@ -1,5 +1,7 @@
 package ru.frostman.mvc;
 
+import com.google.common.base.Preconditions;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
@@ -21,10 +23,7 @@ public class ModelAndView {
     }
 
     public void process(PrintWriter writer) {
-        if (view == null) {
-            //todo impl
-            throw new RuntimeException();
-        }
+        Preconditions.checkNotNull(view, "View can't be null");
 
         view.process(model, writer);
     }

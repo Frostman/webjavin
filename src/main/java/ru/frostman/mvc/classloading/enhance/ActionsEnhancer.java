@@ -6,6 +6,7 @@ import ru.frostman.mvc.annotation.*;
 import ru.frostman.mvc.classloading.FrostyClass;
 import ru.frostman.mvc.dispatch.ActionDefinition;
 import ru.frostman.mvc.dispatch.url.UrlPatternType;
+import ru.frostman.mvc.thr.ActionEnhancerException;
 import ru.frostman.mvc.util.HttpMethod;
 
 import java.util.List;
@@ -42,8 +43,8 @@ class ActionsEnhancer {
                 boolean async = actionAnnotation.async();
 
                 if (CtClass.voidType == actionMethod.getReturnType()) {
-                    //todo impl
-                    throw new RuntimeException();
+                    throw new ActionEnhancerException("Action method should return some value (not void method): "
+                            + actionMethod.getLongName());
                 }
 
                 CtClass actionInvoker = generateActionInvoker(classPool, actionMethod, async);
@@ -60,8 +61,7 @@ class ActionsEnhancer {
                             Sets.newHashSet(methods)), actionInvoker.getName()));
                 }
             } catch (Exception e) {
-                //todo impl
-                throw new RuntimeException(e);
+                throw new ActionEnhancerException("Error while enhancing action: " + actionMethod.getLongName(), e);
             }
         }
     }
@@ -100,10 +100,9 @@ class ActionsEnhancer {
         StringBuilder body = new StringBuilder();
         body.append("{super($$);");
 
-        CtConstructor[] constructors= controller.getConstructors();
-        if(constructors.length!=1) {
-            //todo impl
-            throw new RuntimeException("Only one constructor must be in controller");
+        CtConstructor[] constructors = controller.getConstructors();
+        if (constructors.length != 1) {
+            throw new ActionEnhancerException("Only one constructor should be in controller: " + controller.getName());
         }
 
         StringBuilder parameters = resolveParameters(classPool, constructors[0], body);
@@ -130,8 +129,7 @@ class ActionsEnhancer {
             throws CannotCompileException, NotFoundException, ClassNotFoundException {
 
         if (!isPublicAndNonStatic(actionMethod)) {
-            //todo impl
-            throw new RuntimeException();
+            throw new ActionEnhancerException("Action method should be public and non static: " + actionMethod.getLongName());
         }
 
         CtMethod method = new CtMethod(CtClass.voidType, "action", new CtClass[]{}, actionInvoker);
@@ -153,15 +151,12 @@ class ActionsEnhancer {
             body.append("mav.setView(ru.frostman.mvc.Frosty.getViews().getViewByName((")
                     .append(JAVA_LANG_STRING).append(") result").append("));");
         } else {
-            //todo impl
-            throw new RuntimeException();
+            throw new ActionEnhancerException("Action method can't return specified type: " + actionMethod.getLongName());
         }
 
         body.append("}catch(Throwable th){throw new ru.frostman.mvc.dispatch.ActionException(th);}");
 
         method.setBody(body.append("}").toString());
-
-        //todo print to trace action specification for each action method
 
         actionInvoker.addMethod(method);
     }
@@ -184,25 +179,22 @@ class ActionsEnhancer {
 
         List<CtMethod> methods = getMethodsAnnotatedWith(Catch.class, controller);
         if (methods.size() > 1) {
-            //todo think about this
-            //todo impl
-            throw new RuntimeException();
+            throw new ActionEnhancerException("Only one method in controller should be marked with @Catch: "
+                    + controller.getName());
         }
 
         StringBuilder body = new StringBuilder("{");
         for (CtMethod invokeMethod : methods) {
             if (invokeMethod.getReturnType() != CtClass.voidType) {
-                //todo impl
-                throw new RuntimeException("!=void type");
+                throw new ActionEnhancerException("Method marked with @Catch should return void: " + invokeMethod.getLongName());
             } else if (!isPublicAndNonStatic(invokeMethod)) {
-                //todo impl
-                throw new RuntimeException("static || non public");
+                throw new ActionEnhancerException("Method marked with @Catch should be public and non static: "
+                        + invokeMethod.getLongName());
             } else if (invokeMethod.getParameterTypes().length < 1 ||
                     (!invokeMethod.getParameterTypes()[0].getName().equals(THROWABLE))) {
-                //todo impl
-                throw new RuntimeException("First arg isn't throwable");
+                throw new ActionEnhancerException("First argument of method marked with @Catch should be java.lang.Throwable: "
+                        + invokeMethod.getLongName());
             }
-
 
             StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
 
@@ -213,8 +205,7 @@ class ActionsEnhancer {
         }
 
         if (methods.size() == 0) {
-            //todo think about this
-            body.append("{throw new RuntimeException($1);}");
+            body.append("{throw new DefaultActionCatch($1);}");
         }
 
         method.setBody(body.append("}").toString());
@@ -236,11 +227,11 @@ class ActionsEnhancer {
         StringBuilder body = new StringBuilder("{");
         for (CtMethod invokeMethod : methods) {
             if (invokeMethod.getReturnType() != CtClass.voidType) {
-                //todo impl
-                throw new RuntimeException("!=void type");
+                throw new ActionEnhancerException("Method marked with @After or @Before should return void: "
+                +invokeMethod.getLongName());
             } else if (!isPublicAndNonStatic(invokeMethod)) {
-                //todo impl
-                throw new RuntimeException("static || non public");
+                throw new ActionEnhancerException("Method marked with @After or @Before should be public and non static: "
+                +invokeMethod.getLongName());
             }
 
             StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
@@ -275,9 +266,8 @@ class ActionsEnhancer {
                 body.append(MODEL).append(" $param$").append(idx).append(" = mav.getModel();");
             } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
                 if (!parameterType.equals(getCtClass(classPool, "java.lang.String"))) {
-                    //todo impl auto converting or exception
-                    //todo impl
-                    throw new RuntimeException("Currently unsupported");
+                    throw new ActionEnhancerException("Auto converted method argument type "+parameterType.getName()
+                            + " is currently unsupported: "+behavior.getLongName());
                 }
 
                 Param paramAnnotation = isAnnotatedWith(annotations[idx], Param.class);
@@ -285,12 +275,12 @@ class ActionsEnhancer {
                         .append(paramAnnotation.value()).append("\");");
                 if (paramAnnotation.required()) {
                     body.append("if($param$").append(idx).append(" == null) {" +
-                            //todo impl new exception
-                            "throw new RuntimeException(\"required\");"
+                            "throw new ParameterRequiredException(\"required\");"
                             + "}");
                 }
             } else {
-                throw new RuntimeException("Unsupported parameter type!! (and not marked as @Param)");
+                throw new ActionEnhancerException("Unsupported auto injected method argument type "+parameterType
+                        +": "+behavior.getLongName());
             }
 
             parameters.append("$param$").append(idx);

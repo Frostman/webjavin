@@ -60,7 +60,10 @@ public class FrostyClassLoader extends ClassLoader {
 
 
     public void loadAllClasses() {
-        long start = System.currentTimeMillis();
+        long start = 0;
+        if (log.isDebugEnabled()) {
+            start = System.currentTimeMillis();
+        }
 
         for (String name : classes.keySet()) {
             try {
@@ -70,7 +73,9 @@ public class FrostyClassLoader extends ClassLoader {
             }
         }
 
-        log.debug("All application classes loaded successfully ({}ms)", System.currentTimeMillis() - start);
+        if (log.isDebugEnabled()) {
+            log.debug("All application classes loaded successfully ({}ms)", System.currentTimeMillis() - start);
+        }
     }
 
     @Override
@@ -96,7 +101,11 @@ public class FrostyClassLoader extends ClassLoader {
     }
 
     private Class<?> loadApplicationClass(String name) {
-        long start = System.currentTimeMillis();
+        long start = 0;
+        if (log.isDebugEnabled()) {
+            start = System.currentTimeMillis();
+        }
+
         FrostyClass frostyClass = classes.get(name);
 
         if (frostyClass == null) {
@@ -109,7 +118,9 @@ public class FrostyClassLoader extends ClassLoader {
 
         frostyClass.setJavaClass(clazz);
 
-        log.debug("Application class defined and resolved: {} ({}ms)", name, System.currentTimeMillis() - start);
+        if (log.isDebugEnabled()) {
+            log.debug("Application class defined and resolved: {} ({}ms)", name, System.currentTimeMillis() - start);
+        }
 
         return clazz;
     }

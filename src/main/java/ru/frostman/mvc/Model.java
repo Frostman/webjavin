@@ -1,5 +1,6 @@
 package ru.frostman.mvc;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import javax.servlet.http.HttpServletRequest;
@@ -80,18 +81,21 @@ public class Model {
         return this;
     }
 
-    //todo check this method
+    /**
+     * key1, value1, key2, value2, etc
+     *
+     * @param args
+     *
+     * @return
+     */
     public Model putAll(Object... args) {
-        if (args.length % 2 != 0) {
-            //todo replace with Preconditions
-            throw new RuntimeException();
-        }
+        Preconditions.checkArgument(args.length % 2 == 0, "Model#putAll wait for key-value parameters");
 
         String name = null;
         int idx = 0;
         for (Object arg : args) {
             if (idx % 2 == 0) {
-                //todo check type
+                Preconditions.checkArgument(arg instanceof String);
                 name = (String) arg;
             } else {
                 put(name, arg);
