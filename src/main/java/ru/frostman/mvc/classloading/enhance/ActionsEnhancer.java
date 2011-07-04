@@ -81,7 +81,7 @@ class ActionsEnhancer {
         generateActionInvokerConstructor(classPool, actionInvoker, controller);
 
         generateActionInvokerBefore(classPool, actionInvoker, controller);
-        generateActionInvokerAction(classPool, actionInvoker, controller, actionMethod);
+        generateActionInvokerAction(classPool, actionInvoker, actionMethod);
         generateActionInvokerAfter(classPool, actionInvoker, controller);
 
         generateActionInvokerCatchError(classPool, actionInvoker, controller);
@@ -124,7 +124,7 @@ class ActionsEnhancer {
         actionInvoker.addMethod(method);
     }
 
-    private static void generateActionInvokerAction(ClassPool classPool, CtClass actionInvoker, CtClass controller,
+    private static void generateActionInvokerAction(ClassPool classPool, CtClass actionInvoker,
                                                     CtMethod actionMethod)
             throws CannotCompileException, NotFoundException, ClassNotFoundException {
 

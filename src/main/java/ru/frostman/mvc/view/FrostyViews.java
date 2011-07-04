@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author slukjanov aka Frostman
  */
 public class FrostyViews {
-    private Configuration freemarker;
+    private final Configuration freemarker;
 
     public FrostyViews() {
         freemarker = new Configuration();

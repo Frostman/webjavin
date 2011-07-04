@@ -13,7 +13,7 @@ import java.io.PrintWriter;
  * @author slukjanov aka Frostman
  */
 public class FreemarkerView extends View {
-    private Template template;
+    private final Template template;
 
     public FreemarkerView(Template template) {
         Preconditions.checkNotNull(template);
