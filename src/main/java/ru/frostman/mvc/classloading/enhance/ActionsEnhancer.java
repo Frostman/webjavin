@@ -27,9 +27,9 @@ class ActionsEnhancer {
     private static final String HTTP_SERVLET_RESPONSE = "javax.servlet.http.HttpServletResponse";
     private static final String SERVLET_RESPONSE = "javax.servlet.ServletResponse";
     private static final String ASYNC_CONTEXT = "javax.servlet.AsyncContext";
-    private static final String VIEW = "ru.frostman.mvc.View";
-    private static final String MODEL = "ru.frostman.mvc.Model";
-    private static final String MODEL_AND_VIEW = "ru.frostman.mvc.ModelAndView";
+    private static final String VIEW = "ru.frostman.mvc.controller.View";
+    private static final String MODEL = "ru.frostman.mvc.controller.Model";
+    private static final String MODEL_AND_VIEW = "ru.frostman.mvc.controller.ModelAndView";
     private static final String JAVA_LANG_STRING = "java.lang.String";
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String DEFAULT_ACTION_CATCH = "ru.frostman.mvc.thr.DefaultActionCatch";
@@ -99,6 +99,7 @@ class ActionsEnhancer {
         }, actionInvoker);
 
         StringBuilder body = new StringBuilder();
+        // invoke super class constructor
         body.append("{super($$);");
 
         CtConstructor[] constructors = controller.getConstructors();
@@ -107,6 +108,7 @@ class ActionsEnhancer {
         }
 
         StringBuilder parameters = resolveParameters(classPool, constructors[0], body);
+        // instantiate controller class (with resolved parameters)
         body.append(INSTANCE).append(" = new ").append(controller.getName()).append("(").append(parameters).append(");}");
 
         constructor.setBody(body.toString());
@@ -138,23 +140,26 @@ class ActionsEnhancer {
         StringBuilder body = new StringBuilder("{");
         StringBuilder parameters = resolveParameters(classPool, actionMethod, body);
 
-        body.append("try{");
-        body.append("Object result = ").append(INSTANCE).append(".")
+        // invoke action method in controller (with resolved parameters)
+        body.append("try{ Object result = ").append(INSTANCE).append(".")
                 .append(actionMethod.getName()).append("(").append(parameters).append(");");
 
-        //todo add comments for each generated line of code
         CtClass returnType = actionMethod.getReturnType();
         if (returnType.equals(getCtClass(classPool, VIEW))) {
+            // iff return type is View then change current ModelAndView's view
             body.append("mav.setView((").append(VIEW).append(") result").append(");");
         } else if (returnType.equals(getCtClass(classPool, MODEL_AND_VIEW))) {
+            // iff return type is ModelAndView then change current ModelAndView
             body.append("mav = (").append(MODEL_AND_VIEW).append(") result;");
         } else if (returnType.equals(getCtClass(classPool, JAVA_LANG_STRING))) {
+            // iff return type is String then change ModelAndView's view to resolved view by name
             body.append("mav.setView(ru.frostman.mvc.Frosty.getViews().getViewByName((")
                     .append(JAVA_LANG_STRING).append(") result").append("));");
         } else {
             throw new ActionEnhancerException("Action method can't return specified type: " + actionMethod.getLongName());
         }
 
+        // append catch section with ActionException
         body.append("}catch(Throwable th){throw new ru.frostman.mvc.dispatch.ActionException(th);}");
 
         method.setBody(body.append("}").toString());
@@ -199,6 +204,7 @@ class ActionsEnhancer {
 
             StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
 
+            // invoke method with resolved parameters
             body.append("{").append(INSTANCE).append(".")
                     .append(invokeMethod.getName())
                     .append("($1,").append(parameters).append(");")
@@ -206,6 +212,7 @@ class ActionsEnhancer {
         }
 
         if (methods.size() == 0) {
+            // append throwing default action exception
             body.append("{throw new " + DEFAULT_ACTION_CATCH + "($1);}");
         }
 
@@ -237,6 +244,7 @@ class ActionsEnhancer {
 
             StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
 
+            // invoke method with resolved parameters
             body.append("{").append(INSTANCE).append(".")
                     .append(invokeMethod.getName())
                     .append("(").append(parameters).append(");")
@@ -252,20 +260,26 @@ class ActionsEnhancer {
         int idx = 0;
         StringBuilder parameters = new StringBuilder();
         for (CtClass parameterType : behavior.getParameterTypes()) {
-            //todo add comments for each generated line of code
             if (parameterType.equals(getCtClass(classPool, HTTP_SERVLET_REQUEST))) {
+                // javax.servlet.http.HttpServletRequest type resolved as current request
                 body.append(HTTP_SERVLET_REQUEST).append(" $param$").append(idx).append(" = request;");
             } else if (parameterType.equals(getCtClass(classPool, SERVLET_REQUEST))) {
+                // javax.servlet.ServletRequest type resolved as current request
                 body.append(SERVLET_REQUEST).append(" $param$").append(idx).append(" = request;");
             } else if (parameterType.equals(getCtClass(classPool, HTTP_SERVLET_RESPONSE))) {
+                // javax.servlet.http.HttpServletResponse type resolved as current response
                 body.append(HTTP_SERVLET_RESPONSE).append(" $param$").append(idx).append(" = response;");
             } else if (parameterType.equals(getCtClass(classPool, SERVLET_RESPONSE))) {
+                // javax.servlet.ServletResponse type resolved as current response
                 body.append(SERVLET_RESPONSE).append(" $param$").append(idx).append(" = response;");
             } else if (parameterType.equals(getCtClass(classPool, ASYNC_CONTEXT))) {
+                // javax.servlet.AsyncContext type resolved as current async context
                 body.append(ASYNC_CONTEXT).append(" $param$").append(idx).append(" = asyncContext;");
             } else if (parameterType.equals(getCtClass(classPool, MODEL))) {
+                // ru.frostman.mvc.controller.Model type resolved as current model
                 body.append(MODEL).append(" $param$").append(idx).append(" = mav.getModel();");
             } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
+                // iff annotated with @Param but not String
                 if (!parameterType.equals(getCtClass(classPool, "java.lang.String"))) {
                     throw new ActionEnhancerException("Auto converted method argument type " + parameterType.getName()
                             + " is currently unsupported: " + behavior.getLongName());
@@ -275,6 +289,7 @@ class ActionsEnhancer {
                 body.append("String $param$").append(idx).append(" = request.getParameter(\"")
                         .append(paramAnnotation.value()).append("\");");
                 if (paramAnnotation.required()) {
+                    // append checking parameter for not null
                     body.append("if($param$").append(idx).append(" == null) {" +
                             "throw new ParameterRequiredException(\"required\");"
                             + "}");
@@ -290,6 +305,7 @@ class ActionsEnhancer {
             }
             idx++;
         }
+
         return parameters;
     }
 

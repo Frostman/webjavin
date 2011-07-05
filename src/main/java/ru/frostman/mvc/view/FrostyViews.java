@@ -3,7 +3,7 @@ package ru.frostman.mvc.view;
 import freemarker.cache.MruCacheStorage;
 import freemarker.template.Configuration;
 import ru.frostman.mvc.Frosty;
-import ru.frostman.mvc.View;
+import ru.frostman.mvc.controller.View;
 import ru.frostman.mvc.util.FrostyConfig;
 
 import java.io.File;

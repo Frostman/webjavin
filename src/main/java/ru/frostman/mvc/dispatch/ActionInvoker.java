@@ -1,13 +1,14 @@
 package ru.frostman.mvc.dispatch;
 
 import ru.frostman.mvc.Frosty;
-import ru.frostman.mvc.ModelAndView;
+import ru.frostman.mvc.controller.ModelAndView;
 import ru.frostman.mvc.thr.FrostyRuntimeException;
 import ru.frostman.mvc.util.FrostyConfig;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author slukjanov aka Frostman
@@ -29,7 +30,6 @@ public abstract class ActionInvoker implements Runnable {
     public void invoke() {
         if (async && Frosty.isAsyncApiSupported() && Frosty.getInvoker().getQueueSize() < FrostyConfig.getAsyncQueueLength()) {
             asyncContext = request.startAsync(request, response);
-            //todo think about async listener
             Frosty.getInvoker().execute(this);
         } else {
             async = false;
@@ -57,7 +57,14 @@ public abstract class ActionInvoker implements Runnable {
             }
             mav.process(response.getWriter());
         } catch (Throwable th) {
-            //todo impl http error send
+             try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, th.getMessage());
+            } catch (IOException e) {
+                //todo impl
+                e.printStackTrace();
+            }
+
+            // todo impl
             th.printStackTrace();
         }
 

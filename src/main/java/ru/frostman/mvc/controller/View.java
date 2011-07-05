@@ -1,4 +1,4 @@
-package ru.frostman.mvc;
+package ru.frostman.mvc.controller;
 
 import java.io.PrintWriter;
 

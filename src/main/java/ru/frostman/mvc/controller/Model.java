@@ -1,4 +1,4 @@
-package ru.frostman.mvc;
+package ru.frostman.mvc.controller;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

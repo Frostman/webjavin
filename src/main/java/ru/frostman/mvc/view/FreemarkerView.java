@@ -3,8 +3,8 @@ package ru.frostman.mvc.view;
 import com.google.common.base.Preconditions;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import ru.frostman.mvc.Model;
-import ru.frostman.mvc.View;
+import ru.frostman.mvc.controller.Model;
+import ru.frostman.mvc.controller.View;
 
 import java.io.IOException;
 import java.io.PrintWriter;

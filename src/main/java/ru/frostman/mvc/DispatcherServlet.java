@@ -26,6 +26,13 @@ public class DispatcherServlet extends HttpServlet {
             ActionInvoker actionInvoker = Frosty.getClasses().getDispatcher().dispatch(request, response);
             actionInvoker.invoke();
         } catch (Throwable th) {
+            try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, th.getMessage());
+            } catch (IOException e) {
+                //todo impl
+                e.printStackTrace();
+            }
+
             //todo handle exceptions
             th.printStackTrace();
         }
