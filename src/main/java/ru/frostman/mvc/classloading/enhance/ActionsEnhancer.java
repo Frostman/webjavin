@@ -32,6 +32,7 @@ class ActionsEnhancer {
     private static final String MODEL_AND_VIEW = "ru.frostman.mvc.ModelAndView";
     private static final String JAVA_LANG_STRING = "java.lang.String";
     private static final String THROWABLE = "java.lang.Throwable";
+    private static final String DEFAULT_ACTION_CATCH = "ru.frostman.mvc.thr.DefaultActionCatch";
 
     public static void enhance(Map<String, FrostyClass> classes, ClassPool classPool, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
@@ -205,7 +206,7 @@ class ActionsEnhancer {
         }
 
         if (methods.size() == 0) {
-            body.append("{throw new DefaultActionCatch($1);}");
+            body.append("{throw new " + DEFAULT_ACTION_CATCH + "($1);}");
         }
 
         method.setBody(body.append("}").toString());

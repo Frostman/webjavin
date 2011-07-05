@@ -159,6 +159,8 @@ public class FrostyClasses {
                     }
                 }
 
+                this.securityManager = new FrostySecurityManager();
+
                 List<ActionDefinition> actionDefinitions = Lists.newLinkedList();
                 for (String className : Lists.newLinkedList(classes.keySet())) {
                     Enhancer.enhance(classes, classes.get(className), actionDefinitions);
@@ -173,7 +175,8 @@ public class FrostyClasses {
 
                 this.classLoader = newClassLoader;
                 this.dispatcher = new Dispatcher(actionDefinitions);
-                this.securityManager = new FrostySecurityManager();
+
+                this.securityManager.compileAll();
 
                 if (log.isInfoEnabled()) {
                     log.info("Application classes successfully reloaded ({}ms)", System.currentTimeMillis() - start);
@@ -183,7 +186,6 @@ public class FrostyClasses {
             }
 
             return needReload;
-
         } finally {
             lastUpdate = System.currentTimeMillis();
             UPDATE_LOCK.unlock();
