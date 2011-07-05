@@ -1,6 +1,5 @@
 package ru.frostman.mvc.el;
 
-import org.mvel2.compiler.ExecutableStatement;
 import ru.frostman.mvc.secure.User;
 
 /**
@@ -8,8 +7,8 @@ import ru.frostman.mvc.secure.User;
  */
 public class Expressions {
     public static void main(String[] args) throws NoSuchFieldException, NoSuchMethodException {
-        ExecutableStatement expression = SecureExpressions.compile("isAuth(user) && 'asde'.equals(role)");
-        boolean result = SecureExpressions.execute(expression, new User(), "asd");
+        int id = SecureExpressions.compile("isAuth() || 'asd'.equals(param$1)", String.class);
+        boolean result = SecureExpressions.execute(id, new User(), "asd", "asd");
         System.out.println("Result: " + result);
     }
 }

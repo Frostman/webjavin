@@ -5,63 +5,77 @@ import com.google.common.collect.Maps;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.compiler.ExecutableStatement;
-import ru.frostman.mvc.annotation.Secure;
 import ru.frostman.mvc.secure.User;
+import ru.frostman.mvc.thr.FrostyRuntimeException;
 
-import javax.management.RuntimeErrorException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author slukjanov aka Frostman
  */
 public class SecureExpressions {
+    private static AtomicInteger counter = new AtomicInteger();
+    private static Map<Integer, ExecutableStatement> expressions = Maps.newHashMap();
+    //todo think about sync and updating
 
-    public static ExecutableStatement compile(String expressionStr) {
-        ParserContext context = new ParserContext();
-        context.setStrongTyping(true);
+    private static final ThreadLocal<User> currentUser = new ThreadLocal<User>();
+    private static final ThreadLocal<String> currentRole = new ThreadLocal<String>();
 
-        context.addInput("user", User.class);
-        context.addInput("role", String.class);
-
+    public static int compile(String expressionStr, Class... paramTypes) {
         try {
-            context.addImport("isAuth", SecureExpressions.class.getMethod("isAuthenticated", User.class));
-        } catch (NoSuchMethodException e) {
-            //todo impl
-            throw new RuntimeException(e);
+            ParserContext context = new ParserContext();
+            context.setStrongTyping(true);
+
+            context.addInput("user", User.class);
+            context.addInput("role", String.class);
+
+            int idx = 1;
+            for (Class paramType : paramTypes) {
+                context.addInput("param$" + idx, paramType);
+
+                idx++;
+            }
+
+            context.addImport("isAuth", SecureExpressions.class.getMethod("isAuthenticated"));
+
+            ExecutableStatement expression = (ExecutableStatement) MVEL.compileExpression(expressionStr, context);
+            if (expression.getKnownEgressType() != boolean.class && expression.getKnownEgressType() != Boolean.class) {
+                throw new FrostyRuntimeException("Expression should return boolean");
+            }
+
+            int id = counter.getAndIncrement();
+            expressions.put(id, expression);
+
+            return id;
+        } catch (Exception e) {
+            throw new FrostyRuntimeException("Can't compile secure expression: " + expressionStr, e);
         }
-
-        //todo inject all method args as param$1, param$2, etc
-        //todo подсовывать пользователя, его роль и тд в ThreadLocal чтобы упростить вызовы
-
-        ExecutableStatement expression = (ExecutableStatement) MVEL.compileExpression(expressionStr, context);
-
-        if (expression.getKnownEgressType() != boolean.class && expression.getKnownEgressType() != Boolean.class) {
-            //todo impl
-            throw new RuntimeException("Expression should return boolean");
-        }
-
-        return expression;
     }
 
-    public static boolean execute(ExecutableStatement expression, User user, String role, Object... params) {
-        Preconditions.checkNotNull(expression);
+    public static boolean execute(int expressionId, User user, String role, Object... params) {
+        try {
+            ExecutableStatement expression = expressions.get(expressionId);
+            Preconditions.checkNotNull(expression);
 
-        Map<String, Object> vars = Maps.newHashMap();
-        vars.put("user", user);
-        vars.put("role", role);
+            Map<String, Object> vars = Maps.newHashMap();
+            vars.put("user", user);
+            vars.put("role", role);
 
-        int idx = 1;
-        for (Object param : params) {
-            vars.put("param$" + idx, param);
+            int idx = 1;
+            for (Object param : params) {
+                vars.put("param$" + idx, param);
 
-            idx++;
+                idx++;
+            }
+
+            return (Boolean) MVEL.executeExpression(expression, vars);
+        } catch (Exception e) {
+            throw new FrostyRuntimeException("Exception while executing secure expression with id: " + expressionId, e);
         }
-
-        return (Boolean) MVEL.executeExpression(expression, vars);
     }
 
-    //todo think about this
-    public static boolean isAuthenticated(User user) {
-        return user != null;
+    public static boolean isAuthenticated() {
+        return false;
     }
 }
