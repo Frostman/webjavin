@@ -3,8 +3,8 @@ package ru.frostman.mvc.view;
 import freemarker.cache.MruCacheStorage;
 import freemarker.template.Configuration;
 import ru.frostman.mvc.Frosty;
+import ru.frostman.mvc.config.FrostyConfig;
 import ru.frostman.mvc.controller.View;
-import ru.frostman.mvc.util.FrostyConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class FrostyViews {
         freemarker.setCacheStorage(new MruCacheStorage(25, 250));
 
         try {
-            freemarker.setDirectoryForTemplateLoading(new File(Frosty.getApplicationPath() + FrostyConfig.getTemplatesPath()));
+            freemarker.setDirectoryForTemplateLoading(new File(Frosty.getApplicationPath() + FrostyConfig.getCurrentConfig().getTemplates().getPath()));
         } catch (IOException e) {
             //todo impl
             throw new RuntimeException(e);

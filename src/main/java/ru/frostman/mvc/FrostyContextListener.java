@@ -3,8 +3,8 @@ package ru.frostman.mvc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.classloading.FrostyClasses;
+import ru.frostman.mvc.config.FrostyConfig;
 import ru.frostman.mvc.thr.FastRuntimeException;
-import ru.frostman.mvc.util.FrostyConfig;
 import ru.frostman.mvc.view.FrostyViews;
 
 import javax.servlet.ServletContextEvent;
@@ -21,7 +21,7 @@ public class FrostyContextListener implements ServletContextListener {
         try {
             freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
 
-            Frosty.setMode(FrostyConfig.getMode());
+            Frosty.setMode(FrostyConfig.getCurrentConfig().getMode());
             Frosty.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
             Frosty.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
 

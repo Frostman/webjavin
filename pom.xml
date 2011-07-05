@@ -84,6 +84,14 @@
             <version>2.0.19</version>
         </dependency>
 
+        <!--Configurations-->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.8</version>
+        </dependency>
+
+        <!--Unit Testing-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

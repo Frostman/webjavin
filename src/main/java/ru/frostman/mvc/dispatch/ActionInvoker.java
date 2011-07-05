@@ -1,9 +1,9 @@
 package ru.frostman.mvc.dispatch;
 
 import ru.frostman.mvc.Frosty;
+import ru.frostman.mvc.config.FrostyConfig;
 import ru.frostman.mvc.controller.ModelAndView;
 import ru.frostman.mvc.thr.FrostyRuntimeException;
-import ru.frostman.mvc.util.FrostyConfig;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +28,7 @@ public abstract class ActionInvoker implements Runnable {
     }
 
     public void invoke() {
-        if (async && Frosty.isAsyncApiSupported() && Frosty.getInvoker().getQueueSize() < FrostyConfig.getAsyncQueueLength()) {
+        if (async && Frosty.isAsyncApiSupported() && Frosty.getInvoker().getQueueSize() < FrostyConfig.getCurrentConfig().getApp().getAsyncQueueLength()) {
             asyncContext = request.startAsync(request, response);
             Frosty.getInvoker().execute(this);
         } else {

@@ -8,10 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.Frosty;
 import ru.frostman.mvc.classloading.enhance.Enhancer;
+import ru.frostman.mvc.config.FrostyConfig;
 import ru.frostman.mvc.dispatch.ActionDefinition;
 import ru.frostman.mvc.dispatch.Dispatcher;
 import ru.frostman.mvc.secure.FrostySecurityManager;
-import ru.frostman.mvc.util.FrostyConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class FrostyClasses {
      * @return true iff class loader changed
      */
     public boolean update() {
-        if (System.currentTimeMillis() - lastUpdate < FrostyConfig.getUpdateInterval()) {
+        if (System.currentTimeMillis() - lastUpdate < FrostyConfig.getCurrentConfig().getClasses().getUpdateInterval()) {
             return false;
         }
 
@@ -81,7 +81,7 @@ public class FrostyClasses {
 
             boolean needReload = FrostyConfig.update();
 
-            List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(FrostyConfig.getApplicationPackages());
+            List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(FrostyConfig.getCurrentConfig().getClasses().getPackages());
 
             Set<String> existedClassNames = Sets.newHashSet(classes.keySet());
             Set<String> foundClassNames = Sets.newHashSet();
