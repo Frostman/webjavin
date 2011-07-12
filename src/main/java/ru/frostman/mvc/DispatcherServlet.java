@@ -26,6 +26,9 @@ public class DispatcherServlet extends HttpServlet {
 
             ActionInvoker actionInvoker = Frosty.getClasses().getDispatcher()
                     .dispatch(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()), request, response);
+            if (actionInvoker == null) {
+                //todo handle NotFound
+            }
             actionInvoker.invoke();
         } catch (Throwable th) {
             try {

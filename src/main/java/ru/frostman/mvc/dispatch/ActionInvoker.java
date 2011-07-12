@@ -6,6 +6,7 @@ import ru.frostman.mvc.controller.ModelAndView;
 import ru.frostman.mvc.controller.View;
 import ru.frostman.mvc.thr.FrostyRuntimeException;
 import ru.frostman.mvc.view.ForwardView;
+import ru.frostman.mvc.view.RedirectView;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
@@ -84,6 +85,11 @@ public abstract class ActionInvoker implements Runnable {
 
             forwardView.setRequest(request);
             forwardView.setResponse(response);
+        } else if (view instanceof RedirectView) {
+            RedirectView redirectView = (RedirectView) view;
+
+            redirectView.setRequest(request);
+            redirectView.setResponse(response);
         }
 
         mav.process(response.getWriter());

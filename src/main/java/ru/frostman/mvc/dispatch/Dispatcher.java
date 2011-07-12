@@ -19,13 +19,14 @@ public class Dispatcher {
 
     public ActionInvoker dispatch(String requestUrl, HttpMethod requestMethod, HttpServletRequest request
             , HttpServletResponse response) {
+        //todo think about context
         for (ActionDefinition definition : actions) {
             if (definition.matches(requestUrl, requestMethod)) {
                 return definition.initInvoker(request, response);
             }
         }
 
-        //todo replace it with default handlers may be
+        //todo replace it with default handlers may be or 404 page/error handler
         return null;
     }
 }

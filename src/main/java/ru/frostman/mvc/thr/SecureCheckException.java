@@ -3,7 +3,7 @@ package ru.frostman.mvc.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class SecureCheckException extends FrostyRuntimeException{
+public class SecureCheckException extends FrostyRuntimeException {
     public SecureCheckException() {
     }
 

@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
  */
 public class TestWrappers {
 
-    @Wrapper("")
+    @Wrapper("test")
     public static Object wrap(String className, Object instance, Method method, Object[] params) throws Exception {
         return method.invoke(instance, params);
     }

@@ -5,6 +5,7 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import ru.frostman.mvc.aop.AopEnhancer;
 import ru.frostman.mvc.aop.MethodWrapper;
 import ru.frostman.mvc.classloading.FrostyClass;
 import ru.frostman.mvc.classloading.FrostyClasses;
@@ -59,7 +60,6 @@ public class Enhancer {
         try {
             CtClass superclass = ctClass.getSuperclass();
             if (classes.containsKey(superclass.getName())) {
-                //todo think about recursion (stack overflow exception)
                 Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions, methodWrappers);
             }
         } catch (NotFoundException e) {
@@ -67,7 +67,7 @@ public class Enhancer {
         }
 
         ActionsEnhancer.enhance(classes, classPool, ctClass, actionDefinitions);
-
+        AopEnhancer.enhance(classPool, ctClass, methodWrappers);
         SecurityEnhancer.enhance(classPool, ctClass);
 
         try {
@@ -76,14 +76,8 @@ public class Enhancer {
             throw new EnhancerException(e);
         }
 
-        try {
-            //todo remove it
-            ctClass.writeFile("C:/temp/");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         ctClass.defrost();
-        //todo detach ctClass after working with it
+        ctClass.detach();
     }
 
 }

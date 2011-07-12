@@ -3,7 +3,7 @@ package ru.frostman.mvc.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyIllegalAccessException extends FrostyRuntimeException{
+public class FrostyIllegalAccessException extends FrostyRuntimeException {
     public FrostyIllegalAccessException() {
     }
 

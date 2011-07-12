@@ -1,6 +1,7 @@
 package ru.frostman.mvc.view;
 
 import ru.frostman.mvc.Frosty;
+import ru.frostman.mvc.config.FrostyConfig;
 import ru.frostman.mvc.controller.Model;
 import ru.frostman.mvc.controller.View;
 import ru.frostman.mvc.dispatch.ActionInvoker;
@@ -33,15 +34,17 @@ public class ForwardView extends View {
             count = 0;
         }
 
-        //todo remove hard code by adding to config max forwards :)
-        if (count > 5) {
-            //todo change text
-            throw new FrostyRuntimeException("Forwards count more than MAX_FORWARDS_COUNT");
+        final int maxForwardsCount = FrostyConfig.getCurrentConfig().getApp().getMaxForwardsCount();
+        if (count > maxForwardsCount) {
+            throw new FrostyRuntimeException("Forwards count more than specified value (" + maxForwardsCount + ")");
         }
         request.setAttribute(FORWARDS_COUNT, count + 1);
 
         ActionInvoker actionInvoker = Frosty.getClasses().getDispatcher()
                 .dispatch(targetUrl, HttpMethod.valueOf(request.getMethod()), request, response);
+        if (actionInvoker == null) {
+            //todo handle NotFound
+        }
         actionInvoker.invoke();
     }
 

@@ -2,11 +2,10 @@ package ru.frostman.mvc.view;
 
 import com.google.common.base.Preconditions;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import ru.frostman.mvc.controller.Model;
 import ru.frostman.mvc.controller.View;
+import ru.frostman.mvc.thr.FrostyRuntimeException;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
@@ -25,13 +24,8 @@ public class FreemarkerView extends View {
     public void process(Model model, PrintWriter writer) {
         try {
             template.process(model, writer);
-        } catch (TemplateException e) {
-            //todo impl
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            //todo impl
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new FrostyRuntimeException("Exception while processing template", e);
         }
-
     }
 }

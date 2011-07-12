@@ -2,10 +2,10 @@ package ru.frostman.mvc.classloading;
 
 import com.google.common.io.Files;
 import ru.frostman.mvc.util.Hex;
+import ru.frostman.mvc.util.MessageDigestPool;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -42,10 +42,8 @@ class ClassFile {
     }
 
     public String getHashCode() {
-        //todo need to cache MessageDigest
-
         try {
-            return Hex.encode(Files.getDigest(file, MessageDigest.getInstance("sha-1")));
+            return Hex.encode(Files.getDigest(file, MessageDigestPool.get("sha-1")));
         } catch (IOException e) {
             throw new RuntimeException("Can't read file: ", e);
         } catch (NoSuchAlgorithmException e) {

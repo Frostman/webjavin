@@ -47,6 +47,9 @@ public class MethodWrappersUtil {
 
                     //todo add to list
                     //todo method signature: public static Object wrap(String className, Object instance, Method method, Object[] params);
+
+                    Wrapper wrapperAnn = (Wrapper) method.getAnnotation(Wrapper.class);
+                    methodWrappers.add(new MethodWrapper(ctClass.getName(), method.getName(), wrapperAnn.value()));
                 }
             }
 

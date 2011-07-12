@@ -1,15 +1,22 @@
 package ru.frostman.mvc.util;
 
-import java.util.concurrent.*;
+import ru.frostman.mvc.config.FrostyConfig;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author slukjanov aka Frostman
  */
 public class FrostyInvoker {
-    //todo remove hard code
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
-            Runtime.getRuntime().availableProcessors() - 1, Runtime.getRuntime().availableProcessors() - 1,
-            10, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>(), new FrostyThreadFactory("frosty-executor")
+            FrostyConfig.getCurrentConfig().getApp().getPool().getCorePoolSize(),
+            FrostyConfig.getCurrentConfig().getApp().getPool().getMaximumPoolSize(),
+            FrostyConfig.getCurrentConfig().getApp().getPool().getKeepAliveTime(),
+            FrostyConfig.getCurrentConfig().getApp().getPool().getTimeUnit(),
+            new LinkedBlockingQueue<Runnable>(), new FrostyThreadFactory("frosty-executor")
     );
 
     public void execute(Runnable command) {

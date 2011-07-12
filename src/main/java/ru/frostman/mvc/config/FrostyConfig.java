@@ -29,7 +29,7 @@ public class FrostyConfig {
             FrostyConfig config = (FrostyConfig) yaml.load(getConfigStream());
 
             boolean changed = false;
-            if(!config.equals(currentConfig)) {
+            if (!config.equals(currentConfig)) {
                 changed = true;
 
                 currentConfig = config;
@@ -89,7 +89,7 @@ public class FrostyConfig {
             return mode == config.mode
                     && Objects.equal(classes, config.classes)
                     && Objects.equal(templates, config.templates)
-                    &&Objects.equal(app, config.app);
+                    && Objects.equal(app, config.app);
         }
 
         return false;
