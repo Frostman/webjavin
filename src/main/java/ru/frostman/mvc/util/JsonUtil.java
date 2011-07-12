@@ -16,49 +16,47 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.mvc.test;
+package ru.frostman.mvc.util;
 
-import ru.frostman.mvc.Frosty;
-import ru.frostman.mvc.annotation.*;
+import org.codehaus.jackson.map.ObjectMapper;
 import ru.frostman.mvc.controller.Model;
-import ru.frostman.mvc.controller.View;
-import ru.frostman.mvc.view.JsonView;
+import ru.frostman.mvc.thr.JsonManipulationException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestController {
+public class JsonUtil {
+    private static final String[] generatedProperties = {Model.REQUEST, Model.RESPONSE};
+    private static final ObjectMapper mapper = new ObjectMapper();
 
-    @Before
-    public void before(HttpServletRequest request) {
-        System.out.println("BEFORE: " + request.getMethod());
+    public static String renderJson(Map<String, Object> map) {
+        StringWriter writer = new StringWriter();
+        renderJson(map, writer);
+
+        return writer.toString();
     }
 
-    @After
-    public void after(HttpServletResponse response) {
-        System.out.println("AFTER: " + response.getBufferSize());
-    }
+    private static void renderJson(Map<String, Object> map, Writer writer) {
+        try {
+            for (String key : generatedProperties) {
+                map.remove(key);
+            }
 
-    @Secure("user != null && isAuth() && hasRole('role') && param$1 != null")
-    @Action("/test/test")
-    public View test(Model model, @Param(value = "b", required = false) String param) throws IOException {
-        model.put("testParam", param);
-
-        if ("f".equals(param)) {
-            return new JsonView();
+            mapper.writeValue(writer, map);
+        } catch (Exception e) {
+            throw new JsonManipulationException("Exception while rendering JSON", e);
         }
-
-        return Frosty.getViews().getViewByName("test.ftl");
     }
 
-    @Action("/test/qwe")
-    public String qwe(Model model) throws IOException {
-        model.put("testParam", "BLA-BLA!!");
+    public static String renderJson(Model model) {
+        return renderJson(model.toMap());
+    }
 
-        return "test.ftl";
+    public static void renderJson(Model model, Writer writer) {
+        renderJson(model.toMap(), writer);
     }
 }

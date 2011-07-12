@@ -29,8 +29,8 @@ import java.util.Map;
  * @author slukjanov aka Frostman
  */
 public class Model {
-    private static final String REQUEST = "request";
-    private static final String RESPONSE = "response";
+    public static final String REQUEST = "request";
+    public static final String RESPONSE = "response";
 
     private final Map<String, Object> map = Maps.newLinkedHashMap();
 
@@ -129,5 +129,9 @@ public class Model {
         map.clear();
 
         return this;
+    }
+
+    public Map<String, Object> toMap() {
+        return Maps.newHashMap(map);
     }
 }

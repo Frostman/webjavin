@@ -16,49 +16,22 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.mvc.test;
+package ru.frostman.mvc.view;
 
-import ru.frostman.mvc.Frosty;
-import ru.frostman.mvc.annotation.*;
 import ru.frostman.mvc.controller.Model;
 import ru.frostman.mvc.controller.View;
-import ru.frostman.mvc.view.JsonView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.PrintWriter;
+
+import static ru.frostman.mvc.util.JsonUtil.renderJson;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestController {
+public class JsonView extends View {
 
-    @Before
-    public void before(HttpServletRequest request) {
-        System.out.println("BEFORE: " + request.getMethod());
-    }
-
-    @After
-    public void after(HttpServletResponse response) {
-        System.out.println("AFTER: " + response.getBufferSize());
-    }
-
-    @Secure("user != null && isAuth() && hasRole('role') && param$1 != null")
-    @Action("/test/test")
-    public View test(Model model, @Param(value = "b", required = false) String param) throws IOException {
-        model.put("testParam", param);
-
-        if ("f".equals(param)) {
-            return new JsonView();
-        }
-
-        return Frosty.getViews().getViewByName("test.ftl");
-    }
-
-    @Action("/test/qwe")
-    public String qwe(Model model) throws IOException {
-        model.put("testParam", "BLA-BLA!!");
-
-        return "test.ftl";
+    @Override
+    public void process(Model model, PrintWriter writer) {
+        renderJson(model, writer);
     }
 }

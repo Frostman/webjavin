@@ -16,49 +16,24 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.mvc.test;
-
-import ru.frostman.mvc.Frosty;
-import ru.frostman.mvc.annotation.*;
-import ru.frostman.mvc.controller.Model;
-import ru.frostman.mvc.controller.View;
-import ru.frostman.mvc.view.JsonView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+package ru.frostman.mvc.thr;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestController {
-
-    @Before
-    public void before(HttpServletRequest request) {
-        System.out.println("BEFORE: " + request.getMethod());
+public class JsonManipulationException extends FrostyRuntimeException {
+    public JsonManipulationException() {
     }
 
-    @After
-    public void after(HttpServletResponse response) {
-        System.out.println("AFTER: " + response.getBufferSize());
+    public JsonManipulationException(String message) {
+        super(message);
     }
 
-    @Secure("user != null && isAuth() && hasRole('role') && param$1 != null")
-    @Action("/test/test")
-    public View test(Model model, @Param(value = "b", required = false) String param) throws IOException {
-        model.put("testParam", param);
-
-        if ("f".equals(param)) {
-            return new JsonView();
-        }
-
-        return Frosty.getViews().getViewByName("test.ftl");
+    public JsonManipulationException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Action("/test/qwe")
-    public String qwe(Model model) throws IOException {
-        model.put("testParam", "BLA-BLA!!");
-
-        return "test.ftl";
+    public JsonManipulationException(Throwable cause) {
+        super(cause);
     }
 }
