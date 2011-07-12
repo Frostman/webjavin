@@ -13,6 +13,7 @@ import java.io.IOException;
  * @author slukjanov aka Frostman
  */
 public class FrostyViews {
+    private static final String FORWARD = "forward:";
     private final Configuration freemarker;
 
     public FrostyViews() {
@@ -35,6 +36,10 @@ public class FrostyViews {
     }
 
     public View getViewByName(String name) {
+        if (name.startsWith(FORWARD)) {
+            return new ForwardView(name.substring(FORWARD.length()).trim());
+        }
+
         try {
             //todo cache freemarker view instances in production
             return new FreemarkerView(freemarker.getTemplate(name));

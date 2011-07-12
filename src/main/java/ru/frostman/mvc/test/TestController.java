@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static ru.frostman.mvc.controller.Controllers.forward;
+
 /**
  * @author slukjanov aka Frostman
  */
@@ -26,10 +28,11 @@ public class TestController {
     @Action("/*")
     public String test(Model model, @Param(value = "b", required = false) String param) throws IOException {
         model.put("testParam", param);
-        System.out.println("ACTION");
 
-        int i = 0;
-        i = i / 0;
+        if ("f".equals(param)) {
+            System.out.println("FORWARD");
+            return forward("/qwe");
+        }
 
         return "test.ftl";
     }

@@ -1,9 +1,11 @@
 package ru.frostman.mvc.classloading.enhance;
 
+import com.google.common.collect.Lists;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import ru.frostman.mvc.aop.MethodWrapper;
 import ru.frostman.mvc.classloading.FrostyClass;
 import ru.frostman.mvc.classloading.FrostyClasses;
 import ru.frostman.mvc.dispatch.ActionDefinition;
@@ -25,24 +27,40 @@ public class Enhancer {
         classPool.appendSystemPath();
     }
 
+    public static void prepareClasses(Map<String, FrostyClass> classes) {
+        for (FrostyClass frostyClass : Lists.newLinkedList(classes.values())) {
+            frostyClass.setEnhancedBytecode(null);
+
+            if (frostyClass.isGenerated()) {
+                classes.remove(frostyClass.getName());
+                continue;
+            }
+
+            CtClass ctClass;
+            try {
+                ctClass = classPool.makeClass(new ByteArrayInputStream(frostyClass.getBytecode()));
+            } catch (Exception e) {
+                throw new EnhancerException(e);
+            }
+
+            frostyClass.setCtClass(ctClass);
+        }
+
+    }
+
     public static void enhance(Map<String, FrostyClass> classes, FrostyClass frostyClass,
-                               List<ActionDefinition> actionDefinitions) {
+                               List<ActionDefinition> actionDefinitions, List<MethodWrapper> methodWrappers) {
         if (frostyClass.isGenerated() || frostyClass.getEnhancedBytecode() != null) {
             return;
         }
 
-        CtClass ctClass;
-        try {
-            ctClass = classPool.makeClass(new ByteArrayInputStream(frostyClass.getBytecode()));
-        } catch (Exception e) {
-            throw new EnhancerException(e);
-        }
+        CtClass ctClass = frostyClass.getCtClass();
 
         try {
             CtClass superclass = ctClass.getSuperclass();
             if (classes.containsKey(superclass.getName())) {
                 //todo think about recursion (stack overflow exception)
-                Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions);
+                Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions, methodWrappers);
             }
         } catch (NotFoundException e) {
             throw new FrostyRuntimeException(e);
@@ -58,7 +76,14 @@ public class Enhancer {
             throw new EnhancerException(e);
         }
 
+        try {
+            //todo remove it
+            ctClass.writeFile("C:/temp/");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         ctClass.defrost();
+        //todo detach ctClass after working with it
     }
 
 }

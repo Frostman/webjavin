@@ -3,7 +3,9 @@ package ru.frostman.mvc.dispatch;
 import ru.frostman.mvc.Frosty;
 import ru.frostman.mvc.config.FrostyConfig;
 import ru.frostman.mvc.controller.ModelAndView;
+import ru.frostman.mvc.controller.View;
 import ru.frostman.mvc.thr.FrostyRuntimeException;
+import ru.frostman.mvc.view.ForwardView;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
@@ -52,12 +54,9 @@ public abstract class ActionInvoker implements Runnable {
 
             after();
 
-            if (mav == null || mav.getModel() == null || mav.getView() == null) {
-                throw new FrostyRuntimeException("ModelAndView or Model or View are undefined after action invoked");
-            }
-            mav.process(response.getWriter());
+            process();
         } catch (Throwable th) {
-             try {
+            try {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, th.getMessage());
             } catch (IOException e) {
                 //todo impl
@@ -71,6 +70,23 @@ public abstract class ActionInvoker implements Runnable {
         if (async) {
             asyncContext.complete();
         }
+    }
+
+    private void process() throws IOException {
+        if (mav == null || mav.getModel() == null || mav.getView() == null) {
+            throw new FrostyRuntimeException("ModelAndView or Model or View are undefined after action invoked");
+        }
+
+        View view = mav.getView();
+
+        if (view instanceof ForwardView) {
+            ForwardView forwardView = (ForwardView) view;
+
+            forwardView.setRequest(request);
+            forwardView.setResponse(response);
+        }
+
+        mav.process(response.getWriter());
     }
 
     protected abstract void before();

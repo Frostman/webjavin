@@ -17,10 +17,8 @@ public class Dispatcher {
         this.actions = Lists.newLinkedList(actions);
     }
 
-    public ActionInvoker dispatch(HttpServletRequest request, HttpServletResponse response) {
-        final String requestUrl = request.getRequestURI();
-        final HttpMethod requestMethod = HttpMethod.valueOf(request.getMethod());
-
+    public ActionInvoker dispatch(String requestUrl, HttpMethod requestMethod, HttpServletRequest request
+            , HttpServletResponse response) {
         for (ActionDefinition definition : actions) {
             if (definition.matches(requestUrl, requestMethod)) {
                 return definition.initInvoker(request, response);

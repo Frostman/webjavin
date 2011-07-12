@@ -1,5 +1,7 @@
 package ru.frostman.mvc.classloading;
 
+import javassist.CtClass;
+
 /**
  * This class contains information about application classes.
  *
@@ -13,6 +15,7 @@ public class FrostyClass {
     private long lastLoaded;
     private String hashCode;
 
+    private CtClass ctClass;
     private Class javaClass;
 
     private boolean generated;
@@ -58,6 +61,14 @@ public class FrostyClass {
 
     public void setHashCode(String hashCode) {
         this.hashCode = hashCode;
+    }
+
+    public CtClass getCtClass() {
+        return ctClass;
+    }
+
+    public void setCtClass(CtClass ctClass) {
+        this.ctClass = ctClass;
     }
 
     public Class getJavaClass() {

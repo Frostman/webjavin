@@ -1,10 +1,12 @@
 package ru.frostman.mvc.classloading.enhance;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import javassist.*;
 import ru.frostman.mvc.annotation.*;
 import ru.frostman.mvc.classloading.FrostyClass;
 import ru.frostman.mvc.dispatch.ActionDefinition;
+import ru.frostman.mvc.dispatch.url.UrlPattern;
 import ru.frostman.mvc.dispatch.url.UrlPatternType;
 import ru.frostman.mvc.thr.ActionEnhancerException;
 import ru.frostman.mvc.util.HttpMethod;
@@ -33,6 +35,9 @@ class ActionsEnhancer {
     private static final String JAVA_LANG_STRING = "java.lang.String";
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String DEFAULT_ACTION_CATCH = "ru.frostman.mvc.thr.DefaultActionCatch";
+    private static final String FROSTY_RUNTIME_EXCEPTION = "ru.frostman.mvc.thr.FrostyRuntimeException";
+    private static final String ACTION_EXCEPTION = "ru.frostman.mvc.dispatch.ActionException";
+    private static final String FORWARD_VIEW = "ru.frostman.mvc.view.ForwardView";
 
     public static void enhance(Map<String, FrostyClass> classes, ClassPool classPool, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
@@ -57,10 +62,12 @@ class ActionsEnhancer {
 
                 classes.put(actionInvoker.getName(), generated);
 
+                List<UrlPattern> patterns = Lists.newLinkedList();
                 for (String url : urls) {
-                    actionDefinitions.add(new ActionDefinition(UrlPatternType.get(url, UrlPatternType.SERVLET,
-                            Sets.newHashSet(methods)), actionInvoker.getName()));
+                    patterns.add(UrlPatternType.get(url, UrlPatternType.SERVLET));
                 }
+
+                actionDefinitions.add(new ActionDefinition(patterns, Sets.newHashSet(methods), actionInvoker.getName()));
             } catch (Exception e) {
                 throw new ActionEnhancerException("Error while enhancing action: " + actionMethod.getLongName(), e);
             }
@@ -160,7 +167,7 @@ class ActionsEnhancer {
         }
 
         // append catch section with ActionException
-        body.append("}catch(Throwable th){throw new ru.frostman.mvc.dispatch.ActionException(th);}");
+        body.append("}catch(Throwable th){throw new " + ACTION_EXCEPTION + "(th);}");
 
         method.setBody(body.append("}").toString());
 
@@ -307,12 +314,6 @@ class ActionsEnhancer {
         }
 
         return parameters;
-    }
-
-    private static boolean isPublicAndNonStatic(CtMethod method) {
-        int mod = method.getModifiers();
-
-        return Modifier.isPublic(mod) && (!Modifier.isStatic(mod));
     }
 }
 

@@ -1,6 +1,7 @@
 package ru.frostman.mvc;
 
 import ru.frostman.mvc.dispatch.ActionInvoker;
+import ru.frostman.mvc.util.HttpMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,14 +17,15 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            response.setContentType("text/plain");
-            response.setHeader("Transfer-Encoding", "chunked");
+            //response.setContentType("text/plain");
+            //response.setHeader("Transfer-Encoding", "chunked");
 
             if (Frosty.getMode().isDevelopmentMode()) {
                 Frosty.getClasses().update();
             }
 
-            ActionInvoker actionInvoker = Frosty.getClasses().getDispatcher().dispatch(request, response);
+            ActionInvoker actionInvoker = Frosty.getClasses().getDispatcher()
+                    .dispatch(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()), request, response);
             actionInvoker.invoke();
         } catch (Throwable th) {
             try {

@@ -7,6 +7,8 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.mvc.Frosty;
+import ru.frostman.mvc.aop.MethodWrapper;
+import ru.frostman.mvc.aop.MethodWrappersUtil;
 import ru.frostman.mvc.classloading.enhance.Enhancer;
 import ru.frostman.mvc.config.FrostyConfig;
 import ru.frostman.mvc.dispatch.ActionDefinition;
@@ -151,19 +153,15 @@ public class FrostyClasses {
                     start = System.currentTimeMillis();
                 }
 
-                for (FrostyClass frostyClass : Lists.newLinkedList(classes.values())) {
-                    frostyClass.setEnhancedBytecode(null);
-
-                    if (frostyClass.isGenerated()) {
-                        classes.remove(frostyClass.getName());
-                    }
-                }
+                Enhancer.prepareClasses(classes);
 
                 this.securityManager = new FrostySecurityManager();
 
+                List<MethodWrapper> methodWrappers = MethodWrappersUtil.findWrappers(classes);
+
                 List<ActionDefinition> actionDefinitions = Lists.newLinkedList();
                 for (String className : Lists.newLinkedList(classes.keySet())) {
-                    Enhancer.enhance(classes, classes.get(className), actionDefinitions);
+                    Enhancer.enhance(classes, classes.get(className), actionDefinitions, methodWrappers);
                 }
 
                 FrostyClassLoader newClassLoader = new FrostyClassLoader(ImmutableMap.copyOf(classes));

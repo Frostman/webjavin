@@ -1,10 +1,7 @@
 package ru.frostman.mvc.classloading.enhance;
 
 import com.google.common.collect.Lists;
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
+import javassist.*;
 import ru.frostman.mvc.thr.BytecodeManipulationException;
 
 import java.lang.annotation.Annotation;
@@ -108,6 +105,18 @@ public class EnhancerUtil {
         }
 
         return null;
+    }
+
+    public static boolean isPublicAndNonStatic(CtMethod method) {
+        int mod = method.getModifiers();
+
+        return Modifier.isPublic(mod) && (!Modifier.isStatic(mod));
+    }
+
+    public static boolean isPublicAndStatic(CtMethod method) {
+        int mod = method.getModifiers();
+
+        return Modifier.isPublic(mod) && Modifier.isStatic(mod);
     }
 
 }

@@ -7,18 +7,22 @@ import ru.frostman.mvc.util.HttpMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author slukjanov aka Frostman
  */
 public class ActionDefinition {
-    private final UrlPattern urlPattern;
+    private final List<UrlPattern> urlPatterns;
+    private final Set<HttpMethod> methods;
     private final String invokerClassName;
     private Class<? extends ActionInvoker> invokerClass;
     private Constructor<? extends ActionInvoker> invokerClassConstructor;
 
-    public ActionDefinition(UrlPattern urlPattern, String invokerClassName) {
-        this.urlPattern = urlPattern;
+    public ActionDefinition(List<UrlPattern> urlPatterns, Set<HttpMethod> methods, String invokerClassName) {
+        this.urlPatterns = urlPatterns;
+        this.methods = methods;
         this.invokerClassName = invokerClassName;
     }
 
@@ -34,19 +38,33 @@ public class ActionDefinition {
     }
 
     public boolean matches(String url, HttpMethod method) {
-        return urlPattern.matches(url, method);
+        if (!methods.contains(method)) {
+            return false;
+        }
+
+        for (UrlPattern urlPattern : urlPatterns) {
+            if (urlPattern.matches(url)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public ActionInvoker initInvoker(HttpServletRequest request, HttpServletResponse response) {
         try {
             return invokerClassConstructor.newInstance(request, response);
         } catch (Exception e) {
-            throw new ActionInitializationException("Can't initialize ActionInvoker: " + invokerClass.getName());
+            throw new ActionInitializationException("Can't initialize ActionInvoker: " + invokerClass.getName(), e);
         }
     }
 
-    public UrlPattern getUrlPattern() {
-        return urlPattern;
+    public List<UrlPattern> getUrlPatterns() {
+        return urlPatterns;
+    }
+
+    public Set<HttpMethod> getMethods() {
+        return methods;
     }
 
     public String getInvokerClassName() {
