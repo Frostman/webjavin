@@ -1,0 +1,14 @@
+mode: DEV
+
+classes:
+      packages: ["ru.frostman.web.test", "ru.frostman.web.test2"]
+      updateInterval: 500
+
+templates:
+      path: "/WEB-INF/view"
+
+app:
+      asyncQueueLength: 100
+
+#res:
+#      jquery: true
