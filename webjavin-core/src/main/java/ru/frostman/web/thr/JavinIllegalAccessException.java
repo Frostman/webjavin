@@ -21,19 +21,19 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyRuntimeException extends RuntimeException {
-    public FrostyRuntimeException() {
+public class JavinIllegalAccessException extends JavinRuntimeException {
+    public JavinIllegalAccessException() {
     }
 
-    public FrostyRuntimeException(String message) {
+    public JavinIllegalAccessException(String message) {
         super(message);
     }
 
-    public FrostyRuntimeException(String message, Throwable cause) {
+    public JavinIllegalAccessException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FrostyRuntimeException(Throwable cause) {
+    public JavinIllegalAccessException(Throwable cause) {
         super(cause);
     }
 }

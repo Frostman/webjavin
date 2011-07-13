@@ -25,7 +25,7 @@ import javassist.CtClass;
  *
  * @author slukjanov aka Frostman
  */
-public class FrostyClass {
+public class AppClass {
     private String name;
     private byte[] bytecode;
     private byte[] enhancedBytecode;
@@ -38,7 +38,7 @@ public class FrostyClass {
 
     private boolean generated;
 
-    public FrostyClass() {
+    public AppClass() {
     }
 
     public String getName() {

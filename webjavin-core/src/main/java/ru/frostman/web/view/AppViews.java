@@ -20,10 +20,10 @@ package ru.frostman.web.view;
 
 import freemarker.cache.MruCacheStorage;
 import freemarker.template.Configuration;
-import ru.frostman.web.Frosty;
-import ru.frostman.web.config.FrostyConfig;
+import ru.frostman.web.Javin;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,29 +31,29 @@ import java.io.IOException;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyViews {
+public class AppViews {
     private static final String FORWARD = "forward:";
     private static final String REDIRECT = "redirect:";
     private final Configuration freemarker;
 
-    public FrostyViews() {
+    public AppViews() {
         freemarker = new Configuration();
 
-        int updateInterval = FrostyConfig.getCurrentConfig().getMode().isProductionMode()
-                ? FrostyConfig.getCurrentConfig().getTemplates().getUpdateInterval() : 0;
+        int updateInterval = JavinConfig.getCurrentConfig().getMode().isProductionMode()
+                ? JavinConfig.getCurrentConfig().getTemplates().getUpdateInterval() : 0;
         freemarker.setTemplateUpdateDelay(updateInterval);
         freemarker.setDefaultEncoding("utf-8");
         freemarker.setOutputEncoding("utf-8");
 
-        int maxStrongSize = FrostyConfig.getCurrentConfig().getTemplates().getMaxCacheStrongSize();
-        int maxSoftSize = FrostyConfig.getCurrentConfig().getTemplates().getMaxCacheSoftSize();
+        int maxStrongSize = JavinConfig.getCurrentConfig().getTemplates().getMaxCacheStrongSize();
+        int maxSoftSize = JavinConfig.getCurrentConfig().getTemplates().getMaxCacheSoftSize();
         freemarker.setCacheStorage(new MruCacheStorage(maxStrongSize, maxSoftSize));
 
         try {
-            freemarker.setDirectoryForTemplateLoading(new File(Frosty.getApplicationPath()
-                    + FrostyConfig.getCurrentConfig().getTemplates().getPath()));
+            freemarker.setDirectoryForTemplateLoading(new File(Javin.getApplicationPath()
+                    + JavinConfig.getCurrentConfig().getTemplates().getPath()));
         } catch (IOException e) {
-            throw new FrostyRuntimeException("Exception while initializing FrostyViews", e);
+            throw new JavinRuntimeException("Exception while initializing AppViews", e);
         }
     }
 
@@ -67,7 +67,7 @@ public class FrostyViews {
         try {
             return new FreemarkerView(freemarker.getTemplate(name));
         } catch (IOException e) {
-            throw new FrostyRuntimeException("Exception while instantiating FreemarkerView");
+            throw new JavinRuntimeException("Exception while instantiating FreemarkerView");
         }
     }
 }

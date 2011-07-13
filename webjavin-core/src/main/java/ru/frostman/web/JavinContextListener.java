@@ -22,10 +22,10 @@ import com.google.code.morphia.logging.MorphiaLoggerFactory;
 import com.google.code.morphia.logging.slf4j.SLF4JLogrImplFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.frostman.web.classloading.FrostyClasses;
-import ru.frostman.web.config.FrostyConfig;
+import ru.frostman.web.classloading.AppClasses;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.thr.FastRuntimeException;
-import ru.frostman.web.view.FrostyViews;
+import ru.frostman.web.view.AppViews;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -33,8 +33,8 @@ import javax.servlet.ServletContextListener;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyContextListener implements ServletContextListener {
-    private static final Logger log = LoggerFactory.getLogger(FrostyContextListener.class);
+public class JavinContextListener implements ServletContextListener {
+    private static final Logger log = LoggerFactory.getLogger(JavinContextListener.class);
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -42,15 +42,15 @@ public class FrostyContextListener implements ServletContextListener {
             freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
             MorphiaLoggerFactory.registerLogger(SLF4JLogrImplFactory.class);
 
-            Frosty.setMode(FrostyConfig.getCurrentConfig().getMode());
-            Frosty.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
-            Frosty.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
+            Javin.setMode(JavinConfig.getCurrentConfig().getMode());
+            Javin.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
+            Javin.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
 
-            Frosty.setApplicationPath(sce.getServletContext().getRealPath("/"));
-            Frosty.setClasses(new FrostyClasses());
-            Frosty.setViews(new FrostyViews());
+            Javin.setApplicationPath(sce.getServletContext().getRealPath("/"));
+            Javin.setClasses(new AppClasses());
+            Javin.setViews(new AppViews());
 
-            log.info("Frosty context initialized successfully");
+            log.info("Javin context initialized successfully");
         } catch (Throwable th) {
             log.error("Initialization failed with: ", th);
 
@@ -60,6 +60,6 @@ public class FrostyContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        log.info("Frosty context destroyed successfully");
+        log.info("Javin context destroyed successfully");
     }
 }

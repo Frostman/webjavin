@@ -21,18 +21,18 @@ package ru.frostman.web.config;
 import com.google.common.base.Objects;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import ru.frostman.web.FrostyMode;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.JavinMode;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.io.InputStream;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyConfig {
-    private static FrostyConfig currentConfig;
+public class JavinConfig {
+    private static JavinConfig currentConfig;
 
-    private FrostyMode mode = FrostyMode.DEV;
+    private JavinMode mode = JavinMode.DEV;
     private ClassesConfig classes = new ClassesConfig();
     private TemplatesConfig templates = new TemplatesConfig();
     private AppConfig app = new AppConfig();
@@ -43,8 +43,8 @@ public class FrostyConfig {
 
     public synchronized static boolean update() {
         try {
-            Yaml yaml = new Yaml(new Constructor(FrostyConfig.class));
-            FrostyConfig config = (FrostyConfig) yaml.load(getConfigStream());
+            Yaml yaml = new Yaml(new Constructor(JavinConfig.class));
+            JavinConfig config = (JavinConfig) yaml.load(getConfigStream());
 
             boolean changed = false;
             if (!config.equals(currentConfig)) {
@@ -55,23 +55,23 @@ public class FrostyConfig {
 
             return changed;
         } catch (Exception e) {
-            throw new FrostyRuntimeException("Can't load framework configuration", e);
+            throw new JavinRuntimeException("Can't load framework configuration", e);
         }
     }
 
-    public static FrostyConfig getCurrentConfig() {
+    public static JavinConfig getCurrentConfig() {
         return currentConfig;
     }
 
     private static InputStream getConfigStream() {
-        return FrostyConfig.class.getResourceAsStream("/frosty.yaml");
+        return JavinConfig.class.getResourceAsStream("/javin.yaml");
     }
 
-    public FrostyMode getMode() {
+    public JavinMode getMode() {
         return mode;
     }
 
-    public void setMode(FrostyMode mode) {
+    public void setMode(JavinMode mode) {
         this.mode = mode;
     }
 
@@ -101,8 +101,8 @@ public class FrostyConfig {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof FrostyConfig) {
-            FrostyConfig config = (FrostyConfig) obj;
+        if (obj instanceof JavinConfig) {
+            JavinConfig config = (JavinConfig) obj;
 
             return mode == config.mode
                     && Objects.equal(classes, config.classes)

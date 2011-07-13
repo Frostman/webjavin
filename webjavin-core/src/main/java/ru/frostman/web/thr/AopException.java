@@ -21,7 +21,7 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class AopException extends FrostyRuntimeException {
+public class AopException extends JavinRuntimeException {
     public AopException() {
     }
 

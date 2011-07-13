@@ -22,8 +22,8 @@ import com.google.common.collect.Maps;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.compiler.ExecutableStatement;
-import ru.frostman.web.Frosty;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.Javin;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.util.List;
 import java.util.Map;
@@ -51,21 +51,21 @@ class SecureExpression {
 
             int idx = 1;
             for (String paramType : paramTypes) {
-                context.addInput("param$" + idx, Frosty.getClasses().getClassLoader().loadClass(paramType));
+                context.addInput("param$" + idx, Javin.getClasses().getClassLoader().loadClass(paramType));
 
                 idx++;
             }
 
-            context.addImport("isAuth", FrostySecurityManager.class.getMethod("isAuthenticated"));
-            context.addImport("hasRole", FrostySecurityManager.class.getMethod("hasRole", String.class));
+            context.addImport("isAuth", AppSecurityManager.class.getMethod("isAuthenticated"));
+            context.addImport("hasRole", AppSecurityManager.class.getMethod("hasRole", String.class));
 
             expression = (ExecutableStatement) MVEL.compileExpression(expressionStr, context);
 
             if (expression.getKnownEgressType() != boolean.class && expression.getKnownEgressType() != Boolean.class) {
-                throw new FrostyRuntimeException("Expression should return boolean");
+                throw new JavinRuntimeException("Expression should return boolean");
             }
         } catch (Exception e) {
-            throw new FrostyRuntimeException("Can't compile secure expression: " + expressionStr, e);
+            throw new JavinRuntimeException("Can't compile secure expression: " + expressionStr, e);
         }
     }
 
@@ -84,7 +84,7 @@ class SecureExpression {
 
             return (Boolean) MVEL.executeExpression(expression, vars);
         } catch (Exception e) {
-            throw new FrostyRuntimeException("Exception while executing secure expression: " + expressionStr, e);
+            throw new JavinRuntimeException("Exception while executing secure expression: " + expressionStr, e);
         }
     }
 

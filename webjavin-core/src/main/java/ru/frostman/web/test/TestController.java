@@ -18,7 +18,7 @@
 
 package ru.frostman.web.test;
 
-import ru.frostman.web.Frosty;
+import ru.frostman.web.Javin;
 import ru.frostman.web.annotation.*;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
@@ -52,7 +52,7 @@ public class TestController {
             return new JsonView();
         }
 
-        return Frosty.getViews().getViewByName("test.ftl");
+        return Javin.getViews().getViewByName("test.ftl");
     }
 
     @Action("/test/qwe")

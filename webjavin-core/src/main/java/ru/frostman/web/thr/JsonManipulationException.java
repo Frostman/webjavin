@@ -21,7 +21,7 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class JsonManipulationException extends FrostyRuntimeException {
+public class JsonManipulationException extends JavinRuntimeException {
     public JsonManipulationException() {
     }
 

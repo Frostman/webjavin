@@ -18,23 +18,23 @@
 
 package ru.frostman.web;
 
-import ru.frostman.web.classloading.FrostyClasses;
-import ru.frostman.web.util.FrostyInvoker;
-import ru.frostman.web.view.FrostyViews;
+import ru.frostman.web.classloading.AppClasses;
+import ru.frostman.web.util.Invoker;
+import ru.frostman.web.view.AppViews;
 
 /**
- * Main class of Frosty framework, that encapsulates most of all
+ * Main class of Javin framework, that encapsulates most of all
  * application's properties, such as, servlet api version, loaded
  * classes of the application and so on.
  *
  * @author slukjanov aka Frostman
  */
-public final class Frosty {
+public final class Javin {
 
     /**
      * Current application mode
      */
-    private static FrostyMode mode;
+    private static JavinMode mode;
 
     /**
      * Major version of the Servlet API that current servlet container supports
@@ -54,22 +54,22 @@ public final class Frosty {
     /**
      * Application classes and tools to update and use them, such as class loader
      */
-    private static FrostyClasses classes;
+    private static AppClasses classes;
 
     /**
      * Application views, like templates and codec
      */
-    private static FrostyViews views;
+    private static AppViews views;
 
     /**
      * Executor
      */
-    private static FrostyInvoker invoker;
+    private static Invoker invoker;
 
     /**
      * @return current application mode
      */
-    public static FrostyMode getMode() {
+    public static JavinMode getMode() {
         return mode;
     }
 
@@ -83,14 +83,14 @@ public final class Frosty {
     /**
      * @return application classes and tools to update and use them
      */
-    public static FrostyClasses getClasses() {
+    public static AppClasses getClasses() {
         return classes;
     }
 
     /**
      * @return application views
      */
-    public static FrostyViews getViews() {
+    public static AppViews getViews() {
         return views;
     }
 
@@ -104,35 +104,35 @@ public final class Frosty {
     /**
      * @return executor
      */
-    public static FrostyInvoker getInvoker() {
+    public static Invoker getInvoker() {
         return invoker;
     }
 
-    static void setMode(FrostyMode mode) {
-        Frosty.mode = mode;
+    static void setMode(JavinMode mode) {
+        Javin.mode = mode;
     }
 
     static void setServletApiMajorVersion(int servletApiMajorVersion) {
-        Frosty.servletApiMajorVersion = servletApiMajorVersion;
+        Javin.servletApiMajorVersion = servletApiMajorVersion;
     }
 
     static void setServletApiMinorVersion(int servletApiMinorVersion) {
-        Frosty.servletApiMinorVersion = servletApiMinorVersion;
+        Javin.servletApiMinorVersion = servletApiMinorVersion;
     }
 
-    static void setClasses(FrostyClasses classes) {
-        Frosty.classes = classes;
+    static void setClasses(AppClasses classes) {
+        Javin.classes = classes;
     }
 
     static void setApplicationPath(String applicationPath) {
-        Frosty.applicationPath = applicationPath;
+        Javin.applicationPath = applicationPath;
     }
 
-    static void setViews(FrostyViews views) {
-        Frosty.views = views;
+    static void setViews(AppViews views) {
+        Javin.views = views;
     }
 
-    public static void setInvoker(FrostyInvoker invoker) {
-        Frosty.invoker = invoker;
+    public static void setInvoker(Invoker invoker) {
+        Javin.invoker = invoker;
     }
 }

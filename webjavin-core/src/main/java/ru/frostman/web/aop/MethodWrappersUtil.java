@@ -22,9 +22,9 @@ import com.google.common.collect.Lists;
 import javassist.CtClass;
 import javassist.CtMethod;
 import ru.frostman.web.annotation.Wrapper;
-import ru.frostman.web.classloading.FrostyClass;
+import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.thr.AopException;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.util.List;
 import java.util.Map;
@@ -36,11 +36,11 @@ import static ru.frostman.web.classloading.enhance.EnhancerUtil.isPublicAndStati
  * @author slukjanov aka Frostman
  */
 public class MethodWrappersUtil {
-    public static List<MethodWrapper> findWrappers(Map<String, FrostyClass> classes) {
+    public static List<MethodWrapper> findWrappers(Map<String, AppClass> classes) {
         try {
             List<MethodWrapper> methodWrappers = Lists.newLinkedList();
 
-            for (Map.Entry<String, FrostyClass> entry : classes.entrySet()) {
+            for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
                 CtClass ctClass = entry.getValue().getCtClass();
 
                 for (CtMethod method : getDeclaredMethodsAnnotatedWith(Wrapper.class, ctClass)) {
@@ -73,7 +73,7 @@ public class MethodWrappersUtil {
 
             return methodWrappers;
         } catch (Exception e) {
-            throw new FrostyRuntimeException("Exception while searching method wrappers", e);
+            throw new JavinRuntimeException("Exception while searching method wrappers", e);
         }
     }
 }

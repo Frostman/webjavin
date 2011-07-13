@@ -18,12 +18,12 @@
 
 package ru.frostman.web.view;
 
-import ru.frostman.web.Frosty;
-import ru.frostman.web.config.FrostyConfig;
+import ru.frostman.web.Javin;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.dispatch.ActionInvoker;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.util.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,13 +52,13 @@ public class ForwardView extends View {
             count = 0;
         }
 
-        final int maxForwardsCount = FrostyConfig.getCurrentConfig().getApp().getMaxForwardsCount();
+        final int maxForwardsCount = JavinConfig.getCurrentConfig().getApp().getMaxForwardsCount();
         if (count > maxForwardsCount) {
-            throw new FrostyRuntimeException("Forwards count more than specified value (" + maxForwardsCount + ")");
+            throw new JavinRuntimeException("Forwards count more than specified value (" + maxForwardsCount + ")");
         }
         request.setAttribute(FORWARDS_COUNT, count + 1);
 
-        ActionInvoker actionInvoker = Frosty.getClasses().getDispatcher()
+        ActionInvoker actionInvoker = Javin.getClasses().getDispatcher()
                 .dispatch(targetUrl, HttpMethod.valueOf(request.getMethod()), request, response);
         if (actionInvoker == null) {
             //todo handle NotFound

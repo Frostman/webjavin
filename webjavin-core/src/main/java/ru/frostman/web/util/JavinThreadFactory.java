@@ -16,24 +16,39 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.thr;
+package ru.frostman.web.util;
+
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyIllegalAccessException extends FrostyRuntimeException {
-    public FrostyIllegalAccessException() {
+public class JavinThreadFactory implements ThreadFactory {
+
+    private final AtomicInteger threadNumber = new AtomicInteger();
+    private final ThreadGroup group;
+    private final String threadNamePrefix;
+
+    public JavinThreadFactory(String poolName) {
+        SecurityManager s = System.getSecurityManager();
+        ThreadGroup parentGroup = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+        group = new ThreadGroup(parentGroup, poolName);
+        threadNamePrefix = poolName + "-thread-";
     }
 
-    public FrostyIllegalAccessException(String message) {
-        super(message);
-    }
+    @Override
+    public Thread newThread(Runnable runnable) {
+        Thread thread = new Thread(group, runnable, threadNamePrefix + threadNumber.getAndIncrement());
 
-    public FrostyIllegalAccessException(String message, Throwable cause) {
-        super(message, cause);
-    }
+        if (thread.isDaemon()) {
+            thread.setDaemon(false);
+        }
 
-    public FrostyIllegalAccessException(Throwable cause) {
-        super(cause);
+        if (thread.getPriority() != Thread.NORM_PRIORITY) {
+            thread.setPriority(Thread.NORM_PRIORITY);
+        }
+
+        return thread;
     }
 }

@@ -38,11 +38,11 @@ public class DispatcherServlet extends HttpServlet {
             //response.setContentType("text/plain");
             //response.setHeader("Transfer-Encoding", "chunked");
 
-            if (Frosty.getMode().isDevelopmentMode()) {
-                Frosty.getClasses().update();
+            if (Javin.getMode().isDevelopmentMode()) {
+                Javin.getClasses().update();
             }
 
-            ActionInvoker actionInvoker = Frosty.getClasses().getDispatcher()
+            ActionInvoker actionInvoker = Javin.getClasses().getDispatcher()
                     .dispatch(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()), request, response);
             if (actionInvoker == null) {
                 //todo handle NotFound

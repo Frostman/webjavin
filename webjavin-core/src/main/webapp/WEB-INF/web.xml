@@ -15,7 +15,7 @@
     </servlet-mapping>
 
     <listener>
-        <listener-class>ru.frostman.web.FrostyContextListener</listener-class>
+        <listener-class>ru.frostman.web.JavinContextListener</listener-class>
     </listener>
 
 </web-app>

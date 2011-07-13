@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import javassist.*;
 import ru.frostman.web.annotation.*;
-import ru.frostman.web.classloading.FrostyClass;
+import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.url.UrlPattern;
 import ru.frostman.web.dispatch.url.UrlPatternType;
@@ -53,11 +53,9 @@ class ActionsEnhancer {
     private static final String JAVA_LANG_STRING = "java.lang.String";
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String DEFAULT_ACTION_CATCH = "ru.frostman.web.thr.DefaultActionCatch";
-    private static final String FROSTY_RUNTIME_EXCEPTION = "ru.frostman.web.thr.FrostyRuntimeException";
     private static final String ACTION_EXCEPTION = "ru.frostman.web.dispatch.ActionException";
-    private static final String FORWARD_VIEW = "ru.frostman.web.view.ForwardView";
 
-    public static void enhance(Map<String, FrostyClass> classes, ClassPool classPool, CtClass controller,
+    public static void enhance(Map<String, AppClass> classes, ClassPool classPool, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
         for (CtMethod actionMethod : getDeclaredMethodsAnnotatedWith(Action.class, controller)) {
             try {
@@ -73,7 +71,7 @@ class ActionsEnhancer {
 
                 CtClass actionInvoker = generateActionInvoker(classPool, actionMethod, async);
 
-                FrostyClass generated = new FrostyClass();
+                AppClass generated = new AppClass();
                 generated.setName(actionInvoker.getName());
                 generated.setEnhancedBytecode(actionInvoker.toBytecode());
                 generated.setGenerated(true);
@@ -178,7 +176,7 @@ class ActionsEnhancer {
             body.append("mav = (").append(MODEL_AND_VIEW).append(") result;");
         } else if (returnType.equals(getCtClass(classPool, JAVA_LANG_STRING))) {
             // iff return type is String then change ModelAndView's view to resolved view by name
-            body.append("mav.setView(ru.frostman.web.Frosty.getViews().getViewByName((")
+            body.append("mav.setView(ru.frostman.web.Javin.getViews().getViewByName((")
                     .append(JAVA_LANG_STRING).append(") result").append("));");
         } else {
             throw new ActionEnhancerException("Action method can't return specified type: " + actionMethod.getLongName());

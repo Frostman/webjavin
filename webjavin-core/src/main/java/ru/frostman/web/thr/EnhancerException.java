@@ -21,7 +21,7 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class EnhancerException extends FrostyRuntimeException {
+public class EnhancerException extends JavinRuntimeException {
     public EnhancerException() {
     }
 

@@ -18,7 +18,7 @@
 
 package ru.frostman.web.thr;
 
-public class BytecodeManipulationException extends FrostyRuntimeException {
+public class BytecodeManipulationException extends JavinRuntimeException {
     public BytecodeManipulationException() {
     }
 

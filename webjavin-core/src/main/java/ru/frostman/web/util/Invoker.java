@@ -18,7 +18,7 @@
 
 package ru.frostman.web.util;
 
-import ru.frostman.web.config.FrostyConfig;
+import ru.frostman.web.config.JavinConfig;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -28,13 +28,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyInvoker {
+public class Invoker {
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
-            FrostyConfig.getCurrentConfig().getApp().getPool().getCorePoolSize(),
-            FrostyConfig.getCurrentConfig().getApp().getPool().getMaximumPoolSize(),
-            FrostyConfig.getCurrentConfig().getApp().getPool().getKeepAliveTime(),
-            FrostyConfig.getCurrentConfig().getApp().getPool().getTimeUnit(),
-            new LinkedBlockingQueue<Runnable>(), new FrostyThreadFactory("frosty-executor")
+            JavinConfig.getCurrentConfig().getApp().getPool().getCorePoolSize(),
+            JavinConfig.getCurrentConfig().getApp().getPool().getMaximumPoolSize(),
+            JavinConfig.getCurrentConfig().getApp().getPool().getKeepAliveTime(),
+            JavinConfig.getCurrentConfig().getApp().getPool().getTimeUnit(),
+            new LinkedBlockingQueue<Runnable>(), new JavinThreadFactory("javin-executor")
     );
 
     public void execute(Runnable command) {

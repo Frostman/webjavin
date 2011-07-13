@@ -18,11 +18,11 @@
 
 package ru.frostman.web.dispatch;
 
-import ru.frostman.web.Frosty;
-import ru.frostman.web.config.FrostyConfig;
+import ru.frostman.web.Javin;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.ModelAndView;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.view.ForwardView;
 import ru.frostman.web.view.RedirectView;
 
@@ -49,9 +49,9 @@ public abstract class ActionInvoker implements Runnable {
     }
 
     public void invoke() {
-        if (async && Frosty.isAsyncApiSupported() && Frosty.getInvoker().getQueueSize() < FrostyConfig.getCurrentConfig().getApp().getAsyncQueueLength()) {
+        if (async && Javin.isAsyncApiSupported() && Javin.getInvoker().getQueueSize() < JavinConfig.getCurrentConfig().getApp().getAsyncQueueLength()) {
             asyncContext = request.startAsync(request, response);
-            Frosty.getInvoker().execute(this);
+            Javin.getInvoker().execute(this);
         } else {
             async = false;
             run();
@@ -93,7 +93,7 @@ public abstract class ActionInvoker implements Runnable {
 
     private void process() throws IOException {
         if (mav == null || mav.getModel() == null || mav.getView() == null) {
-            throw new FrostyRuntimeException("ModelAndView or Model or View are undefined after action invoked");
+            throw new JavinRuntimeException("ModelAndView or Model or View are undefined after action invoked");
         }
 
         View view = mav.getView();

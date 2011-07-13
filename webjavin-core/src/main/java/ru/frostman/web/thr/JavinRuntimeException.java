@@ -16,19 +16,24 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web;
+package ru.frostman.web.thr;
 
 /**
  * @author slukjanov aka Frostman
  */
-public enum FrostyMode {
-    DEV, PROD;
-
-    public boolean isDevelopmentMode() {
-        return this == DEV;
+public class JavinRuntimeException extends RuntimeException {
+    public JavinRuntimeException() {
     }
 
-    public boolean isProductionMode() {
-        return this == PROD;
+    public JavinRuntimeException(String message) {
+        super(message);
+    }
+
+    public JavinRuntimeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public JavinRuntimeException(Throwable cause) {
+        super(cause);
     }
 }

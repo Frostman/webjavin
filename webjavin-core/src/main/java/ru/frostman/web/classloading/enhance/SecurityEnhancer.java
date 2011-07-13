@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
-import ru.frostman.web.Frosty;
+import ru.frostman.web.Javin;
 import ru.frostman.web.annotation.Secure;
 import ru.frostman.web.thr.BytecodeManipulationException;
 
@@ -43,10 +43,10 @@ public class SecurityEnhancer {
                     paramClasses.add(paramCtClass.getName());
                 }
 
-                int expressionId = Frosty.getClasses().getSecurityManager()
+                int expressionId = Javin.getClasses().getSecurityManager()
                         .register(secureAnnotation.value(), paramClasses);
 
-                method.insertBefore("{" + Frosty.class.getName() + ".getClasses().getSecurityManager().check("
+                method.insertBefore("{" + Javin.class.getName() + ".getClasses().getSecurityManager().check("
                         + ctClass.getName() + ".class, " +
                         "\"" + method.getName() + "\", "
                         + expressionId

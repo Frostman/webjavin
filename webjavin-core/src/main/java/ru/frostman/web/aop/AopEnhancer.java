@@ -23,7 +23,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class AopEnhancer {
             });
         } catch (Exception e) {
             //todo impl
-            throw new FrostyRuntimeException(e);
+            throw new JavinRuntimeException(e);
         }
     }
 }

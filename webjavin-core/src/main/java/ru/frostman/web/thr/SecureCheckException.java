@@ -21,7 +21,7 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class SecureCheckException extends FrostyRuntimeException {
+public class SecureCheckException extends JavinRuntimeException {
     public SecureCheckException() {
     }
 

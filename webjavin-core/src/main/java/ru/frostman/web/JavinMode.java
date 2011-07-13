@@ -16,39 +16,19 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.util;
-
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
+package ru.frostman.web;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyThreadFactory implements ThreadFactory {
+public enum JavinMode {
+    DEV, PROD;
 
-    private final AtomicInteger threadNumber = new AtomicInteger();
-    private final ThreadGroup group;
-    private final String threadNamePrefix;
-
-    public FrostyThreadFactory(String poolName) {
-        SecurityManager s = System.getSecurityManager();
-        ThreadGroup parentGroup = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-        group = new ThreadGroup(parentGroup, poolName);
-        threadNamePrefix = poolName + "-thread-";
+    public boolean isDevelopmentMode() {
+        return this == DEV;
     }
 
-    @Override
-    public Thread newThread(Runnable runnable) {
-        Thread thread = new Thread(group, runnable, threadNamePrefix + threadNumber.getAndIncrement());
-
-        if (thread.isDaemon()) {
-            thread.setDaemon(false);
-        }
-
-        if (thread.getPriority() != Thread.NORM_PRIORITY) {
-            thread.setPriority(Thread.NORM_PRIORITY);
-        }
-
-        return thread;
+    public boolean isProductionMode() {
+        return this == PROD;
     }
 }

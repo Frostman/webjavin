@@ -21,7 +21,7 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class DefaultActionCatch extends FrostyRuntimeException {
+public class DefaultActionCatch extends JavinRuntimeException {
     public DefaultActionCatch() {
     }
 

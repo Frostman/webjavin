@@ -21,7 +21,7 @@ package ru.frostman.web.classloading;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.frostman.web.Frosty;
+import ru.frostman.web.Javin;
 
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
@@ -38,11 +38,11 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyClassLoader extends ClassLoader {
-    private static final Logger log = LoggerFactory.getLogger(FrostyClassLoader.class);
+public class AppClassLoader extends ClassLoader {
+    private static final Logger log = LoggerFactory.getLogger(AppClassLoader.class);
 
     /**
-     * FrostyClassLoader instances counter
+     * AppClassLoader instances counter
      */
     private static final AtomicLong LOADERS_COUNT = new AtomicLong();
 
@@ -54,20 +54,20 @@ public class FrostyClassLoader extends ClassLoader {
     /**
      * All application classes stored by name
      */
-    private final Map<String, FrostyClass> classes;
+    private final Map<String, AppClass> classes;
 
     /**
      * Protection domain will be applied to all loaded classes
      */
     private ProtectionDomain protectionDomain;
 
-    public FrostyClassLoader(Map<String, FrostyClass> classes) {
-        super(Frosty.class.getClassLoader());
+    public AppClassLoader(Map<String, AppClass> classes) {
+        super(Javin.class.getClassLoader());
 
         this.classes = classes;
 
         try {
-            CodeSource codeSource = new CodeSource(new URL("file:" + Frosty.getApplicationPath()), (Certificate[]) null);
+            CodeSource codeSource = new CodeSource(new URL("file:" + Javin.getApplicationPath()), (Certificate[]) null);
             Permissions permissions = new Permissions();
             permissions.add(new AllPermission());
             protectionDomain = new ProtectionDomain(codeSource, permissions);
@@ -124,17 +124,17 @@ public class FrostyClassLoader extends ClassLoader {
             start = System.currentTimeMillis();
         }
 
-        FrostyClass frostyClass = classes.get(name);
+        AppClass appClass = classes.get(name);
 
-        if (frostyClass == null) {
+        if (appClass == null) {
             return null;
         }
 
-        final byte[] enhancedBytecode = frostyClass.getEnhancedBytecode();
+        final byte[] enhancedBytecode = appClass.getEnhancedBytecode();
         Class<?> clazz = defineClass(name, enhancedBytecode, 0, enhancedBytecode.length, protectionDomain);
         resolveClass(clazz);
 
-        frostyClass.setJavaClass(clazz);
+        appClass.setJavaClass(clazz);
 
         if (log.isDebugEnabled()) {
             log.debug("Application class defined and resolved: {} ({}ms)", name, System.currentTimeMillis() - start);
@@ -145,7 +145,7 @@ public class FrostyClassLoader extends ClassLoader {
 
     public List<Class> getClassesAnnotatedWith(Class<? extends Annotation> annotation) {
         List<Class> result = Lists.newLinkedList();
-        for (Map.Entry<String, FrostyClass> entry : classes.entrySet()) {
+        for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
             final Class<?> javaClass = entry.getValue().getJavaClass();
             if (javaClass != null && javaClass.getAnnotation(annotation) != null) {
                 result.add(javaClass);

@@ -21,7 +21,7 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class ActionInitializationException extends FrostyRuntimeException {
+public class ActionInitializationException extends JavinRuntimeException {
     public ActionInitializationException() {
     }
 

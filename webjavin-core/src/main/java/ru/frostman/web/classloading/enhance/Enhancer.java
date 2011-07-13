@@ -25,11 +25,11 @@ import javassist.CtClass;
 import javassist.NotFoundException;
 import ru.frostman.web.aop.AopEnhancer;
 import ru.frostman.web.aop.MethodWrapper;
-import ru.frostman.web.classloading.FrostyClass;
-import ru.frostman.web.classloading.FrostyClasses;
+import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.classloading.AppClasses;
 import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.thr.EnhancerException;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -42,38 +42,38 @@ public class Enhancer {
     private static final ClassPool classPool = new ClassPool();
 
     static {
-        classPool.appendClassPath(new ClassClassPath(FrostyClasses.class));
+        classPool.appendClassPath(new ClassClassPath(AppClasses.class));
         classPool.appendSystemPath();
     }
 
-    public static void prepareClasses(Map<String, FrostyClass> classes) {
-        for (FrostyClass frostyClass : Lists.newLinkedList(classes.values())) {
-            frostyClass.setEnhancedBytecode(null);
+    public static void prepareClasses(Map<String, AppClass> classes) {
+        for (AppClass appClass : Lists.newLinkedList(classes.values())) {
+            appClass.setEnhancedBytecode(null);
 
-            if (frostyClass.isGenerated()) {
-                classes.remove(frostyClass.getName());
+            if (appClass.isGenerated()) {
+                classes.remove(appClass.getName());
                 continue;
             }
 
             CtClass ctClass;
             try {
-                ctClass = classPool.makeClass(new ByteArrayInputStream(frostyClass.getBytecode()));
+                ctClass = classPool.makeClass(new ByteArrayInputStream(appClass.getBytecode()));
             } catch (Exception e) {
                 throw new EnhancerException(e);
             }
 
-            frostyClass.setCtClass(ctClass);
+            appClass.setCtClass(ctClass);
         }
 
     }
 
-    public static void enhance(Map<String, FrostyClass> classes, FrostyClass frostyClass,
+    public static void enhance(Map<String, AppClass> classes, AppClass appClass,
                                List<ActionDefinition> actionDefinitions, List<MethodWrapper> methodWrappers) {
-        if (frostyClass.isGenerated() || frostyClass.getEnhancedBytecode() != null) {
+        if (appClass.isGenerated() || appClass.getEnhancedBytecode() != null) {
             return;
         }
 
-        CtClass ctClass = frostyClass.getCtClass();
+        CtClass ctClass = appClass.getCtClass();
 
         try {
             CtClass superclass = ctClass.getSuperclass();
@@ -81,7 +81,7 @@ public class Enhancer {
                 Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions, methodWrappers);
             }
         } catch (NotFoundException e) {
-            throw new FrostyRuntimeException(e);
+            throw new JavinRuntimeException(e);
         }
 
         ActionsEnhancer.enhance(classes, classPool, ctClass, actionDefinitions);
@@ -89,7 +89,7 @@ public class Enhancer {
         SecurityEnhancer.enhance(classPool, ctClass);
 
         try {
-            frostyClass.setEnhancedBytecode(ctClass.toBytecode());
+            appClass.setEnhancedBytecode(ctClass.toBytecode());
         } catch (Exception e) {
             throw new EnhancerException(e);
         }

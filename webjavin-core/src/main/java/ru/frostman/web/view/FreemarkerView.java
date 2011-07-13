@@ -22,7 +22,7 @@ import com.google.common.base.Preconditions;
 import freemarker.template.Template;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.thr.FrostyRuntimeException;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.io.PrintWriter;
 
@@ -43,7 +43,7 @@ public class FreemarkerView extends View {
         try {
             template.process(model, writer);
         } catch (Exception e) {
-            throw new FrostyRuntimeException("Exception while processing template", e);
+            throw new JavinRuntimeException("Exception while processing template", e);
         }
     }
 }

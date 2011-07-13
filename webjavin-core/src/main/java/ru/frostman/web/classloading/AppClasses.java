@@ -24,14 +24,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.frostman.web.Frosty;
+import ru.frostman.web.Javin;
 import ru.frostman.web.aop.MethodWrapper;
 import ru.frostman.web.aop.MethodWrappersUtil;
 import ru.frostman.web.classloading.enhance.Enhancer;
-import ru.frostman.web.config.FrostyConfig;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.Dispatcher;
-import ru.frostman.web.secure.FrostySecurityManager;
+import ru.frostman.web.secure.AppSecurityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -41,8 +41,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostyClasses {
-    private static final Logger log = LoggerFactory.getLogger(FrostyClasses.class);
+public class AppClasses {
+    private static final Logger log = LoggerFactory.getLogger(AppClasses.class);
 
     /**
      * Lock that used to synchronize all invokes of method update()
@@ -57,12 +57,12 @@ public class FrostyClasses {
     /**
      * All application classes stored by name
      */
-    private final Map<String, FrostyClass> classes = Maps.newLinkedHashMap();
+    private final Map<String, AppClass> classes = Maps.newLinkedHashMap();
 
     /**
      * Current class loader instance
      */
-    private FrostyClassLoader classLoader;
+    private AppClassLoader classLoader;
 
     /**
      * Request dispatcher
@@ -72,10 +72,10 @@ public class FrostyClasses {
     /**
      * Security manager
      */
-    private FrostySecurityManager securityManager;
+    private AppSecurityManager securityManager;
 
-    public FrostyClasses() {
-        if (Frosty.getMode().isProductionMode()) {
+    public AppClasses() {
+        if (Javin.getMode().isProductionMode()) {
             update();
         }
     }
@@ -87,7 +87,7 @@ public class FrostyClasses {
      * @return true iff class loader changed
      */
     public boolean update() {
-        if (System.currentTimeMillis() - lastUpdate < FrostyConfig.getCurrentConfig().getClasses().getUpdateInterval()) {
+        if (System.currentTimeMillis() - lastUpdate < JavinConfig.getCurrentConfig().getClasses().getUpdateInterval()) {
             return false;
         }
 
@@ -99,9 +99,9 @@ public class FrostyClasses {
                 start = System.currentTimeMillis();
             }
 
-            boolean needReload = FrostyConfig.update();
+            boolean needReload = JavinConfig.update();
 
-            List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(FrostyConfig.getCurrentConfig().getClasses().getPackages());
+            List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(JavinConfig.getCurrentConfig().getClasses().getPackages());
 
             Set<String> existedClassNames = Sets.newHashSet(classes.keySet());
             Set<String> foundClassNames = Sets.newHashSet();
@@ -115,7 +115,7 @@ public class FrostyClasses {
                     needReload = true;
 
                     long lastModified = classFile.getLastModified();
-                    FrostyClass newClass = new FrostyClass();
+                    AppClass newClass = new AppClass();
                     newClass.setName(className);
                     newClass.setLastLoaded(lastModified);
                     newClass.setHashCode(classFile.getHashCode());
@@ -125,7 +125,7 @@ public class FrostyClasses {
                     log.debug("Application class added: {}", className);
                 } else {
                     // existed class
-                    final FrostyClass existedClass = classes.get(className);
+                    final AppClass existedClass = classes.get(className);
 
                     final String hashCode = classFile.getHashCode();
                     if (existedClass.getLastLoaded() < classFile.getLastModified()
@@ -135,7 +135,7 @@ public class FrostyClasses {
                         needReload = true;
 
                         long lastModified = classFile.getLastModified();
-                        FrostyClass changedClass = new FrostyClass();
+                        AppClass changedClass = new AppClass();
                         changedClass.setName(className);
                         changedClass.setLastLoaded(lastModified);
                         changedClass.setHashCode(hashCode);
@@ -173,7 +173,7 @@ public class FrostyClasses {
 
                 Enhancer.prepareClasses(classes);
 
-                this.securityManager = new FrostySecurityManager();
+                this.securityManager = new AppSecurityManager();
 
                 List<MethodWrapper> methodWrappers = MethodWrappersUtil.findWrappers(classes);
 
@@ -182,7 +182,7 @@ public class FrostyClasses {
                     Enhancer.enhance(classes, classes.get(className), actionDefinitions, methodWrappers);
                 }
 
-                FrostyClassLoader newClassLoader = new FrostyClassLoader(ImmutableMap.copyOf(classes));
+                AppClassLoader newClassLoader = new AppClassLoader(ImmutableMap.copyOf(classes));
                 newClassLoader.loadAllClasses();
 
                 for (ActionDefinition definition : actionDefinitions) {
@@ -208,7 +208,7 @@ public class FrostyClasses {
         }
     }
 
-    public FrostyClassLoader getClassLoader() {
+    public AppClassLoader getClassLoader() {
         return classLoader;
     }
 
@@ -216,7 +216,7 @@ public class FrostyClasses {
         return dispatcher;
     }
 
-    public FrostySecurityManager getSecurityManager() {
+    public AppSecurityManager getSecurityManager() {
         return securityManager;
     }
 }

@@ -19,7 +19,7 @@
 package ru.frostman.web.secure;
 
 import com.google.common.collect.Maps;
-import ru.frostman.web.thr.FrostyIllegalAccessException;
+import ru.frostman.web.thr.JavinIllegalAccessException;
 import ru.frostman.web.thr.SecureCheckException;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author slukjanov aka Frostman
  */
-public class FrostySecurityManager {
+public class AppSecurityManager {
     private static final ThreadLocal<User> currentUser = new ThreadLocal<User>();
     private static final ThreadLocal<String> currentRole = new ThreadLocal<String>();
 
@@ -90,9 +90,9 @@ public class FrostySecurityManager {
             currentRole.set(role);
 
             if (!expression.execute(user, role, args)) {
-                throw new FrostyIllegalAccessException("Secure expression returns false");
+                throw new JavinIllegalAccessException("Secure expression returns false");
             }
-        } catch (FrostyIllegalAccessException e) {
+        } catch (JavinIllegalAccessException e) {
             throw e;
         } catch (Exception e) {
             throw new SecureCheckException("Can't check secure expression for method: " + clazz.getName() + "#" + method, e);
