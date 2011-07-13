@@ -63,7 +63,7 @@ public class AppSecurityManager {
             SecureExpression expression = expressions.get(expressionId);
 
             //todo impl it
-            User user = new User(){
+            User user = new User() {
                 @Override
                 public String getLogin() {
                     return null;  //To change body of implemented methods use File | Settings | File Templates.

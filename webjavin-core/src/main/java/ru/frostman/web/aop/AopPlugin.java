@@ -16,39 +16,26 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.test;
+package ru.frostman.web.aop;
 
-import ru.frostman.web.Javin;
-import ru.frostman.web.annotation.Action;
-import ru.frostman.web.annotation.Param;
-import ru.frostman.web.annotation.Secure;
-import ru.frostman.web.controller.Model;
-import ru.frostman.web.controller.View;
-import ru.frostman.web.view.JsonView;
+import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.plugin.Plugin;
 
-import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestController {
-
-    @Secure("user != null && isAuth() && hasRole('role') && param$1 != null")
-    @Action("/test/test")
-    public View test(Model model, @Param(value = "b", required = false) String param) throws IOException {
-        model.put("testParam", param);
-
-        if ("f".equals(param)) {
-            return new JsonView();
-        }
-
-        return Javin.getViews().getViewByName("test.ftl");
+public class AopPlugin extends Plugin {
+    public AopPlugin() {
+        super(1);
     }
 
-    @Action("/test/qwe")
-    public String qwe(Model model) throws IOException {
-        model.put("testParam", "BLA-BLA!!!");
+    @Override
+    public void onLoad() {
+    }
 
-        return "test.ftl";
+    @Override
+    public void beforeClassesEnhance(Map<String, AppClass> classes) {
     }
 }

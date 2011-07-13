@@ -16,39 +16,48 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.test;
+package ru.frostman.web.plugin;
 
-import ru.frostman.web.Javin;
-import ru.frostman.web.annotation.Action;
-import ru.frostman.web.annotation.Param;
-import ru.frostman.web.annotation.Secure;
-import ru.frostman.web.controller.Model;
-import ru.frostman.web.controller.View;
-import ru.frostman.web.view.JsonView;
+import com.google.common.base.Preconditions;
+import ru.frostman.web.classloading.AppClass;
 
-import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestController {
+public abstract class Plugin implements Comparable<Plugin> {
+    private int weight;
 
-    @Secure("user != null && isAuth() && hasRole('role') && param$1 != null")
-    @Action("/test/test")
-    public View test(Model model, @Param(value = "b", required = false) String param) throws IOException {
-        model.put("testParam", param);
+    protected Plugin(int weight) {
+        Preconditions.checkArgument(weight >= 0, "Plugin's weight should be >= 0");
 
-        if ("f".equals(param)) {
-            return new JsonView();
-        }
-
-        return Javin.getViews().getViewByName("test.ftl");
+        this.weight = weight;
     }
 
-    @Action("/test/qwe")
-    public String qwe(Model model) throws IOException {
-        model.put("testParam", "BLA-BLA!!!");
+    public void onLoad() {
+    }
 
-        return "test.ftl";
+    public void beforeClassesEnhance(Map<String, AppClass> classes) {
+    }
+
+    @Override
+    public int compareTo(Plugin p) {
+        int res = weight < p.weight ? -1 : (weight != p.weight ? 1 : 0);
+
+        if (res != 0) {
+            return res;
+        }
+
+        res = getClass().getName().compareTo(p.getClass().getName());
+
+        if (res != 0) {
+            return res;
+        }
+
+        int thisHashCode = System.identityHashCode(this);
+        int otherHashCode = System.identityHashCode(p);
+
+        return (thisHashCode < otherHashCode ? -1 : (thisHashCode != otherHashCode ? 1 : 0));
     }
 }

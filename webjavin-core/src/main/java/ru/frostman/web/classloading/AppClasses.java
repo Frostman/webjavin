@@ -31,6 +31,7 @@ import ru.frostman.web.classloading.enhance.Enhancer;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.Dispatcher;
+import ru.frostman.web.plugin.JavinPlugins;
 import ru.frostman.web.secure.AppSecurityManager;
 
 import java.util.List;
@@ -171,20 +172,30 @@ public class AppClasses {
                     start = System.currentTimeMillis();
                 }
 
+                // load plugins
+                JavinPlugins.reload();
+
+                // prepare classes (creates CtClasses)
                 Enhancer.prepareClasses(classes);
 
+                // init security manager
                 this.securityManager = new AppSecurityManager();
 
+                // AOP
+                //todo need to be moved into plugin
                 List<MethodWrapper> methodWrappers = MethodWrappersUtil.findWrappers(classes);
 
+                // find actions
                 List<ActionDefinition> actionDefinitions = Lists.newLinkedList();
                 for (String className : Lists.newLinkedList(classes.keySet())) {
                     Enhancer.enhance(classes, classes.get(className), actionDefinitions, methodWrappers);
                 }
 
+                // create new class loader and load all app classes
                 AppClassLoader newClassLoader = new AppClassLoader(ImmutableMap.copyOf(classes));
                 newClassLoader.loadAllClasses();
 
+                // init action definitions with new class loader
                 for (ActionDefinition definition : actionDefinitions) {
                     definition.init(newClassLoader);
                 }
@@ -192,6 +203,7 @@ public class AppClasses {
                 this.classLoader = newClassLoader;
                 this.dispatcher = new Dispatcher(actionDefinitions);
 
+                // compile all secure expressions
                 this.securityManager.compileAll();
 
                 if (log.isInfoEnabled()) {

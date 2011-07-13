@@ -16,39 +16,24 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.test;
-
-import ru.frostman.web.Javin;
-import ru.frostman.web.annotation.Action;
-import ru.frostman.web.annotation.Param;
-import ru.frostman.web.annotation.Secure;
-import ru.frostman.web.controller.Model;
-import ru.frostman.web.controller.View;
-import ru.frostman.web.view.JsonView;
-
-import java.io.IOException;
+package ru.frostman.web.thr;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestController {
-
-    @Secure("user != null && isAuth() && hasRole('role') && param$1 != null")
-    @Action("/test/test")
-    public View test(Model model, @Param(value = "b", required = false) String param) throws IOException {
-        model.put("testParam", param);
-
-        if ("f".equals(param)) {
-            return new JsonView();
-        }
-
-        return Javin.getViews().getViewByName("test.ftl");
+public class JavinPluginException extends JavinRuntimeException {
+    public JavinPluginException() {
     }
 
-    @Action("/test/qwe")
-    public String qwe(Model model) throws IOException {
-        model.put("testParam", "BLA-BLA!!!");
+    public JavinPluginException(String message) {
+        super(message);
+    }
 
-        return "test.ftl";
+    public JavinPluginException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public JavinPluginException(Throwable cause) {
+        super(cause);
     }
 }
