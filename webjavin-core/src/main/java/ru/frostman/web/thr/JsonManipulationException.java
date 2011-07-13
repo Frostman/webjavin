@@ -1,5 +1,5 @@
 /******************************************************************************
- * Frosty - MVC framework.                                                    *
+ * WebJavin - Java Web Framework.                                             *
  *                                                                            *
  * Copyright (c) 2011 - Sergey "Frosman" Lukjanov, me@frostman.ru             *
  *                                                                            *
