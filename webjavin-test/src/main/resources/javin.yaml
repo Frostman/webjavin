@@ -12,7 +12,7 @@ app:
 
 plugins: [
       "ru.frostman.web.aop.AopPlugin",
-      "ru.frostman.web.db.mongo.MorphiaPlugin"
+      "ru.frostman.web.MongoPlugin"
 ]
 
 #res:

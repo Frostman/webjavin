@@ -16,10 +16,17 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.test.tt.qq.ee;
+package ru.frostman.web.secure.userdetails;
+
+import java.io.Serializable;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestPackagedClass {
+public interface Role extends Comparable<Role>, Serializable {
+
+    int getWeight();
+
+    String getName();
+
 }

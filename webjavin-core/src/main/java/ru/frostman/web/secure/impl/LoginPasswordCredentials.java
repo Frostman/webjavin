@@ -16,51 +16,39 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.plugin;
+package ru.frostman.web.secure.impl;
 
-import com.google.common.base.Preconditions;
-import ru.frostman.web.classloading.AppClass;
-
-import java.util.Map;
+import com.google.common.base.Objects;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class Plugin implements Comparable<Plugin> {
-    private int weight;
+public class LoginPasswordCredentials {
+    private final String login;
+    private final String password;
 
-    protected Plugin(int weight) {
-        Preconditions.checkArgument(weight >= 0, "Plugin's weight should be >= 0");
-
-        this.weight = weight;
+    public LoginPasswordCredentials(String login, String password) {
+        this.login = login;
+        this.password = password;
     }
 
-    public void onLoad() {
+    public String getLogin() {
+        return login;
     }
 
-    public void beforeClassesEnhance(Map<String, AppClass> classes) {
-    }
-
-    public void afterClassesEnhance(Map<String, AppClass> classes) {
+    public String getPassword() {
+        return password;
     }
 
     @Override
-    public int compareTo(Plugin p) {
-        int res = weight < p.weight ? -1 : (weight != p.weight ? 1 : 0);
+    public boolean equals(Object obj) {
+        if (obj instanceof LoginPasswordCredentials) {
+            LoginPasswordCredentials credentials = (LoginPasswordCredentials) obj;
 
-        if (res != 0) {
-            return res;
+            return Objects.equal(login, credentials.login)
+                    && Objects.equal(password, credentials.password);
         }
 
-        res = getClass().getName().compareTo(p.getClass().getName());
-
-        if (res != 0) {
-            return res;
-        }
-
-        int thisHashCode = System.identityHashCode(this);
-        int otherHashCode = System.identityHashCode(p);
-
-        return (thisHashCode < otherHashCode ? -1 : (thisHashCode != otherHashCode ? 1 : 0));
+        return false;
     }
 }

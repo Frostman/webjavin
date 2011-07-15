@@ -181,6 +181,8 @@ public class AppClasses {
                 // init security manager
                 this.securityManager = new AppSecurityManager();
 
+                JavinPlugins.get().beforeClassesEnhance(classes);
+
                 // AOP
                 //todo need to be moved into plugin
                 List<MethodWrapper> methodWrappers = MethodWrappersUtil.findWrappers(classes);
@@ -204,7 +206,9 @@ public class AppClasses {
                 this.dispatcher = new Dispatcher(actionDefinitions);
 
                 // compile all secure expressions
-                this.securityManager.compileAll();
+                this.securityManager.compileAllExpressions();
+
+                JavinPlugins.get().afterClassesEnhance(classes);
 
                 if (log.isInfoEnabled()) {
                     log.info("Application classes successfully reloaded ({}ms)", System.currentTimeMillis() - start);

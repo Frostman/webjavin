@@ -16,51 +16,15 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.plugin;
+package ru.frostman.web.secure.userdetails;
 
-import com.google.common.base.Preconditions;
-import ru.frostman.web.classloading.AppClass;
-
-import java.util.Map;
+import java.io.Serializable;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class Plugin implements Comparable<Plugin> {
-    private int weight;
+public interface Credentials extends Serializable {
 
-    protected Plugin(int weight) {
-        Preconditions.checkArgument(weight >= 0, "Plugin's weight should be >= 0");
+    boolean isNonExpired();
 
-        this.weight = weight;
-    }
-
-    public void onLoad() {
-    }
-
-    public void beforeClassesEnhance(Map<String, AppClass> classes) {
-    }
-
-    public void afterClassesEnhance(Map<String, AppClass> classes) {
-    }
-
-    @Override
-    public int compareTo(Plugin p) {
-        int res = weight < p.weight ? -1 : (weight != p.weight ? 1 : 0);
-
-        if (res != 0) {
-            return res;
-        }
-
-        res = getClass().getName().compareTo(p.getClass().getName());
-
-        if (res != 0) {
-            return res;
-        }
-
-        int thisHashCode = System.identityHashCode(this);
-        int otherHashCode = System.identityHashCode(p);
-
-        return (thisHashCode < otherHashCode ? -1 : (thisHashCode != otherHashCode ? 1 : 0));
-    }
 }

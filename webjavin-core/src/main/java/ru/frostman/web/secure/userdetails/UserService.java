@@ -16,19 +16,18 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.secure;
+package ru.frostman.web.secure.userdetails;
+
+import ru.frostman.web.secure.thr.UsernameAlreadyTakenException;
 
 /**
  * @author slukjanov aka Frostman
  */
-public interface User {
-    String getLogin();
+public interface UserService {
 
-    void getRole();
+    UserDetails getUser(String username);
 
-    void hasPermission();
+    void addUser(UserDetails userDetails) throws UsernameAlreadyTakenException;
 
-    void hasRole();
-
-    //etc
+    UserDetails authenticate(Credentials credentials);
 }

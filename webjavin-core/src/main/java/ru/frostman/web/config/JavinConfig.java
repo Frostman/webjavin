@@ -40,6 +40,7 @@ public class JavinConfig {
     private ClassesConfig classes = new ClassesConfig();
     private TemplatesConfig templates = new TemplatesConfig();
     private AppConfig app = new AppConfig();
+    private SecureConfig secure = new SecureConfig();
 
     static {
         update();
@@ -111,6 +112,14 @@ public class JavinConfig {
         this.app = app;
     }
 
+    public SecureConfig getSecure() {
+        return secure;
+    }
+
+    public void setSecure(SecureConfig secure) {
+        this.secure = secure;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof JavinConfig) {
@@ -120,7 +129,8 @@ public class JavinConfig {
                     && Objects.equal(plugins, config.plugins)
                     && Objects.equal(classes, config.classes)
                     && Objects.equal(templates, config.templates)
-                    && Objects.equal(app, config.app);
+                    && Objects.equal(app, config.app)
+                    && Objects.equal(secure, config.secure);
         }
 
         return false;

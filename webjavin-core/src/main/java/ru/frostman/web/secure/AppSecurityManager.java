@@ -19,6 +19,8 @@
 package ru.frostman.web.secure;
 
 import com.google.common.collect.Maps;
+import ru.frostman.web.secure.userdetails.UserDetails;
+import ru.frostman.web.secure.userdetails.UserService;
 import ru.frostman.web.thr.JavinIllegalAccessException;
 import ru.frostman.web.thr.SecureCheckException;
 
@@ -30,20 +32,27 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author slukjanov aka Frostman
  */
 public class AppSecurityManager {
-    private static final ThreadLocal<User> currentUser = new ThreadLocal<User>();
+    private static final ThreadLocal<UserDetails> currentUser = new ThreadLocal<UserDetails>();
     private static final ThreadLocal<String> currentRole = new ThreadLocal<String>();
+
+    private UserService userService;
 
     private AtomicInteger counter = new AtomicInteger();
     private Map<Integer, SecureExpression> expressions = Maps.newHashMap();
 
-    public int register(String expressionStr, List<String> paramClasses) {
+    public AppSecurityManager() {
+
+        // todo move USerService creation into plugins may be O_o
+    }
+
+    public int registerExpression(String expressionStr, List<String> paramClasses) {
         int id = counter.getAndIncrement();
         expressions.put(id, new SecureExpression(expressionStr, paramClasses));
 
         return id;
     }
 
-    public synchronized void compileAll() {
+    public synchronized void compileAllExpressions() {
         final int length = counter.get();
         for (int i = 0; i < length; i++) {
             expressions.get(i).compile();
@@ -63,27 +72,7 @@ public class AppSecurityManager {
             SecureExpression expression = expressions.get(expressionId);
 
             //todo impl it
-            User user = new User() {
-                @Override
-                public String getLogin() {
-                    return null;  //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                @Override
-                public void getRole() {
-                    //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                @Override
-                public void hasPermission() {
-                    //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                @Override
-                public void hasRole() {
-                    //To change body of implemented methods use File | Settings | File Templates.
-                }
-            };
+            UserDetails user = null;
             String role = "role";
 
             currentUser.set(user);

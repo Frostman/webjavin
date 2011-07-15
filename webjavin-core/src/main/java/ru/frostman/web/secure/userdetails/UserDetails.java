@@ -16,22 +16,30 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.test.tt.qq.ee;
+package ru.frostman.web.secure.userdetails;
 
-import ru.frostman.web.annotation.After;
-import ru.frostman.web.annotation.Before;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class BaseController {
-    @Before
-    public void baseBefore3() {
-        System.out.println("before test base3");
-    }
+public interface UserDetails extends Comparable<UserDetails>, Serializable {
+    String getUsername();
 
-    @After
-    public void baseAfter12() {
-        System.out.println("after test base12");
-    }
+    List<Credentials> getCredentials();
+
+    boolean checkCredentials(Credentials credentials);
+
+    boolean isNonExpired();
+
+    boolean isNonLocked();
+
+    boolean isEnabled();
+
+    List<Role> getRoles();
+
+    boolean hasRole(Role role);
+
+    boolean hasPermission(String permission);
 }

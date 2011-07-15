@@ -16,20 +16,29 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.test;
-
-import ru.frostman.web.annotation.Wrapper;
-
-import java.lang.reflect.Method;
+package ru.frostman.web.thr;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestWrappers {
-
-    @Wrapper("test")
-    public static Object wrap(String className, Object instance, Method method, Object[] params) throws Exception {
-        return method.invoke(instance, params);
+public class FastException extends Exception {
+    public FastException() {
     }
 
+    public FastException(String message) {
+        super(message);
+    }
+
+    public FastException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FastException(Throwable cause) {
+        super(cause);
+    }
+
+    @Override
+    public Throwable fillInStackTrace() {
+        return null;
+    }
 }

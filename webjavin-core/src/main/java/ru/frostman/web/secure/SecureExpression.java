@@ -23,6 +23,7 @@ import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.compiler.ExecutableStatement;
 import ru.frostman.web.Javin;
+import ru.frostman.web.secure.userdetails.UserDetails;
 import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.util.List;
@@ -46,7 +47,7 @@ class SecureExpression {
             ParserContext context = new ParserContext();
             context.setStrongTyping(true);
 
-            context.addInput("user", User.class);
+            context.addInput("user", UserDetails.class);
             context.addInput("role", String.class);
 
             int idx = 1;
@@ -69,7 +70,7 @@ class SecureExpression {
         }
     }
 
-    boolean execute(User user, String role, Object... params) {
+    boolean execute(UserDetails user, String role, Object... params) {
         try {
             Map<String, Object> vars = Maps.newHashMap();
             vars.put("user", user);

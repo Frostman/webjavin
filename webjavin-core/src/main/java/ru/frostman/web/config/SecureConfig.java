@@ -16,51 +16,32 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.plugin;
+package ru.frostman.web.config;
 
-import com.google.common.base.Preconditions;
-import ru.frostman.web.classloading.AppClass;
-
-import java.util.Map;
+import com.google.common.base.Objects;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class Plugin implements Comparable<Plugin> {
-    private int weight;
+public class SecureConfig {
+    private String userService = "ru.frostman.web.secure.impl.InMemoryUserService";
 
-    protected Plugin(int weight) {
-        Preconditions.checkArgument(weight >= 0, "Plugin's weight should be >= 0");
-
-        this.weight = weight;
+    public String getUserService() {
+        return userService;
     }
 
-    public void onLoad() {
-    }
-
-    public void beforeClassesEnhance(Map<String, AppClass> classes) {
-    }
-
-    public void afterClassesEnhance(Map<String, AppClass> classes) {
+    public void setUserService(String userService) {
+        this.userService = userService;
     }
 
     @Override
-    public int compareTo(Plugin p) {
-        int res = weight < p.weight ? -1 : (weight != p.weight ? 1 : 0);
+    public boolean equals(Object obj) {
+        if(obj instanceof SecureConfig)                                          {
+            SecureConfig config = (SecureConfig) obj;
 
-        if (res != 0) {
-            return res;
+            return Objects.equal(userService, config.userService);
         }
 
-        res = getClass().getName().compareTo(p.getClass().getName());
-
-        if (res != 0) {
-            return res;
-        }
-
-        int thisHashCode = System.identityHashCode(this);
-        int otherHashCode = System.identityHashCode(p);
-
-        return (thisHashCode < otherHashCode ? -1 : (thisHashCode != otherHashCode ? 1 : 0));
+        return false;
     }
 }

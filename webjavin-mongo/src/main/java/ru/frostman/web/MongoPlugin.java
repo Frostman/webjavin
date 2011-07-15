@@ -16,39 +16,42 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.test;
+package ru.frostman.web;
 
-import ru.frostman.web.Javin;
-import ru.frostman.web.annotation.Action;
-import ru.frostman.web.annotation.Param;
-import ru.frostman.web.annotation.Secure;
-import ru.frostman.web.controller.Model;
-import ru.frostman.web.controller.View;
-import ru.frostman.web.view.JsonView;
+import com.google.code.morphia.Morphia;
+import com.google.code.morphia.annotations.Embedded;
+import com.google.code.morphia.annotations.Entity;
+import com.google.common.collect.Lists;
+import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.plugin.Plugin;
 
-import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class TestController {
+public class MongoPlugin extends Plugin {
 
-    @Secure("user != null && isAuth() && hasRole('role') && param$1 != null")
-    @Action("/test/test")
-    public View test(Model model, @Param(value = "b", required = false) String param) throws IOException {
-        model.put("testParam", param);
-
-        if ("f".equals(param)) {
-            return new JsonView();
-        }
-
-        return Javin.getViews().getViewByName("test.ftl");
+    public MongoPlugin() {
+        super(1);
     }
 
-    @Action("/test/qwe")
-    public String qwe(Model model) throws IOException {
-        model.put("testParam", "BLA-BLA!!!");
+    @Override
+    public void afterClassesEnhance(Map<String, AppClass> classes) {
+        List<Class> morphiaClasses = Lists.newLinkedList();
+        Morphia morphia = new Morphia();
 
-        return "test.ftl";
+        for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
+            Class<?> clazz = entry.getValue().getJavaClass();
+
+            if(clazz.getAnnotation(Entity.class)!=null
+                    ||clazz.getAnnotation(Embedded.class)!=null) {
+                morphiaClasses.add(clazz);
+                morphia.map(clazz);
+            }
+        }
+
+        //todo store morphia to public bean storage
     }
 }

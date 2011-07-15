@@ -44,7 +44,7 @@ public class SecurityEnhancer {
                 }
 
                 int expressionId = Javin.getClasses().getSecurityManager()
-                        .register(secureAnnotation.value(), paramClasses);
+                        .registerExpression(secureAnnotation.value(), paramClasses);
 
                 method.insertBefore("{" + Javin.class.getName() + ".getClasses().getSecurityManager().check("
                         + ctClass.getName() + ".class, " +

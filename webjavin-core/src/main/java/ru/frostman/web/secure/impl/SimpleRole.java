@@ -16,51 +16,45 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.plugin;
+package ru.frostman.web.secure.impl;
 
-import com.google.common.base.Preconditions;
-import ru.frostman.web.classloading.AppClass;
-
-import java.util.Map;
+import ru.frostman.web.secure.userdetails.Role;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class Plugin implements Comparable<Plugin> {
+public class SimpleRole implements Role {
+
     private int weight;
 
-    protected Plugin(int weight) {
-        Preconditions.checkArgument(weight >= 0, "Plugin's weight should be >= 0");
+    private String name;
 
+    public SimpleRole() {
+    }
+
+    public SimpleRole(int weight, String name) {
+        this.weight = weight;
+        this.name = name;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
         this.weight = weight;
     }
 
-    public void onLoad() {
+    public String getName() {
+        return name;
     }
 
-    public void beforeClassesEnhance(Map<String, AppClass> classes) {
-    }
-
-    public void afterClassesEnhance(Map<String, AppClass> classes) {
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
-    public int compareTo(Plugin p) {
-        int res = weight < p.weight ? -1 : (weight != p.weight ? 1 : 0);
-
-        if (res != 0) {
-            return res;
-        }
-
-        res = getClass().getName().compareTo(p.getClass().getName());
-
-        if (res != 0) {
-            return res;
-        }
-
-        int thisHashCode = System.identityHashCode(this);
-        int otherHashCode = System.identityHashCode(p);
-
-        return (thisHashCode < otherHashCode ? -1 : (thisHashCode != otherHashCode ? 1 : 0));
+    public int compareTo(Role role) {
+        return weight - role.getWeight();
     }
 }

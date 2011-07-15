@@ -84,13 +84,33 @@ public class JavinPlugins extends Plugin {
             try {
                 plugin.onLoad();
             } catch (Exception e) {
-                throw new JavinPluginException("Exception while executing onLoad() on plugin with main class: " + plugin.getClass().getName(), e);
+                throw new JavinPluginException("Exception while executing onLoad() on plugin with main class: "
+                        + plugin.getClass().getName(), e);
             }
         }
     }
 
     @Override
     public void beforeClassesEnhance(Map<String, AppClass> classes) {
+         for (Plugin plugin : plugins) {
+            try {
+                plugin.beforeClassesEnhance(classes);
+            } catch (Exception e) {
+                throw new JavinPluginException("Exception while executing beforeClassesEnhance() on plugin with main class: "
+                        + plugin.getClass().getName(), e);
+            }
+        }
+    }
 
+    @Override
+    public void afterClassesEnhance(Map<String, AppClass> classes) {
+         for (Plugin plugin : plugins) {
+            try {
+                plugin.afterClassesEnhance(classes);
+            } catch (Exception e) {
+                throw new JavinPluginException("Exception while executing afterClassesEnhance() on plugin with main class: "
+                        + plugin.getClass().getName(), e);
+            }
+        }
     }
 }

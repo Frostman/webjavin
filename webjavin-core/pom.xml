@@ -75,32 +75,5 @@
             <artifactId>snakeyaml</artifactId>
             <version>1.8</version>
         </dependency>
-
-        <!-- MongoDB / Morphia -->
-        <dependency>
-            <groupId>com.google.code.morphia</groupId>
-            <artifactId>morphia</artifactId>
-            <version>0.99</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.morphia</groupId>
-            <artifactId>morphia-logging-slf4j</artifactId>
-            <version>0.99</version>
-        </dependency>
-        <!-- Optional Jars (for certain features) but required by maven for building. -->
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>[2.1_3,)</version>
-            <type>jar</type>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.thoughtworks.proxytoys</groupId>
-            <artifactId>proxytoys</artifactId>
-            <version>1.0</version>
-            <type>jar</type>
-            <optional>true</optional>
-        </dependency>
     </dependencies>
 </project>
