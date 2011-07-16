@@ -18,9 +18,7 @@
 
 package ru.frostman.web.mongo;
 
-import com.google.code.morphia.annotations.Embedded;
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.Reference;
+import com.google.code.morphia.annotations.*;
 import ru.frostman.web.secure.userdetails.Credentials;
 import ru.frostman.web.secure.userdetails.Role;
 import ru.frostman.web.secure.userdetails.UserDetails;
@@ -31,9 +29,13 @@ import java.util.List;
  * @author slukjanov aka Frostman
  */
 @Entity
+@Indexes({
+        @Index("username")
+})
 public class User extends BaseEntity implements UserDetails {
     private String username;
 
+    //todo think about indexing credentials for fast auth
     @Embedded
     private List<Credentials> credentials;
 
