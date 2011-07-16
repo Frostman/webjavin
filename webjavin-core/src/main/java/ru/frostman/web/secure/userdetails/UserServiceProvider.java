@@ -16,33 +16,13 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.config;
-
-import com.google.common.base.Objects;
+package ru.frostman.web.secure.userdetails;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class SecureConfig {
-    private String userServiceProvider = "ru.frostman.web.secure.impl.InMemoryUserServiceProvider";
+public interface UserServiceProvider {
 
+    UserService get();
 
-    public String getUserServiceProvider() {
-        return userServiceProvider;
-    }
-
-    public void setUserServiceProvider(String userServiceProvider) {
-        this.userServiceProvider = userServiceProvider;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(obj instanceof SecureConfig)                                          {
-            SecureConfig config = (SecureConfig) obj;
-
-            return Objects.equal(userServiceProvider, config.userServiceProvider);
-        }
-
-        return false;
-    }
 }

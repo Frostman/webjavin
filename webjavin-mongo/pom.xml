@@ -41,6 +41,7 @@
             <version>0.99</version>
         </dependency>
         <!-- Optional Jars (for certain features) but required by maven for building. -->
+        <!-- todo write in docs, that this jars need to be added to project iff we want to use lazy -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>

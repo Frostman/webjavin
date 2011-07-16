@@ -19,8 +19,10 @@
 package ru.frostman.web.secure;
 
 import com.google.common.collect.Maps;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.secure.userdetails.UserDetails;
 import ru.frostman.web.secure.userdetails.UserService;
+import ru.frostman.web.secure.userdetails.UserServiceProvider;
 import ru.frostman.web.thr.JavinIllegalAccessException;
 import ru.frostman.web.thr.SecureCheckException;
 
@@ -31,18 +33,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author slukjanov aka Frostman
  */
-public class AppSecurityManager {
+public class JavinSecurityManager {
     private static final ThreadLocal<UserDetails> currentUser = new ThreadLocal<UserDetails>();
     private static final ThreadLocal<String> currentRole = new ThreadLocal<String>();
 
-    private UserService userService;
+    private UserServiceProvider userServiceProvider;
 
     private AtomicInteger counter = new AtomicInteger();
     private Map<Integer, SecureExpression> expressions = Maps.newHashMap();
 
-    public AppSecurityManager() {
+    public JavinSecurityManager() {
+        String userServiceProviderClassName = JavinConfig.getCurrentConfig().getSecure().getUserServiceProvider();
+        Class<?> userServiceProviderClass;
+        try {
+            userServiceProviderClass = Class.forName(userServiceProviderClassName);
+        } catch (ClassNotFoundException e) {
+            throw new SecurityException("Can't load UserServiceProvider impl: " + userServiceProviderClassName);
+        }
 
-        // todo move USerService creation into plugins may be O_o
+        try {
+            userServiceProvider = (UserServiceProvider) userServiceProviderClass.newInstance();
+        } catch (Exception e) {
+            throw new SecurityException("Can't instantiate UserServiceProvider impl: " + userServiceProviderClassName);
+        }
+    }
+
+    public UserService getUserService() {
+        return userServiceProvider.get();
     }
 
     public int registerExpression(String expressionStr, List<String> paramClasses) {

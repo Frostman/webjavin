@@ -57,8 +57,8 @@ class SecureExpression {
                 idx++;
             }
 
-            context.addImport("isAuth", AppSecurityManager.class.getMethod("isAuthenticated"));
-            context.addImport("hasRole", AppSecurityManager.class.getMethod("hasRole", String.class));
+            context.addImport("isAuth", JavinSecurityManager.class.getMethod("isAuthenticated"));
+            context.addImport("hasRole", JavinSecurityManager.class.getMethod("hasRole", String.class));
 
             expression = (ExecutableStatement) MVEL.compileExpression(expressionStr, context);
 

@@ -75,15 +75,7 @@ public abstract class ActionInvoker implements Runnable {
 
             process();
         } catch (Throwable th) {
-            try {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, th.getMessage());
-            } catch (IOException e) {
-                //todo impl
-                e.printStackTrace();
-            }
-
-            // todo impl
-            th.printStackTrace();
+            throw new JavinRuntimeException("Exception while executing action", th);
         }
 
         if (async) {

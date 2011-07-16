@@ -16,33 +16,25 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.config;
+package ru.frostman.web.mongo;
 
-import com.google.common.base.Objects;
+import com.google.code.morphia.annotations.Id;
+import org.bson.types.ObjectId;
+
+import java.io.Serializable;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class SecureConfig {
-    private String userServiceProvider = "ru.frostman.web.secure.impl.InMemoryUserServiceProvider";
+public class BaseEntity implements Serializable {
+    @Id
+    private ObjectId id;
 
-
-    public String getUserServiceProvider() {
-        return userServiceProvider;
+    public ObjectId getId() {
+        return id;
     }
 
-    public void setUserServiceProvider(String userServiceProvider) {
-        this.userServiceProvider = userServiceProvider;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(obj instanceof SecureConfig)                                          {
-            SecureConfig config = (SecureConfig) obj;
-
-            return Objects.equal(userServiceProvider, config.userServiceProvider);
-        }
-
-        return false;
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 }

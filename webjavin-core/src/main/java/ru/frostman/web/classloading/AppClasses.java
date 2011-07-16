@@ -32,7 +32,7 @@ import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.Dispatcher;
 import ru.frostman.web.plugin.JavinPlugins;
-import ru.frostman.web.secure.AppSecurityManager;
+import ru.frostman.web.secure.JavinSecurityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -73,7 +73,7 @@ public class AppClasses {
     /**
      * Security manager
      */
-    private AppSecurityManager securityManager;
+    private JavinSecurityManager securityManager;
 
     public AppClasses() {
         if (Javin.getMode().isProductionMode()) {
@@ -179,7 +179,7 @@ public class AppClasses {
                 Enhancer.prepareClasses(classes);
 
                 // init security manager
-                this.securityManager = new AppSecurityManager();
+                this.securityManager = new JavinSecurityManager();
 
                 JavinPlugins.get().beforeClassesEnhance(classes);
 
@@ -232,7 +232,7 @@ public class AppClasses {
         return dispatcher;
     }
 
-    public AppSecurityManager getSecurityManager() {
+    public JavinSecurityManager getSecurityManager() {
         return securityManager;
     }
 }

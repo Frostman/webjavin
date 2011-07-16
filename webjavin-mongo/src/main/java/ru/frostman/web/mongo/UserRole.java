@@ -16,33 +16,46 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.config;
+package ru.frostman.web.mongo;
 
-import com.google.common.base.Objects;
+import com.google.code.morphia.annotations.Entity;
+import ru.frostman.web.secure.userdetails.Role;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class SecureConfig {
-    private String userServiceProvider = "ru.frostman.web.secure.impl.InMemoryUserServiceProvider";
+@Entity
+public class UserRole extends BaseEntity implements Role {
+    private int weight;
 
+    private String name;
 
-    public String getUserServiceProvider() {
-        return userServiceProvider;
+    public UserRole() {
     }
 
-    public void setUserServiceProvider(String userServiceProvider) {
-        this.userServiceProvider = userServiceProvider;
+    public UserRole(int weight, String name) {
+        this.weight = weight;
+        this.name = name;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if(obj instanceof SecureConfig)                                          {
-            SecureConfig config = (SecureConfig) obj;
-
-            return Objects.equal(userServiceProvider, config.userServiceProvider);
-        }
-
-        return false;
+    public int compareTo(Role role) {
+        return weight - role.getWeight();
     }
 }

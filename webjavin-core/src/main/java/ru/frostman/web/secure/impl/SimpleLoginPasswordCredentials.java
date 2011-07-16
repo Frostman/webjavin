@@ -19,36 +19,49 @@
 package ru.frostman.web.secure.impl;
 
 import com.google.common.base.Objects;
+import ru.frostman.web.secure.userdetails.Credentials;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class LoginPasswordCredentials {
-    private final String login;
-    private final String password;
+public class SimpleLoginPasswordCredentials implements Credentials {
+    private String login;
+    private String password;
+    private boolean nonExpired;
 
-    public LoginPasswordCredentials(String login, String password) {
-        this.login = login;
-        this.password = password;
+    public SimpleLoginPasswordCredentials() {
     }
 
     public String getLogin() {
         return login;
     }
 
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof LoginPasswordCredentials) {
-            LoginPasswordCredentials credentials = (LoginPasswordCredentials) obj;
+        if (obj instanceof SimpleLoginPasswordCredentials) {
+            SimpleLoginPasswordCredentials credentials = (SimpleLoginPasswordCredentials) obj;
 
             return Objects.equal(login, credentials.login)
                     && Objects.equal(password, credentials.password);
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isNonExpired() {
+        return nonExpired;
     }
 }

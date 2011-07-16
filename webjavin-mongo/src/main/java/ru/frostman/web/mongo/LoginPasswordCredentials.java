@@ -16,47 +16,61 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web;
+package ru.frostman.web.mongo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.frostman.web.classloading.AppClasses;
-import ru.frostman.web.config.JavinConfig;
-import ru.frostman.web.thr.FastRuntimeException;
-import ru.frostman.web.view.AppViews;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import com.google.code.morphia.annotations.Embedded;
+import com.google.common.base.Objects;
+import ru.frostman.web.secure.impl.SimpleLoginPasswordCredentials;
+import ru.frostman.web.secure.userdetails.Credentials;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class JavinContextListener implements ServletContextListener {
-    private static final Logger log = LoggerFactory.getLogger(JavinContextListener.class);
+@Embedded
+public class LoginPasswordCredentials implements Credentials {
+    private String login;
+    private String password;
+    private boolean nonExpired;
 
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        try {
-            freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
+    public LoginPasswordCredentials() {
+    }
 
-            Javin.setMode(JavinConfig.getCurrentConfig().getMode());
-            Javin.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
-            Javin.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
+    public LoginPasswordCredentials(SimpleLoginPasswordCredentials credentials) {
+        login = credentials.getLogin();
+        password = credentials.getPassword();
+        nonExpired = credentials.isNonExpired();
+    }
 
-            Javin.setApplicationPath(sce.getServletContext().getRealPath("/"));
-            Javin.setClasses(new AppClasses());
-            Javin.setViews(new AppViews());
+    public String getLogin() {
+        return login;
+    }
 
-            log.info("Javin context initialized successfully");
-        } catch (Throwable th) {
-            log.error("Initialization failed with: ", th);
+    public void setLogin(String login) {
+        this.login = login;
+    }
 
-            throw new FastRuntimeException("Initialization failed");
-        }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        log.info("Javin context destroyed successfully");
+    public boolean equals(Object obj) {
+        if (obj instanceof LoginPasswordCredentials) {
+            LoginPasswordCredentials credentials = (LoginPasswordCredentials) obj;
+
+            return Objects.equal(login, credentials.login)
+                    && Objects.equal(password, credentials.password);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isNonExpired() {
+        return nonExpired;
     }
 }

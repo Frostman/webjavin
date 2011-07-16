@@ -21,10 +21,20 @@ package ru.frostman.web;
 import com.google.code.morphia.Morphia;
 import com.google.code.morphia.annotations.Embedded;
 import com.google.code.morphia.annotations.Entity;
+import com.google.code.morphia.logging.MorphiaLoggerFactory;
+import com.google.code.morphia.logging.slf4j.SLF4JLogrImplFactory;
 import com.google.common.collect.Lists;
+import com.mongodb.Mongo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.mongo.LoginPasswordCredentials;
+import ru.frostman.web.mongo.User;
+import ru.frostman.web.mongo.UserRole;
 import ru.frostman.web.plugin.Plugin;
+import ru.frostman.web.thr.JavinRuntimeException;
 
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +42,17 @@ import java.util.Map;
  * @author slukjanov aka Frostman
  */
 public class MongoPlugin extends Plugin {
+    private static final Logger log = LoggerFactory.getLogger(MongoPlugin.class);
+    private static Mongo mongo;
+    private static Morphia morphia;
 
     public MongoPlugin() {
         super(1);
+    }
+
+    @Override
+    public void onLoad() {
+        MorphiaLoggerFactory.registerLogger(SLF4JLogrImplFactory.class);
     }
 
     @Override
@@ -45,13 +63,34 @@ public class MongoPlugin extends Plugin {
         for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
             Class<?> clazz = entry.getValue().getJavaClass();
 
-            if(clazz.getAnnotation(Entity.class)!=null
-                    ||clazz.getAnnotation(Embedded.class)!=null) {
+            if (clazz.getAnnotation(Entity.class) != null
+                    || clazz.getAnnotation(Embedded.class) != null) {
                 morphiaClasses.add(clazz);
                 morphia.map(clazz);
             }
         }
 
-        //todo store morphia to public bean storage
+        morphia.map(User.class).map(UserRole.class).map(LoginPasswordCredentials.class);
+
+        try {
+            //todo impl config
+            mongo = new Mongo("127.0.0.1");
+
+            String mongoVersion = mongo.getVersion();
+            log.debug("Successfully connected to MongoDB v." + mongoVersion);
+        } catch (UnknownHostException e) {
+            throw new JavinRuntimeException("Can't connect to MongoDB", e);
+        }
+        MongoPlugin.morphia = morphia;
+
+        log.info("Mongo plugin loaded successfully");
+    }
+
+    public static Mongo getMongo() {
+        return mongo;
+    }
+
+    public static Morphia getMorphia() {
+        return morphia;
     }
 }

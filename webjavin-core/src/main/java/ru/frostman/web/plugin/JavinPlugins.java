@@ -45,7 +45,7 @@ public class JavinPlugins extends Plugin {
         this.plugins = plugins;
     }
 
-    public static void reload() {
+    public static Plugin reload() {
         List<String> pluginClassNames = JavinConfig.getCurrentConfig().getPlugins();
 
         Set<Plugin> newPlugins = Sets.newTreeSet();
@@ -72,6 +72,8 @@ public class JavinPlugins extends Plugin {
 
         instance = new JavinPlugins(ImmutableSortedSet.copyOf(newPlugins));
         instance.onLoad();
+
+        return instance;
     }
 
     public static Plugin get() {
@@ -92,7 +94,7 @@ public class JavinPlugins extends Plugin {
 
     @Override
     public void beforeClassesEnhance(Map<String, AppClass> classes) {
-         for (Plugin plugin : plugins) {
+        for (Plugin plugin : plugins) {
             try {
                 plugin.beforeClassesEnhance(classes);
             } catch (Exception e) {
@@ -104,7 +106,7 @@ public class JavinPlugins extends Plugin {
 
     @Override
     public void afterClassesEnhance(Map<String, AppClass> classes) {
-         for (Plugin plugin : plugins) {
+        for (Plugin plugin : plugins) {
             try {
                 plugin.afterClassesEnhance(classes);
             } catch (Exception e) {
