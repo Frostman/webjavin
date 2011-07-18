@@ -20,8 +20,11 @@ package ru.frostman.web.test;
 
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
+import ru.frostman.web.annotation.JsonParam;
 import ru.frostman.web.annotation.JsonResponse;
 import ru.frostman.web.mongo.User;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author slukjanov aka Frostman
@@ -29,11 +32,11 @@ import ru.frostman.web.mongo.User;
 @Controller
 public class TestController {
 
-    @Action("/test/test")
+    @Action("/test/*")
     @JsonResponse
-    public User test() {
-        User user = new User();
-        user.setUsername("test");
+    public User test(HttpServletRequest request, @JsonParam(name = {"test"}) User user) {
+//        User user = new User();
+//        user.setUsername("test");
 
         return user;
     }

@@ -23,6 +23,7 @@ import ru.frostman.web.util.HttpMethod;
 import java.lang.annotation.*;
 
 import static ru.frostman.web.util.HttpMethod.GET;
+import static ru.frostman.web.util.HttpMethod.POST;
 
 /**
  * This annotation is needed to mark action methods in controller
@@ -42,7 +43,7 @@ public @interface Action {
     /**
      * @return supported http methods
      */
-    HttpMethod[] method() default GET;
+    HttpMethod[] method() default {GET, POST};
 
     /**
      * @return use or not async api if it available

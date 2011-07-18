@@ -31,9 +31,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JsonParam {
     /**
+     * Parameter name. It can be array to specify nested elements.
+     *
      * @return parameter name
      */
-    String name();
+    String[] name();
 
     /**
      * @return true if param required

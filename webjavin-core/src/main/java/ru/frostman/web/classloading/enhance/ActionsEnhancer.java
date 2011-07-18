@@ -54,6 +54,10 @@ class ActionsEnhancer {
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String DEFAULT_ACTION_CATCH = "ru.frostman.web.thr.DefaultActionCatch";
     private static final String ACTION_EXCEPTION = "ru.frostman.web.dispatch.ActionException";
+    private static final String JSON_UTIL = "ru.frostman.web.util.JsonUtil";
+    private static final String JSON_NODE = "org.codehaus.jackson.JsonNode";
+    private static final String REQUEST_BODY_JSON = "requestBodyJson";
+    private static final String PARAMETER_REQUIRED_EXCEPTION = "ru.frostman.web.thr.ParameterRequiredException";
 
     public static void enhance(Map<String, AppClass> classes, ClassPool classPool, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
@@ -179,7 +183,7 @@ class ActionsEnhancer {
             body.append("mav.setView(ru.frostman.web.Javin.getViews().getViewByName((")
                     .append(JAVA_LANG_STRING).append(") result").append("));");
         } else if (actionMethod.getAnnotation(JsonResponse.class) != null) {
-             // iff return type is some class then change ModelAndView's view to JsonModelView
+            // iff return type is some class then change ModelAndView's view to JsonModelView
             body.append("mav.setView(new ru.frostman.web.view.JsonValueView(")
                     .append("result").append("));");
         } else {
@@ -285,6 +289,7 @@ class ActionsEnhancer {
             throws ClassNotFoundException, NotFoundException {
         Object[][] annotations = behavior.getParameterAnnotations();
         int idx = 0;
+        boolean requestBodyJsonParsed = false;
         StringBuilder parameters = new StringBuilder();
         for (CtClass parameterType : behavior.getParameterTypes()) {
             if (parameterType.equals(getCtClass(classPool, HTTP_SERVLET_REQUEST))) {
@@ -319,6 +324,39 @@ class ActionsEnhancer {
                     // append checking parameter for not null
                     body.append("if($param$").append(idx).append(" == null) {" +
                             "throw new ParameterRequiredException(\"required\");"
+                            + "}");
+                }
+            } else if (isAnnotatedWith(annotations[idx], JsonParam.class) != null) {
+                JsonParam paramAnnotation = isAnnotatedWith(annotations[idx], JsonParam.class);
+
+                if (!requestBodyJsonParsed) {
+                    requestBodyJsonParsed = true;
+
+                    body.append(JSON_NODE).append(" ").append(REQUEST_BODY_JSON).append(" = ")
+                            .append(JSON_UTIL).append(".parseJsonBody(request);");
+                }
+
+                body.append(parameterType.getName()).append(" $param$").append(idx)
+                        .append(" = (").append(parameterType.getName()).append(")")
+                        .append(JSON_UTIL).append(".getParam(")
+                        .append(REQUEST_BODY_JSON).append(", \"").append(parameterType.getName()).append("\"")
+                        .append(", new ").append(JAVA_LANG_STRING).append("[]{");
+
+                final String[] path = paramAnnotation.name();
+                int pathIdx = 0;
+                for (String str : path) {
+                    body.append("\"").append(str).append("\"");
+                    if (pathIdx < path.length - 1) {
+                        body.append(",");
+                    }
+                }
+
+                body.append("});");
+
+                if (paramAnnotation.required()) {
+                    // append checking parameter for not null
+                    body.append("if($param$").append(idx).append(" == null) {" +
+                            "throw new " + PARAMETER_REQUIRED_EXCEPTION + "(\"required\");"
                             + "}");
                 }
             } else {

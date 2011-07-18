@@ -43,6 +43,8 @@ import java.util.Map;
  */
 public class MongoPlugin extends Plugin {
     private static final Logger log = LoggerFactory.getLogger(MongoPlugin.class);
+    private static boolean firstLoad = true;
+
     private static Mongo mongo;
     private static Morphia morphia;
 
@@ -52,7 +54,10 @@ public class MongoPlugin extends Plugin {
 
     @Override
     public void onLoad() {
-        MorphiaLoggerFactory.registerLogger(SLF4JLogrImplFactory.class);
+        if (firstLoad) {
+            MorphiaLoggerFactory.registerLogger(SLF4JLogrImplFactory.class);
+            firstLoad = false;
+        }
     }
 
     @Override

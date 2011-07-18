@@ -18,12 +18,18 @@
 
 package ru.frostman.web.util;
 
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import ru.frostman.web.Javin;
 import ru.frostman.web.controller.Model;
+import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.JsonManipulationException;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -68,4 +74,34 @@ public class JsonUtil {
         }
     }
 
+    public static JsonNode parseJsonBody(HttpServletRequest request) {
+        try {
+            return mapper.readTree(request.getReader());
+        } catch (IOException e) {
+            throw new JavinRuntimeException("Exception while parsing request body as tree: ", e);
+        }
+    }
+
+    /**
+     * Return specified parameter from Json tree.
+     * Nested elements supported, to specify nested element
+     * you should pass all names of parent elements in array.
+     *
+     * @param node     json tree
+     * @param typeName name of type to convert to
+     * @param path     full name of element
+     *
+     * @return specified parameter converted to specified type
+     */
+    public static Object getParam(JsonNode node, String typeName, String... path) {
+        try {
+            //todo impl recursive
+            Class<?> type = Javin.getClasses().getClassLoader().loadClass(typeName);
+            return mapper.readValue((path == null || path.length == 0) ? node : node.get(path[0]), type);
+        } catch (IOException e) {
+            throw new JavinRuntimeException("Exception while finding element with specified path: " + Arrays.toString(path), e);
+        } catch (ClassNotFoundException e) {
+            throw new JavinRuntimeException("Can't load class to read json from request body:" + typeName, e);
+        }
+    }
 }
