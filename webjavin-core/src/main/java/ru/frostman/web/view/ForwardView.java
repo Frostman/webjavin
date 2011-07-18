@@ -22,7 +22,6 @@ import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.dispatch.ActionInvoker;
 import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.util.HttpMethod;
 
@@ -58,12 +57,8 @@ public class ForwardView extends View {
         }
         request.setAttribute(FORWARDS_COUNT, count + 1);
 
-        ActionInvoker actionInvoker = Javin.getClasses().getDispatcher()
+        Javin.getClasses().getDispatcher()
                 .dispatch(targetUrl, HttpMethod.valueOf(request.getMethod()), request, response);
-        if (actionInvoker == null) {
-            //todo handle NotFound
-        }
-        actionInvoker.invoke();
     }
 
     public String getTargetUrl() {
