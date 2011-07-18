@@ -18,6 +18,7 @@
 
 package ru.frostman.web.controller;
 
+import ru.frostman.web.Javin;
 import ru.frostman.web.view.ForwardView;
 import ru.frostman.web.view.RedirectView;
 
@@ -40,6 +41,10 @@ public class Controllers {
 
     public static View redirectView(String targetUrl) {
         return new RedirectView(targetUrl);
+    }
+
+    public static View view(String viewName){
+        return  Javin.getViews().getViewByName(viewName);
     }
 
 }

@@ -20,11 +20,13 @@ package ru.frostman.web.test;
 
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
-import ru.frostman.web.annotation.JsonParam;
-import ru.frostman.web.annotation.JsonResponse;
+import ru.frostman.web.annotation.Param;
+import ru.frostman.web.controller.Model;
+import ru.frostman.web.controller.View;
 import ru.frostman.web.mongo.User;
+import ru.frostman.web.view.JsonValueView;
 
-import javax.servlet.http.HttpServletRequest;
+import static ru.frostman.web.controller.Controllers.view;
 
 /**
  * @author slukjanov aka Frostman
@@ -33,12 +35,19 @@ import javax.servlet.http.HttpServletRequest;
 public class TestController {
 
     @Action("/test/*")
-    @JsonResponse
-    public User test(HttpServletRequest request, @JsonParam(name = {"test"}) User user) {
-//        User user = new User();
-//        user.setUsername("test");
+    public View test(Model model, @Param("a") String testParam, @Param(value = "b", required = false) String testParam2) {
 
-        return user;
+        model.put("testParam", testParam);
+        model.put("testParam2", testParam2);
+
+        if("page".equals(testParam2)) {
+            return view("test.ftl");
+        }
+
+        User user = new User();
+        user.setUsername(testParam);
+
+        return new JsonValueView<User>(user);
     }
 
 }

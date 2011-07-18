@@ -323,7 +323,7 @@ class ActionsEnhancer {
                 if (paramAnnotation.required()) {
                     // append checking parameter for not null
                     body.append("if($param$").append(idx).append(" == null) {" +
-                            "throw new ParameterRequiredException(\"required\");"
+                            "throw new " + PARAMETER_REQUIRED_EXCEPTION + "(\"required\");"
                             + "}");
                 }
             } else if (isAnnotatedWith(annotations[idx], JsonParam.class) != null) {
