@@ -21,7 +21,6 @@ package ru.frostman.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.config.JavinConfig;
-import ru.frostman.web.dispatch.ActionInvoker;
 import ru.frostman.web.util.HttpMethod;
 
 import javax.servlet.ServletException;
@@ -46,13 +45,8 @@ public class DispatcherServlet extends HttpServlet {
                 Javin.getClasses().update();
             }
 
-            ActionInvoker actionInvoker = Javin.getClasses().getDispatcher()
+            Javin.getClasses().getDispatcher()
                     .dispatch(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()), request, response);
-            if (actionInvoker == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
-            } else {
-                actionInvoker.invoke();
-            }
         } catch (Throwable th) {
             try {
                 log.debug("Sending error: ", th);

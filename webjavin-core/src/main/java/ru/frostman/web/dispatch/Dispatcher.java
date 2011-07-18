@@ -19,10 +19,12 @@
 package ru.frostman.web.dispatch;
 
 import com.google.common.collect.Lists;
+import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.util.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -37,14 +39,26 @@ public class Dispatcher {
 
     public ActionInvoker dispatch(String requestUrl, HttpMethod requestMethod, HttpServletRequest request
             , HttpServletResponse response) {
-        //todo think about context
+
+        ActionInvoker invoker = null;
         for (ActionDefinition definition : actions) {
             if (definition.matches(requestUrl, requestMethod)) {
-                return definition.initInvoker(request, response);
+                invoker = definition.initInvoker(request, response);
+
+                break;
             }
         }
 
-        //todo replace it with default handlers may be or 404 page/error handler
-        return null;
+        if (invoker == null) {
+            try {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
+            } catch (IOException e) {
+                throw new JavinRuntimeException("Exception while sending 404:Not found", e);
+            }
+        } else {
+            invoker.invoke();
+        }
+
+        return invoker;
     }
 }
