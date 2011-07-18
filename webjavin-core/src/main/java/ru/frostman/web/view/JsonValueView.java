@@ -23,15 +23,26 @@ import ru.frostman.web.controller.View;
 
 import java.io.PrintWriter;
 
-import static ru.frostman.web.util.JsonUtil.renderJson;
+import static ru.frostman.web.util.JsonUtil.renderValueToJson;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class JsonView extends View {
+public class JsonValueView<T> extends View {
+    private final T value;
+
+    public JsonValueView(T value) {
+        this.value = value;
+        this.contentType = ContentTypes.APPLICATION_JSON;
+        this.characterEncoding = CharacterEncodings.UTF8;
+    }
+
+    public T getValue() {
+        return value;
+    }
 
     @Override
     public void process(Model model, PrintWriter writer) {
-        renderJson(model, writer);
+        renderValueToJson(value, writer);
     }
 }

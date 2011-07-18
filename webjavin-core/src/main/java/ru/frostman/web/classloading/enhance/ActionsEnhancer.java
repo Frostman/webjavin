@@ -178,6 +178,10 @@ class ActionsEnhancer {
             // iff return type is String then change ModelAndView's view to resolved view by name
             body.append("mav.setView(ru.frostman.web.Javin.getViews().getViewByName((")
                     .append(JAVA_LANG_STRING).append(") result").append("));");
+        } else if (actionMethod.getAnnotation(JsonResponse.class) != null) {
+             // iff return type is some class then change ModelAndView's view to JsonModelView
+            body.append("mav.setView(new ru.frostman.web.view.JsonValueView(")
+                    .append("result").append("));");
         } else {
             throw new ActionEnhancerException("Action method can't return specified type: " + actionMethod.getLongName());
         }

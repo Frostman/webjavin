@@ -33,14 +33,14 @@ public class JsonUtil {
     private static final String[] generatedProperties = {Model.REQUEST, Model.RESPONSE};
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static String renderJson(Map<String, Object> map) {
+    public static String renderMapToJson(Map<String, Object> map) {
         StringWriter writer = new StringWriter();
-        renderJson(map, writer);
+        renderMapToJson(map, writer);
 
         return writer.toString();
     }
 
-    private static void renderJson(Map<String, Object> map, Writer writer) {
+    private static void renderMapToJson(Map<String, Object> map, Writer writer) {
         try {
             for (String key : generatedProperties) {
                 map.remove(key);
@@ -52,11 +52,20 @@ public class JsonUtil {
         }
     }
 
-    public static String renderJson(Model model) {
-        return renderJson(model.toMap());
+    public static String renderModelToJson(Model model) {
+        return renderMapToJson(model.toMap());
     }
 
-    public static void renderJson(Model model, Writer writer) {
-        renderJson(model.toMap(), writer);
+    public static void renderModelToJson(Model model, Writer writer) {
+        renderMapToJson(model.toMap(), writer);
     }
+
+    public static void renderValueToJson(Object value, Writer writer) {
+        try {
+            mapper.writeValue(writer, value);
+        } catch (Exception e) {
+            throw new JsonManipulationException("Exception while rendering JSON", e);
+        }
+    }
+
 }

@@ -20,6 +20,8 @@ package ru.frostman.web.test;
 
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
+import ru.frostman.web.annotation.JsonResponse;
+import ru.frostman.web.mongo.User;
 
 /**
  * @author slukjanov aka Frostman
@@ -28,8 +30,12 @@ import ru.frostman.web.annotation.Controller;
 public class TestController {
 
     @Action("/test/test")
-    public String test() {
-        return "test.ftl";
+    @JsonResponse
+    public User test() {
+        User user = new User();
+        user.setUsername("test");
+
+        return user;
     }
 
 }

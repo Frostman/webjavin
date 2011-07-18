@@ -24,16 +24,33 @@ import java.io.PrintWriter;
  * @author slukjanov aka Frostman
  */
 public abstract class View {
-    private boolean processed;
+    protected boolean processed;
+    protected String contentType;
+    protected String characterEncoding;
+
+    public abstract void process(Model model, PrintWriter writer);
 
     public boolean isProcessed() {
         return processed;
     }
 
-    protected void setProcessed(boolean processed) {
+    public void setProcessed(boolean processed) {
         this.processed = processed;
     }
 
-    public abstract void process(Model model, PrintWriter writer);
+    public String getContentType() {
+        return contentType;
+    }
 
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getCharacterEncoding() {
+        return characterEncoding;
+    }
+
+    public void setCharacterEncoding(String characterEncoding) {
+        this.characterEncoding = characterEncoding;
+    }
 }

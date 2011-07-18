@@ -18,6 +18,9 @@
 
 package ru.frostman.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.dispatch.ActionInvoker;
 import ru.frostman.web.util.HttpMethod;
 
@@ -31,12 +34,13 @@ import java.io.IOException;
  * @author slukjanov aka Frostman
  */
 public class DispatcherServlet extends HttpServlet {
+    private static final Logger log = LoggerFactory.getLogger(DispatcherServlet.class);
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            //response.setContentType("text/plain");
             //response.setHeader("Transfer-Encoding", "chunked");
+            response.setHeader("Server", JavinConfig.getCurrentConfig().getApp().getServerHeader());
 
             if (Javin.getMode().isDevelopmentMode()) {
                 Javin.getClasses().update();
@@ -45,19 +49,17 @@ public class DispatcherServlet extends HttpServlet {
             ActionInvoker actionInvoker = Javin.getClasses().getDispatcher()
                     .dispatch(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()), request, response);
             if (actionInvoker == null) {
-                //todo handle NotFound
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
+            } else {
+                actionInvoker.invoke();
             }
-            actionInvoker.invoke();
         } catch (Throwable th) {
             try {
+                log.debug("Sending error: ", th);
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, th.getMessage());
             } catch (IOException e) {
-                //todo impl
-                e.printStackTrace();
+                log.warn("Exception while sending error (" + th.getMessage() + "): ", e);
             }
-
-            //todo handle exceptions
-            th.printStackTrace();
         }
     }
 }

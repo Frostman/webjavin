@@ -18,38 +18,25 @@
 
 package ru.frostman.web.view;
 
-import com.google.common.base.Preconditions;
-import freemarker.template.Template;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.io.PrintWriter;
+
+import static ru.frostman.web.util.JsonUtil.renderModelToJson;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class FreemarkerView extends View {
-    private final Template template;
+public class JsonModelView extends View {
 
-    public FreemarkerView(Template template) {
-        this(template, ContentTypes.TEXT_HTML);
-    }
-
-    public FreemarkerView(Template template, String contentType) {
-        Preconditions.checkNotNull(template);
-
-        this.template = template;
-        this.contentType = contentType;
+    public JsonModelView() {
+        this.contentType = ContentTypes.APPLICATION_JSON;
         this.characterEncoding = CharacterEncodings.UTF8;
     }
 
     @Override
     public void process(Model model, PrintWriter writer) {
-        try {
-            template.process(model, writer);
-        } catch (Exception e) {
-            throw new JavinRuntimeException("Exception while processing template", e);
-        }
+        renderModelToJson(model, writer);
     }
 }

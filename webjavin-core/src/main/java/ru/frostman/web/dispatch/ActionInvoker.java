@@ -102,6 +102,9 @@ public abstract class ActionInvoker implements Runnable {
             redirectView.setResponse(response);
         }
 
+        response.setContentType(view.getContentType());
+        response.setCharacterEncoding(view.getCharacterEncoding());
+
         mav.process(response.getWriter());
     }
 

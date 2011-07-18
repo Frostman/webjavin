@@ -26,6 +26,7 @@ import com.google.common.base.Objects;
 public class AppConfig {
     private int asyncQueueLength = 100;
     private int maxForwardsCount = 5;
+    private String serverHeader = "WebJavin";
     private PoolConfig pool = new PoolConfig();
 
     public int getAsyncQueueLength() {
@@ -44,6 +45,14 @@ public class AppConfig {
         this.maxForwardsCount = maxForwardsCount;
     }
 
+    public String getServerHeader() {
+        return serverHeader;
+    }
+
+    public void setServerHeader(String serverHeader) {
+        this.serverHeader = serverHeader;
+    }
+
     public PoolConfig getPool() {
         return pool;
     }
@@ -59,6 +68,7 @@ public class AppConfig {
 
             return asyncQueueLength == config.asyncQueueLength
                     && maxForwardsCount == config.maxForwardsCount
+                    && Objects.equal(serverHeader, config.serverHeader)
                     && Objects.equal(pool, config.pool);
         }
 
