@@ -52,15 +52,6 @@ public class JavinContextListener implements ServletContextListener {
             Javin.setViews(new AppViews());
 
             log.info("Javin context initialized successfully");
-
-            if (Javin.getMode().isProductionMode()) {
-                log.info("Preparing application");
-
-                Javin.getClasses().update();
-
-                log.info("Application ready");
-            }
-
         } catch (Throwable th) {
             log.error("Initialization failed with: ", th);
 

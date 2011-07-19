@@ -36,6 +36,7 @@ import ru.frostman.web.thr.JavinRuntimeException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -53,6 +54,11 @@ public class AppClasses {
      * Last update time
      */
     private static long lastUpdate = 0;
+
+    /**
+     * Instance uuid
+     */
+    private UUID uuid;
 
     /**
      * All application classes stored by name
@@ -82,6 +88,8 @@ public class AppClasses {
     private boolean forceReload;
 
     public AppClasses() {
+        uuid = UUID.randomUUID();
+
         if (Javin.getMode().isProductionMode()) {
             update();
         }
@@ -247,5 +255,9 @@ public class AppClasses {
 
     public JavinSecurityManager getSecurityManager() {
         return securityManager;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 }
