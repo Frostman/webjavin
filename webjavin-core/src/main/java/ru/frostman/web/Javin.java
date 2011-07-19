@@ -30,7 +30,6 @@ import ru.frostman.web.view.AppViews;
  * @author slukjanov aka Frostman
  */
 public final class Javin {
-
     /**
      * Current application mode
      */

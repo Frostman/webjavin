@@ -23,6 +23,8 @@ import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.ModelAndView;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.thr.NotFoundException;
+import ru.frostman.web.thr.ParameterRequiredException;
 import ru.frostman.web.view.ForwardView;
 import ru.frostman.web.view.RedirectView;
 
@@ -74,6 +76,8 @@ public abstract class ActionInvoker implements Runnable {
             after();
 
             process();
+        } catch (ParameterRequiredException e) {
+            throw new NotFoundException(e);
         } catch (Throwable th) {
             throw new JavinRuntimeException("Exception while executing action", th);
         }

@@ -20,6 +20,7 @@ package ru.frostman.web.dispatch;
 
 import com.google.common.collect.Lists;
 import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.thr.NotFoundException;
 import ru.frostman.web.util.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,15 +51,23 @@ public class Dispatcher {
         }
 
         if (invoker == null) {
-            try {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
-            } catch (IOException e) {
-                throw new JavinRuntimeException("Exception while sending 404:Not found", e);
-            }
+            sendNotFound(request, response);
         } else {
-            invoker.invoke();
+            try {
+                invoker.invoke();
+            } catch (NotFoundException e) {
+                sendNotFound(request, response);
+            }
         }
 
         return invoker;
+    }
+
+    private void sendNotFound(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
+        } catch (IOException e) {
+            throw new JavinRuntimeException("Exception while sending 404:Not found", e);
+        }
     }
 }

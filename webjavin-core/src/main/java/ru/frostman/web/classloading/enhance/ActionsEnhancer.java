@@ -58,6 +58,7 @@ class ActionsEnhancer {
     private static final String JSON_NODE = "org.codehaus.jackson.JsonNode";
     private static final String REQUEST_BODY_JSON = "requestBodyJson";
     private static final String PARAMETER_REQUIRED_EXCEPTION = "ru.frostman.web.thr.ParameterRequiredException";
+    private static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
 
     public static void enhance(Map<String, AppClass> classes, ClassPool classPool, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
@@ -312,7 +313,7 @@ class ActionsEnhancer {
                 body.append(MODEL).append(" $param$").append(idx).append(" = mav.getModel();");
             } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
                 // iff annotated with @Param but not String
-                if (!parameterType.equals(getCtClass(classPool, "java.lang.String"))) {
+                if (!parameterType.equals(getCtClass(classPool, JAVA_LANG_STRING))) {
                     throw new ActionEnhancerException("Auto converted method argument type " + parameterType.getName()
                             + " is currently unsupported: " + behavior.getLongName());
                 }
@@ -323,7 +324,7 @@ class ActionsEnhancer {
                 if (paramAnnotation.required()) {
                     // append checking parameter for not null
                     body.append("if($param$").append(idx).append(" == null) {" +
-                            "throw new " + PARAMETER_REQUIRED_EXCEPTION + "(\"required\");"
+                            "throw new " + PARAMETER_REQUIRED_EXCEPTION + "(\"required param: \"+" + idx + ");"
                             + "}");
                 }
             } else if (isAnnotatedWith(annotations[idx], JsonParam.class) != null) {
@@ -356,9 +357,19 @@ class ActionsEnhancer {
                 if (paramAnnotation.required()) {
                     // append checking parameter for not null
                     body.append("if($param$").append(idx).append(" == null) {" +
-                            "throw new " + PARAMETER_REQUIRED_EXCEPTION + "(\"required\");"
+                            "throw new " + PARAMETER_REQUIRED_EXCEPTION + "(\"required param: \"+" + idx + ");"
                             + "}");
                 }
+            } else if (isAnnotatedWith(annotations[idx], Pjax.class) != null) {
+                if ((!parameterType.equals(getCtClass(classPool, JAVA_LANG_BOOLEAN)))
+                        && (!parameterType.equals(CtClass.booleanType))) {
+                    throw new ActionEnhancerException("@Pjax annotation should mark Boolean or boolean param, but not: "
+                            + parameterType.getName() + " in " + behavior.getLongName());
+                }
+
+                body.append(parameterType.getName()).append(" $param$").append(idx)
+                        .append(" = request.getHeader(\"HTTP_X_PJAX\") != null;");
+
             } else {
                 throw new ActionEnhancerException("Unsupported auto injected method argument type " + parameterType
                         + ": " + behavior.getLongName());

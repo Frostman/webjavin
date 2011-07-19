@@ -21,7 +21,7 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class ParameterRequiredException extends RuntimeException {
+public class ParameterRequiredException extends FastRuntimeException {
     public ParameterRequiredException() {
     }
 

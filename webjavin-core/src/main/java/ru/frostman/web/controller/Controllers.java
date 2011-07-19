@@ -20,6 +20,8 @@ package ru.frostman.web.controller;
 
 import ru.frostman.web.Javin;
 import ru.frostman.web.view.ForwardView;
+import ru.frostman.web.view.JsonModelView;
+import ru.frostman.web.view.JsonValueView;
 import ru.frostman.web.view.RedirectView;
 
 /**
@@ -43,8 +45,16 @@ public class Controllers {
         return new RedirectView(targetUrl);
     }
 
-    public static View view(String viewName){
-        return  Javin.getViews().getViewByName(viewName);
+    public static View view(String viewName) {
+        return Javin.getViews().getViewByName(viewName);
+    }
+
+    public static <T> View jsonValue(T value) {
+        return new JsonValueView<T>(value);
+    }
+
+    public static View jsonModel(){
+        return new JsonModelView();
     }
 
 }

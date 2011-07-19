@@ -16,40 +16,24 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.test;
-
-import ru.frostman.web.annotation.Action;
-import ru.frostman.web.annotation.Controller;
-import ru.frostman.web.annotation.Param;
-import ru.frostman.web.annotation.Pjax;
-import ru.frostman.web.controller.Model;
-import ru.frostman.web.controller.View;
-import ru.frostman.web.mongo.User;
-
-import static ru.frostman.web.controller.Controllers.jsonValue;
-import static ru.frostman.web.controller.Controllers.view;
+package ru.frostman.web.thr;
 
 /**
  * @author slukjanov aka Frostman
  */
-@Controller
-public class TestController {
-
-    @Action("/test/*")
-    public View test(Model model, @Param("a") String testParam, @Param(value = "b", required = false) String testParam2, @Pjax boolean pjax) {
-
-        System.out.println("Pjax: " + pjax);
-
-        model.put("testParam", testParam).put("testParam2", testParam2);
-
-        if ("page".equals(testParam2)) {
-            return view("test.ftl");
-        }
-
-        User user = new User();
-        user.setUsername(testParam);
-
-        return jsonValue(user);
+public class NotFoundException extends FastRuntimeException{
+    public NotFoundException() {
     }
 
+    public NotFoundException(String message) {
+        super(message);
+    }
+
+    public NotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public NotFoundException(Throwable cause) {
+        super(cause);
+    }
 }
