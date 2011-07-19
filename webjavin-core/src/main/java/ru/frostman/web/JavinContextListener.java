@@ -55,7 +55,9 @@ public class JavinContextListener implements ServletContextListener {
 
             if (Javin.getMode().isProductionMode()) {
                 log.info("Preparing application");
+
                 Javin.getClasses().update();
+
                 log.info("Application ready");
             }
 
