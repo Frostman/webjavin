@@ -21,6 +21,10 @@ package ru.frostman.web.controller;
 import java.io.PrintWriter;
 
 /**
+ * View part of MVC.
+ *
+ * Provides process method to render view with specified model and target.
+ *
  * @author slukjanov aka Frostman
  */
 public abstract class View {
@@ -28,28 +32,52 @@ public abstract class View {
     protected String contentType;
     protected String characterEncoding;
 
+    /**
+     * @param model to pass values to view
+     * @param writer to write to
+     */
     public abstract void process(Model model, PrintWriter writer);
 
+    /**
+     * @return true if view is already processed
+     */
     public boolean isProcessed() {
         return processed;
     }
 
+    /**
+     * Change processed state.
+     *
+     * @param processed new processed state
+     */
     public void setProcessed(boolean processed) {
         this.processed = processed;
     }
 
+    /**
+     * @return content type
+     */
     public String getContentType() {
         return contentType;
     }
 
+    /**
+     * @param contentType to set
+     */
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
 
+    /**
+     * @return character encoding
+     */
     public String getCharacterEncoding() {
         return characterEncoding;
     }
 
+    /**
+     * @param characterEncoding to set
+     */
     public void setCharacterEncoding(String characterEncoding) {
         this.characterEncoding = characterEncoding;
     }
