@@ -38,14 +38,12 @@
             <artifactId>cglib-nodep</artifactId>
             <version>[2.1_3,)</version>
             <type>jar</type>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.thoughtworks.proxytoys</groupId>
             <artifactId>proxytoys</artifactId>
             <version>1.0</version>
             <type>jar</type>
-            <optional>true</optional>
         </dependency>
 
         <!--Servlet API-->

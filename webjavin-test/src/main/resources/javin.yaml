@@ -7,13 +7,6 @@ classes:
 templates:
       path: "/WEB-INF/view"
 
-app:
-      asyncQueueLength: 100
-
 plugins: [
-      "ru.frostman.web.aop.AopPlugin",
       "ru.frostman.web.MongoPlugin"
 ]
-
-#res:
-#      jquery: true
