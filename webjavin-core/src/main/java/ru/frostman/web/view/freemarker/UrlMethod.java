@@ -16,27 +16,25 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.view;
+package ru.frostman.web.view.freemarker;
 
-import ru.frostman.web.controller.Model;
-import ru.frostman.web.controller.View;
+import freemarker.template.SimpleScalar;
+import freemarker.template.TemplateMethodModel;
+import freemarker.template.TemplateModelException;
+import ru.frostman.web.controller.Controllers;
 
-import java.io.PrintWriter;
-
-import static ru.frostman.web.util.JsonUtil.renderModelToJson;
+import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class JsonModelView extends View {
-
-    public JsonModelView() {
-        this.contentType = ContentTypes.APPLICATION_JSON;
-        this.characterEncoding = CharacterEncodings.UTF8;
-    }
-
+public class UrlMethod implements TemplateMethodModel {
     @Override
-    public void process(Model model, PrintWriter writer) {
-        renderModelToJson(model, writer);
+    public Object exec(List args) throws TemplateModelException {
+        if (args.size() != 1) {
+            throw new TemplateModelException("Wrong arguments number: required 1 argument");
+        }
+
+        return new SimpleScalar(Controllers.url((String) args.get(0)));
     }
 }

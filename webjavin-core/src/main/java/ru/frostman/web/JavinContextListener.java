@@ -25,6 +25,7 @@ import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.thr.FastRuntimeException;
 import ru.frostman.web.view.AppViews;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -33,10 +34,13 @@ import javax.servlet.ServletContextListener;
  */
 public class JavinContextListener implements ServletContextListener {
     private static final Logger log = LoggerFactory.getLogger(JavinContextListener.class);
+    private static ServletContext servletContext;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
+            servletContext = sce.getServletContext();
+
             freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
 
             Javin.setMode(JavinConfig.getCurrentConfig().getMode());
@@ -48,6 +52,13 @@ public class JavinContextListener implements ServletContextListener {
             Javin.setViews(new AppViews());
 
             log.info("Javin context initialized successfully");
+
+            if (Javin.getMode().isProductionMode()) {
+                log.info("Preparing application");
+                Javin.getClasses().update();
+                log.info("Application ready");
+            }
+
         } catch (Throwable th) {
             log.error("Initialization failed with: ", th);
 
@@ -58,5 +69,9 @@ public class JavinContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         log.info("Javin context destroyed successfully");
+    }
+
+    public static ServletContext getServletContext() {
+        return servletContext;
     }
 }

@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import javassist.*;
 import ru.frostman.web.annotation.*;
 import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.controller.Controllers;
 import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.url.UrlPattern;
 import ru.frostman.web.dispatch.url.UrlPatternType;
@@ -65,7 +66,7 @@ class ActionsEnhancer {
         for (CtMethod actionMethod : getDeclaredMethodsAnnotatedWith(Action.class, controller)) {
             try {
                 Action actionAnnotation = (Action) actionMethod.getAnnotation(Action.class);
-                String[] urls = actionAnnotation.value();
+                String[] urls = normalizeUrls(actionAnnotation.value());
                 HttpMethod[] methods = actionAnnotation.method();
                 boolean async = actionAnnotation.async();
 
@@ -185,7 +186,7 @@ class ActionsEnhancer {
                     .append(JAVA_LANG_STRING).append(") result").append("));");
         } else if (actionMethod.getAnnotation(JsonResponse.class) != null) {
             // iff return type is some class then change ModelAndView's view to JsonModelView
-            body.append("mav.setView(new ru.frostman.web.view.JsonValueView(")
+            body.append("mav.setView(new ru.frostman.web.view.json.JsonValueView(")
                     .append("result").append("));");
         } else {
             throw new ActionEnhancerException("Action method can't return specified type: " + actionMethod.getLongName());
@@ -384,6 +385,14 @@ class ActionsEnhancer {
         }
 
         return parameters;
+    }
+
+    private static String[] normalizeUrls(String[] urls) {
+        for (int i = 0; i < urls.length; i++) {
+            urls[i] = Controllers.url(urls[i]);
+        }
+
+        return urls;
     }
 }
 

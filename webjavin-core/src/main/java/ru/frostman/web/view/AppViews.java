@@ -24,6 +24,7 @@ import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.view.freemarker.FreemarkerView;
 
 import java.io.File;
 import java.io.IOException;

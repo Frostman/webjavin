@@ -16,10 +16,12 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.view;
+package ru.frostman.web.view.json;
 
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
+import ru.frostman.web.view.CharacterEncodings;
+import ru.frostman.web.view.ContentTypes;
 
 import java.io.PrintWriter;
 

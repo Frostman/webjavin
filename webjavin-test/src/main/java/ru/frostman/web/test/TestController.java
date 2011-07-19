@@ -20,14 +20,12 @@ package ru.frostman.web.test;
 
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
-import ru.frostman.web.annotation.Pjax;
+import ru.frostman.web.annotation.Param;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.mongo.User;
 
-import java.util.Date;
-
-import static ru.frostman.web.controller.Controllers.jsonValue;
+import static ru.frostman.web.controller.Controllers.forwardView;
+import static ru.frostman.web.controller.Controllers.view;
 
 /**
  * @author slukjanov aka Frostman
@@ -35,15 +33,22 @@ import static ru.frostman.web.controller.Controllers.jsonValue;
 @Controller
 public class TestController {
 
-    @Action("/test/*")
-    public View test(Model model, @Pjax boolean pjax) {
+    @Action("/test")
+    public View test(Model model, @Param(value = "a", required = false) String a) {
+        model.put("page", "test");
 
-        System.out.println("Pjax: " + pjax);
+        if ("f".equals(a)) {
+            return forwardView("/qwe");
+        }
 
-        User user = new User();
-        user.setUsername(new Date().toString());
+        return view("test.ftl");
+    }
 
-        return jsonValue(user);
+    @Action("/qwe")
+    public View qwe(Model model) {
+        model.put("page", "qwe");
+
+        return view("test.ftl");
     }
 
 }

@@ -16,56 +16,29 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.controller;
+package ru.frostman.web.view.json;
 
-import ru.frostman.web.Javin;
-import ru.frostman.web.config.JavinConfig;
-import ru.frostman.web.view.ForwardView;
-import ru.frostman.web.view.json.JsonModelView;
-import ru.frostman.web.view.json.JsonValueView;
-import ru.frostman.web.view.RedirectView;
+import ru.frostman.web.controller.Model;
+import ru.frostman.web.controller.View;
+import ru.frostman.web.view.CharacterEncodings;
+import ru.frostman.web.view.ContentTypes;
+
+import java.io.PrintWriter;
+
+import static ru.frostman.web.util.JsonUtil.renderModelToJson;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class Controllers {
-    private static final String SLASH = "/";
+public class JsonModelView extends View {
 
-    public static String forward(String targetUrl) {
-        return "forward:" + url(targetUrl);
+    public JsonModelView() {
+        this.contentType = ContentTypes.APPLICATION_JSON;
+        this.characterEncoding = CharacterEncodings.UTF8;
     }
 
-    public static View forwardView(String targetUrl) {
-        return new ForwardView(url(targetUrl));
-    }
-
-    public static String redirect(String targetUrl) {
-        return "redirect:" + url(targetUrl);
-    }
-
-    public static View redirectView(String targetUrl) {
-        return new RedirectView(url(targetUrl));
-    }
-
-    public static View view(String viewName) {
-        return Javin.getViews().getViewByName(viewName);
-    }
-
-    public static <T> View jsonValue(T value) {
-        return new JsonValueView<T>(value);
-    }
-
-    public static View jsonModel() {
-        return new JsonModelView();
-    }
-
-    public static String url(String relativeUrl) {
-        String context = JavinConfig.getCurrentConfig().getContext();
-
-        if (relativeUrl.length() != 0 && relativeUrl.charAt(0) == '/') {
-            return context + relativeUrl;
-        }
-
-        return context + "/" + relativeUrl;
+    @Override
+    public void process(Model model, PrintWriter writer) {
+        renderModelToJson(model, writer);
     }
 }

@@ -34,6 +34,7 @@ public class AopEnhancer {
     public static void enhance(ClassPool classPool, CtClass ctClass, List<MethodWrapper> methodWrappers) {
         try {
             //todo make AOP like filters in servlet-api or see AOP libs like guice
+            //todo may be rename real method to $javin$METHOD_NAME
 
             ctClass.instrument(new ExprEditor() {
                 @Override

@@ -22,6 +22,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import ru.frostman.web.JavinContextListener;
 import ru.frostman.web.JavinMode;
 import ru.frostman.web.thr.JavinRuntimeException;
 
@@ -35,6 +36,7 @@ public class JavinConfig {
     private static JavinConfig currentConfig;
 
     private JavinMode mode = JavinMode.DEV;
+    private String context = null;
     private List<String> plugins = Lists.newLinkedList();
 
     private ClassesConfig classes = new ClassesConfig();
@@ -51,6 +53,9 @@ public class JavinConfig {
             Yaml yaml = new Yaml(new Constructor(JavinConfig.class));
             JavinConfig config = (JavinConfig) yaml.load(getConfigStream());
 
+            // some hacks
+            ensureContext(config);
+
             boolean changed = false;
             if (!config.equals(currentConfig)) {
                 changed = true;
@@ -62,6 +67,20 @@ public class JavinConfig {
         } catch (Exception e) {
             throw new JavinRuntimeException("Can't load framework configuration", e);
         }
+    }
+
+    private static void ensureContext(JavinConfig config) {
+        String context = config.context;
+        if (context == null) {
+            context = JavinContextListener.getServletContext().getContextPath();
+        }
+        if (context.endsWith("/")) {
+            context = context.substring(0, context.length() - 1);
+        }
+        if (context.length() == 0) {
+            context = "/";
+        }
+        config.context = context;
     }
 
     public static JavinConfig getCurrentConfig() {
@@ -78,6 +97,14 @@ public class JavinConfig {
 
     public void setMode(JavinMode mode) {
         this.mode = mode;
+    }
+
+    public String getContext() {
+        return context;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
     }
 
     public List<String> getPlugins() {
@@ -126,6 +153,7 @@ public class JavinConfig {
             JavinConfig config = (JavinConfig) obj;
 
             return mode == config.mode
+                    && Objects.equal(context, config.context)
                     && Objects.equal(plugins, config.plugins)
                     && Objects.equal(classes, config.classes)
                     && Objects.equal(templates, config.templates)

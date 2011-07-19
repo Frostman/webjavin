@@ -31,6 +31,7 @@ import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.Dispatcher;
 import ru.frostman.web.plugin.JavinPlugins;
 import ru.frostman.web.secure.JavinSecurityManager;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,13 @@ public class AppClasses {
      */
     private JavinSecurityManager securityManager;
 
+    /**
+     * Ready status
+     */
+    private boolean ready;
+
+    private boolean forceReload;
+
     public AppClasses() {
         if (Javin.getMode().isProductionMode()) {
             update();
@@ -86,7 +94,7 @@ public class AppClasses {
      * @return true iff class loader changed
      */
     public boolean update() {
-        if (System.currentTimeMillis() - lastUpdate < JavinConfig.getCurrentConfig().getClasses().getUpdateInterval()) {
+        if (ready && System.currentTimeMillis() - lastUpdate < JavinConfig.getCurrentConfig().getClasses().getUpdateInterval()) {
             return false;
         }
 
@@ -98,7 +106,11 @@ public class AppClasses {
                 start = System.currentTimeMillis();
             }
 
-            boolean needReload = JavinConfig.update();
+            boolean needReload = JavinConfig.update() || forceReload;
+
+            if (forceReload) {
+                forceReload = false;
+            }
 
             List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(JavinConfig.getCurrentConfig().getClasses().getPackages());
 
@@ -211,7 +223,12 @@ public class AppClasses {
                 log.debug("Application classes is up to date");
             }
 
+            ready = true;
+
             return needReload;
+        } catch (Throwable th) {
+            forceReload = true;
+            throw new JavinRuntimeException(th);
         } finally {
             lastUpdate = System.currentTimeMillis();
             UPDATE_LOCK.unlock();

@@ -37,6 +37,7 @@ public class MongoConfig {
     private static MongoConfig currentConfig;
 
     private List<MongoServerAddress> replicaSet = Lists.newArrayList(new MongoServerAddress());
+    private String dbName;
 
     static {
         update();
@@ -91,12 +92,21 @@ public class MongoConfig {
         this.replicaSet = replicaSet;
     }
 
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MongoConfig) {
             MongoConfig config = (MongoConfig) obj;
 
-            return Objects.equal(replicaSet, config.replicaSet);
+            return Objects.equal(replicaSet, config.replicaSet)
+                    && Objects.equal(dbName, config.dbName);
         }
 
         return false;

@@ -20,6 +20,7 @@ package ru.frostman.web.view;
 
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,8 +46,7 @@ public class RedirectView extends View {
         try {
             response.sendRedirect(targetUrl);
         } catch (IOException e) {
-            //todo impl
-            throw new RuntimeException(e);
+            throw new JavinRuntimeException("Error while processing redirect view", e);
         }
     }
 

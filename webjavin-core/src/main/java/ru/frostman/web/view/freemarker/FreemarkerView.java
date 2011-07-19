@@ -16,13 +16,15 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.view;
+package ru.frostman.web.view.freemarker;
 
 import com.google.common.base.Preconditions;
 import freemarker.template.Template;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.view.CharacterEncodings;
+import ru.frostman.web.view.ContentTypes;
 
 import java.io.PrintWriter;
 
@@ -30,6 +32,8 @@ import java.io.PrintWriter;
  * @author slukjanov aka Frostman
  */
 public class FreemarkerView extends View {
+    private static final UrlMethod URL_METHOD = new UrlMethod();
+
     private final Template template;
 
     public FreemarkerView(Template template) {
@@ -46,6 +50,8 @@ public class FreemarkerView extends View {
 
     @Override
     public void process(Model model, PrintWriter writer) {
+        model.put("url", URL_METHOD);
+
         try {
             template.process(model, writer);
         } catch (Exception e) {
