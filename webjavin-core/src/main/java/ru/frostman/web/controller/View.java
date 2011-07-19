@@ -33,7 +33,7 @@ public abstract class View {
     protected String characterEncoding;
 
     /**
-     * @param model to pass values to view
+     * @param model  to pass values to view
      * @param writer to write to
      */
     public abstract void process(Model model, PrintWriter writer);

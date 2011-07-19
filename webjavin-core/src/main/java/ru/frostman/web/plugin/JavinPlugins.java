@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Javin framework plugins manager.
+ *
  * @author slukjanov aka Frostman
  */
 public class JavinPlugins extends Plugin {
@@ -45,6 +47,11 @@ public class JavinPlugins extends Plugin {
         this.plugins = plugins;
     }
 
+    /**
+     * Reload all Javin plugins and return aggregated plugin to run some handlers.
+     *
+     * @return aggregated plugin to run handlers
+     */
     public static Plugin reload() {
         List<String> pluginClassNames = JavinConfig.getCurrentConfig().getPlugins();
 
@@ -76,6 +83,9 @@ public class JavinPlugins extends Plugin {
         return instance;
     }
 
+    /**
+     * @return current aggregated plugin to run handlers
+     */
     public static Plugin get() {
         return instance;
     }

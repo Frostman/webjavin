@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
+ * Javin framework configuration.
+ *
  * @author slukjanov aka Frostman
  */
 public class JavinConfig {
@@ -48,6 +50,11 @@ public class JavinConfig {
         update();
     }
 
+    /**
+     * Updates Javin configuration.
+     *
+     * @return true if something changes
+     */
     public synchronized static boolean update() {
         try {
             Yaml yaml = new Yaml(new Constructor(JavinConfig.class));
@@ -83,6 +90,9 @@ public class JavinConfig {
         config.context = context;
     }
 
+    /**
+     * @return current JavinConfig
+     */
     public static JavinConfig getCurrentConfig() {
         return currentConfig;
     }
