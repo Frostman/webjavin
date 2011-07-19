@@ -20,14 +20,14 @@ package ru.frostman.web.test;
 
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
-import ru.frostman.web.annotation.Param;
 import ru.frostman.web.annotation.Pjax;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.mongo.User;
 
+import java.util.Date;
+
 import static ru.frostman.web.controller.Controllers.jsonValue;
-import static ru.frostman.web.controller.Controllers.view;
 
 /**
  * @author slukjanov aka Frostman
@@ -36,18 +36,12 @@ import static ru.frostman.web.controller.Controllers.view;
 public class TestController {
 
     @Action("/test/*")
-    public View test(Model model, @Param("a") String testParam, @Param(value = "b", required = false) String testParam2, @Pjax boolean pjax) {
+    public View test(Model model, @Pjax boolean pjax) {
 
         System.out.println("Pjax: " + pjax);
 
-        model.put("testParam", testParam).put("testParam2", testParam2);
-
-        if ("page".equals(testParam2)) {
-            return view("test.ftl");
-        }
-
         User user = new User();
-        user.setUsername(testParam);
+        user.setUsername(new Date().toString());
 
         return jsonValue(user);
     }

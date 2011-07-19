@@ -361,15 +361,16 @@ class ActionsEnhancer {
                             + "}");
                 }
             } else if (isAnnotatedWith(annotations[idx], Pjax.class) != null) {
-                if ((!parameterType.equals(getCtClass(classPool, JAVA_LANG_BOOLEAN)))
-                        && (!parameterType.equals(CtClass.booleanType))) {
+                if (parameterType.equals(CtClass.booleanType)) {
+                    body.append(parameterType.getName()).append(" $param$").append(idx)
+                                         .append(" = request.getHeader(\"HTTP_X_PJAX\") != null;");
+                }else if (parameterType.equals(getCtClass(classPool, JAVA_LANG_BOOLEAN))) {
+                    body.append(parameterType.getName()).append(" $param$").append(idx)
+                                         .append(" = java.lang.Boolean.valueOf(request.getHeader(\"HTTP_X_PJAX\") != null);");
+                } else {
                     throw new ActionEnhancerException("@Pjax annotation should mark Boolean or boolean param, but not: "
                             + parameterType.getName() + " in " + behavior.getLongName());
                 }
-
-                body.append(parameterType.getName()).append(" $param$").append(idx)
-                        .append(" = request.getHeader(\"HTTP_X_PJAX\") != null;");
-
             } else {
                 throw new ActionEnhancerException("Unsupported auto injected method argument type " + parameterType
                         + ": " + behavior.getLongName());
