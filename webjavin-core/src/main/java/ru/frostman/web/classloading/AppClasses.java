@@ -131,6 +131,7 @@ public class AppClasses {
                     newClass.setLastLoaded(lastModified);
                     newClass.setHashCode(classFile.getHashCode());
                     newClass.setBytecode(classFile.getBytes());
+
                     classes.put(className, newClass);
 
                     log.debug("Application class added: {}", className);
@@ -151,6 +152,7 @@ public class AppClasses {
                         changedClass.setLastLoaded(lastModified);
                         changedClass.setHashCode(hashCode);
                         changedClass.setBytecode(classFile.getBytes());
+
                         classes.put(className, changedClass);
 
                         log.debug("Application class changed: {}", className);
