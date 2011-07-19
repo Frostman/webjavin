@@ -108,14 +108,4 @@ public interface JavinSession {
      */
     public void invalidate();
 
-
-    /**
-     * @return true iff server has created a session,
-     *         but the client has not yet joined
-     *
-     * @throws IllegalStateException if this method is called on an
-     *                               already invalidated session
-     */
-    public boolean isNew();
-
 }

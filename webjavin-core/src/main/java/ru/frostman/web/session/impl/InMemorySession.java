@@ -18,61 +18,58 @@
 
 package ru.frostman.web.session.impl;
 
-import com.google.common.base.Preconditions;
 import ru.frostman.web.session.JavinSession;
 
-import javax.servlet.http.HttpSession;
 import java.util.Enumeration;
+import java.util.UUID;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class ServletSession implements JavinSession {
-    private final HttpSession session;
+public class InMemorySession implements JavinSession {
+    private String id = UUID.randomUUID().toString();
+    private long creationTime;
+    private long lastAccessedTime;
 
-    public ServletSession(HttpSession session) {
-        Preconditions.checkArgument(session != null);
-
-        this.session = session;
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
     public long getCreationTime() {
-        return session.getCreationTime();
-    }
-
-    @Override
-    public String getId() {
-        return session.getId();
+        return creationTime;
     }
 
     @Override
     public long getLastAccessedTime() {
-        return session.getLastAccessedTime();
+        return lastAccessedTime;
     }
 
     @Override
     public Object getAttribute(String name) {
-        return session.getAttribute(name);
+        //todo impl
+        return null;
     }
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        return session.getAttributeNames();
+        //todo impl
+        return null;
     }
 
     @Override
     public void setAttribute(String name, Object value) {
-        session.setAttribute(name, value);
+        //todo impl
     }
 
     @Override
     public void removeAttribute(String name) {
-        session.removeAttribute(name);
+        //todo impl
     }
 
     @Override
     public void invalidate() {
-        session.invalidate();
+        //todo impl
     }
 }

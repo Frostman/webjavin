@@ -26,7 +26,7 @@ import ru.frostman.web.controller.View;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static ru.frostman.web.controller.Controllers.forwardView;
+import static ru.frostman.web.controller.Controllers.forward;
 import static ru.frostman.web.controller.Controllers.view;
 
 /**
@@ -40,7 +40,7 @@ public class TestController {
         model.put("page", "test");
 
         if ("f".equals(a)) {
-            return forwardView("/qwe");
+            return forward("/qwe");
         }
 
         return view("test.ftl");
