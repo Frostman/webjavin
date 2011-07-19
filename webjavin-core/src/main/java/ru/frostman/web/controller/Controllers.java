@@ -21,9 +21,9 @@ package ru.frostman.web.controller;
 import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.view.ForwardView;
+import ru.frostman.web.view.RedirectView;
 import ru.frostman.web.view.json.JsonModelView;
 import ru.frostman.web.view.json.JsonValueView;
-import ru.frostman.web.view.RedirectView;
 
 /**
  * @author slukjanov aka Frostman
