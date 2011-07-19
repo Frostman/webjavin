@@ -8,6 +8,7 @@
     <modules>
         <module>webjavin-core</module>
         <module>webjavin-mongo</module>
+        <module>webjavin-aop</module>
         <module>webjavin-test</module>
     </modules>
     <packaging>pom</packaging>

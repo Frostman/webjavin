@@ -23,11 +23,10 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
-import ru.frostman.web.aop.AopEnhancer;
-import ru.frostman.web.aop.MethodWrapper;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.classloading.AppClasses;
 import ru.frostman.web.dispatch.ActionDefinition;
+import ru.frostman.web.plugin.JavinPlugins;
 import ru.frostman.web.thr.EnhancerException;
 import ru.frostman.web.thr.JavinRuntimeException;
 
@@ -68,7 +67,7 @@ public class Enhancer {
     }
 
     public static void enhance(Map<String, AppClass> classes, AppClass appClass,
-                               List<ActionDefinition> actionDefinitions, List<MethodWrapper> methodWrappers) {
+                               List<ActionDefinition> actionDefinitions) {
         if (appClass.isGenerated() || appClass.getEnhancedBytecode() != null) {
             return;
         }
@@ -78,14 +77,19 @@ public class Enhancer {
         try {
             CtClass superclass = ctClass.getSuperclass();
             if (classes.containsKey(superclass.getName())) {
-                Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions, methodWrappers);
+                Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions);
             }
         } catch (NotFoundException e) {
             throw new JavinRuntimeException(e);
         }
 
+        // enhance actions
         ActionsEnhancer.enhance(classes, classPool, ctClass, actionDefinitions);
-        AopEnhancer.enhance(classPool, ctClass, methodWrappers);
+
+        // enhance in plugins
+        JavinPlugins.get().enhanceClass(classes, classPool, ctClass);
+
+        // enhance security
         SecurityEnhancer.enhance(classPool, ctClass);
 
         try {

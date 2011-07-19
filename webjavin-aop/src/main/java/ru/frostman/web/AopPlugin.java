@@ -16,56 +16,40 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.plugin;
+package ru.frostman.web;
 
-import com.google.common.base.Preconditions;
 import javassist.ClassPool;
 import javassist.CtClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.frostman.web.aop.AopEnhancer;
+import ru.frostman.web.aop.MethodWrapper;
+import ru.frostman.web.aop.MethodWrappersUtil;
 import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.plugin.Plugin;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class Plugin implements Comparable<Plugin> {
-    private int weight;
+public class AopPlugin extends Plugin {
+    private static final Logger log = LoggerFactory.getLogger(AopPlugin.class);
 
-    protected Plugin(int weight) {
-        Preconditions.checkArgument(weight >= 0, "Plugin's weight should be >= 0");
+    private List<MethodWrapper> methodWrappers;
 
-        this.weight = weight;
-    }
-
-    public void onLoad() {
-    }
-
-    public void beforeClassesEnhance(Map<String, AppClass> classes) {
-    }
-
-    public void afterClassesEnhance(Map<String, AppClass> classes) {
-    }
-
-    public void enhanceClass(Map<String, AppClass> classes, ClassPool classPool, CtClass ctClass) {
+    protected AopPlugin() {
+        super(1);
     }
 
     @Override
-    public int compareTo(Plugin p) {
-        int res = weight < p.weight ? -1 : (weight != p.weight ? 1 : 0);
+    public void beforeClassesEnhance(Map<String, AppClass> classes) {
+        methodWrappers = MethodWrappersUtil.findWrappers(classes);
+    }
 
-        if (res != 0) {
-            return res;
-        }
-
-        res = getClass().getName().compareTo(p.getClass().getName());
-
-        if (res != 0) {
-            return res;
-        }
-
-        int thisHashCode = System.identityHashCode(this);
-        int otherHashCode = System.identityHashCode(p);
-
-        return (thisHashCode < otherHashCode ? -1 : (thisHashCode != otherHashCode ? 1 : 0));
+    @Override
+    public void enhanceClass(Map<String, AppClass> classes, ClassPool classPool, CtClass ctClass) {
+        AopEnhancer.enhance(classPool, ctClass, methodWrappers);
     }
 }

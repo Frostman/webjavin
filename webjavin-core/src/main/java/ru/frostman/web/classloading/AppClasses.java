@@ -25,8 +25,6 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.Javin;
-import ru.frostman.web.aop.MethodWrapper;
-import ru.frostman.web.aop.MethodWrappersUtil;
 import ru.frostman.web.classloading.enhance.Enhancer;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.dispatch.ActionDefinition;
@@ -183,14 +181,10 @@ public class AppClasses {
 
                 JavinPlugins.get().beforeClassesEnhance(classes);
 
-                // AOP
-                //todo need to be moved into plugin
-                List<MethodWrapper> methodWrappers = MethodWrappersUtil.findWrappers(classes);
-
                 // find actions
                 List<ActionDefinition> actionDefinitions = Lists.newLinkedList();
                 for (String className : Lists.newLinkedList(classes.keySet())) {
-                    Enhancer.enhance(classes, classes.get(className), actionDefinitions, methodWrappers);
+                    Enhancer.enhance(classes, classes.get(className), actionDefinitions);
                 }
 
                 // create new class loader and load all app classes

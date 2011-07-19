@@ -16,7 +16,9 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.thr;
+package ru.frostman.web.aop.thr;
+
+import ru.frostman.web.thr.JavinRuntimeException;
 
 /**
  * @author slukjanov aka Frostman

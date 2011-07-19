@@ -23,7 +23,6 @@ import java.lang.annotation.*;
 /**
  * Return value of the action method marked with this annotation
  * will be auto converted to json.
- * //todo think about content types
  *
  * @author slukjanov aka Frostman
  */

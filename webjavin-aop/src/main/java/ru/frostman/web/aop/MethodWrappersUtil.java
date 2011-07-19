@@ -22,15 +22,13 @@ import com.google.common.collect.Lists;
 import javassist.CtClass;
 import javassist.CtMethod;
 import ru.frostman.web.annotation.Wrapper;
+import ru.frostman.web.aop.thr.AopException;
 import ru.frostman.web.classloading.AppClass;
-import ru.frostman.web.thr.AopException;
+import ru.frostman.web.classloading.enhance.EnhancerUtil;
 import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.util.List;
 import java.util.Map;
-
-import static ru.frostman.web.classloading.enhance.EnhancerUtil.getDeclaredMethodsAnnotatedWith;
-import static ru.frostman.web.classloading.enhance.EnhancerUtil.isPublicAndStatic;
 
 /**
  * @author slukjanov aka Frostman
@@ -43,8 +41,8 @@ public class MethodWrappersUtil {
             for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
                 CtClass ctClass = entry.getValue().getCtClass();
 
-                for (CtMethod method : getDeclaredMethodsAnnotatedWith(Wrapper.class, ctClass)) {
-                    if (!isPublicAndStatic(method)) {
+                for (CtMethod method : EnhancerUtil.getDeclaredMethodsAnnotatedWith(Wrapper.class, ctClass)) {
+                    if (!EnhancerUtil.isPublicAndStatic(method)) {
                         //todo think about static
                         throw new AopException("Wrapper method should be public and static");
                     }
