@@ -21,7 +21,7 @@ package ru.frostman.web.thr;
 /**
  * @author slukjanov aka Frostman
  */
-public class NotFoundException extends FastRuntimeException{
+public class NotFoundException extends FastRuntimeException {
     public NotFoundException() {
     }
 

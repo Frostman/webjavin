@@ -51,7 +51,7 @@ public class MongoUserService extends BasicDAO<User, ObjectId> implements UserSe
             throw new NullPointerException("UserDetails and username field should not be null");
         }
 
-        if(!(userDetails instanceof User)) {
+        if (!(userDetails instanceof User)) {
             throw new UnsupportedImplementationException("UserDetails should be inherited from ru.frostman.web.mongo.User");
         }
         User user = (User) userDetails;

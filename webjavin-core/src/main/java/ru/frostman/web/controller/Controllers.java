@@ -53,7 +53,7 @@ public class Controllers {
         return new JsonValueView<T>(value);
     }
 
-    public static View jsonModel(){
+    public static View jsonModel() {
         return new JsonModelView();
     }
 

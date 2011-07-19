@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * @author slukjanov aka Frostman
  */
-public class SimpleUser implements UserDetails{
+public class SimpleUser implements UserDetails {
     private String username;
 
     private List<Credentials> credentials;

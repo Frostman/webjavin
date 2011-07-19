@@ -37,7 +37,7 @@ public class SecureConfig {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof SecureConfig)                                          {
+        if (obj instanceof SecureConfig) {
             SecureConfig config = (SecureConfig) obj;
 
             return Objects.equal(userServiceProvider, config.userServiceProvider);
