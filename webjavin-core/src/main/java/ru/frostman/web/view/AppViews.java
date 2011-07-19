@@ -43,6 +43,7 @@ public class AppViews {
         int updateInterval = JavinConfig.getCurrentConfig().getMode().isProductionMode()
                 ? JavinConfig.getCurrentConfig().getTemplates().getUpdateInterval() : 0;
         freemarker.setTemplateUpdateDelay(updateInterval);
+
         freemarker.setDefaultEncoding("utf-8");
         freemarker.setOutputEncoding("utf-8");
 
