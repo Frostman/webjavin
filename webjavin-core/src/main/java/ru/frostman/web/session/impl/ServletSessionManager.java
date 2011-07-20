@@ -16,59 +16,21 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.dispatch;
+package ru.frostman.web.session.impl;
 
-import com.google.common.collect.Lists;
-import ru.frostman.web.thr.JavinRuntimeException;
-import ru.frostman.web.thr.NotFoundException;
-import ru.frostman.web.util.HttpMethod;
+import ru.frostman.web.session.JavinSession;
+import ru.frostman.web.session.SessionManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class Dispatcher {
-    private final List<ActionDefinition> actions;
-
-    public Dispatcher(List<ActionDefinition> actions) {
-        this.actions = Lists.newLinkedList(actions);
-    }
-
-    public ActionInvoker dispatch(String requestUrl, HttpMethod requestMethod, HttpServletRequest request
-            , HttpServletResponse response) {
-
-        ActionInvoker invoker = null;
-
-        for (ActionDefinition definition : actions) {
-            if (definition.matches(requestUrl, requestMethod)) {
-                invoker = definition.initInvoker(request, response);
-
-                break;
-            }
-        }
-
-        if (invoker == null) {
-            sendNotFound(request, response);
-        } else {
-            try {
-                invoker.invoke();
-            } catch (NotFoundException e) {
-                sendNotFound(request, response);
-            }
-        }
-
-        return invoker;
-    }
-
-    private void sendNotFound(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
-        } catch (IOException e) {
-            throw new JavinRuntimeException("Exception while sending 404:Not found", e);
-        }
+public class ServletSessionManager extends SessionManager{
+    @Override
+    public JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create) {
+        //todo think about caching decorators
+        return new ServletSession(request.getSession(create));
     }
 }

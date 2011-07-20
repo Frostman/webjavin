@@ -16,7 +16,7 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.mongo;
+package ru.frostman.web.mongo.secure;
 
 import com.google.code.morphia.dao.BasicDAO;
 import org.bson.types.ObjectId;
@@ -52,7 +52,7 @@ public class MongoUserService extends BasicDAO<User, ObjectId> implements UserSe
         }
 
         if (!(userDetails instanceof User)) {
-            throw new UnsupportedImplementationException("UserDetails should be inherited from ru.frostman.web.mongo.User");
+            throw new UnsupportedImplementationException("UserDetails should be inherited from ru.frostman.web.mongo.secure.User");
         }
         User user = (User) userDetails;
 

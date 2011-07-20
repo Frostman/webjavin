@@ -31,6 +31,7 @@ import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.Dispatcher;
 import ru.frostman.web.plugin.JavinPlugins;
 import ru.frostman.web.secure.JavinSecurityManager;
+import ru.frostman.web.session.JavinSessions;
 import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.util.List;
@@ -114,13 +115,22 @@ public class AppClasses {
                 start = System.currentTimeMillis();
             }
 
-            boolean needReload = JavinConfig.update() || forceReload;
+            boolean needReload = JavinConfig.update() | JavinSessions.update() | forceReload;
 
             if (forceReload) {
                 forceReload = false;
             }
 
-            List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(JavinConfig.getCurrentConfig().getClasses().getPackages());
+            // load plugins
+            //todo about not reloading plugins if nothing changes
+            JavinPlugins.reload();
+
+            List<String> packagesToScan = Lists.newLinkedList();
+            packagesToScan.addAll(JavinPlugins.get().getPluginsAppPackages());
+            packagesToScan.addAll(JavinConfig.getCurrentConfig().getClasses().getPackages());
+
+            //todo not scan plugins classes for changes
+            List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(packagesToScan);
 
             Set<String> existedClassNames = Sets.newHashSet(classes.keySet());
             Set<String> foundClassNames = Sets.newHashSet();
@@ -191,9 +201,6 @@ public class AppClasses {
                 if (log.isInfoEnabled()) {
                     start = System.currentTimeMillis();
                 }
-
-                // load plugins
-                JavinPlugins.reload();
 
                 // prepare classes (creates CtClasses)
                 Enhancer.prepareClasses(classes);

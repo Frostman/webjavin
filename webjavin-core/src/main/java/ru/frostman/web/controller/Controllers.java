@@ -74,6 +74,15 @@ public class Controllers {
     }
 
     /**
+     * @param targetUrl absolut path to redirect
+     *
+     * @return view that redirect to specified targetUrl
+     */
+    public static View redirectAbs(String targetUrl) {
+        return new RedirectView(targetUrl);
+    }
+
+    /**
      * @param viewName to find view
      *
      * @return view with specified name

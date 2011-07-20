@@ -28,6 +28,7 @@
         <module>webjavin-mongo</module>
         <module>webjavin-aop</module>
         <module>webjavin-test</module>
+        <module>webjavin-indigo</module>
     </modules>
     <packaging>pom</packaging>
 

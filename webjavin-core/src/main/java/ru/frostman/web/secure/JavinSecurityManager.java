@@ -88,7 +88,7 @@ public class JavinSecurityManager {
         try {
             SecureExpression expression = expressions.get(expressionId);
 
-            //todo impl it
+            //todo impl it :: store users and other beans in requests attributes
             UserDetails user = null;
             String role = "role";
 

@@ -27,6 +27,7 @@ public class AppConfig {
     private int asyncQueueLength = 100;
     private int maxForwardsCount = 5;
     private String serverHeader = "WebJavin";
+    private String sessionManager = "ru.frostman.web.session.impl.ServletSessionManager";
     private PoolConfig pool = new PoolConfig();
 
     public int getAsyncQueueLength() {
@@ -53,6 +54,14 @@ public class AppConfig {
         this.serverHeader = serverHeader;
     }
 
+    public String getSessionManager() {
+        return sessionManager;
+    }
+
+    public void setSessionManager(String sessionManager) {
+        this.sessionManager = sessionManager;
+    }
+
     public PoolConfig getPool() {
         return pool;
     }
@@ -69,6 +78,7 @@ public class AppConfig {
             return asyncQueueLength == config.asyncQueueLength
                     && maxForwardsCount == config.maxForwardsCount
                     && Objects.equal(serverHeader, config.serverHeader)
+                    && Objects.equal(sessionManager, config.sessionManager)
                     && Objects.equal(pool, config.pool);
         }
 

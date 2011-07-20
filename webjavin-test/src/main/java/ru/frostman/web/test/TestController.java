@@ -23,8 +23,7 @@ import ru.frostman.web.annotation.Controller;
 import ru.frostman.web.annotation.Param;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
-
-import javax.servlet.http.HttpServletRequest;
+import ru.frostman.web.session.JavinSession;
 
 import static ru.frostman.web.controller.Controllers.forward;
 import static ru.frostman.web.controller.Controllers.view;
@@ -36,7 +35,7 @@ import static ru.frostman.web.controller.Controllers.view;
 public class TestController {
 
     @Action("/test")
-    public View test(Model model, @Param(value = "a", required = false) String a, HttpServletRequest request) {
+    public View test(Model model, @Param(value = "a", required = false) String a, JavinSession session) {
         model.put("page", "test");
 
         if ("f".equals(a)) {

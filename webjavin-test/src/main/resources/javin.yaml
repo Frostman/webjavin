@@ -1,12 +1,16 @@
 mode: DEV
 
 classes:
-      packages: ["ru.frostman.web.test", "ru.frostman.web.test2"]
+      packages: [
+          "ru.frostman.web.test",
+          "ru.frostman.web.test2"
+      ]
       updateInterval: 500
 
 templates:
       path: "/WEB-INF/view"
 
 plugins: [
-      "ru.frostman.web.MongoPlugin"
+      "ru.frostman.web.MongoPlugin",
+      "ru.frostman.web.IndigoPlugin"
 ]

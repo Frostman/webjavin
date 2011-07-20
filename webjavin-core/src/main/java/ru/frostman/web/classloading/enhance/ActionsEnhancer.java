@@ -60,6 +60,8 @@ class ActionsEnhancer {
     private static final String REQUEST_BODY_JSON = "requestBodyJson";
     private static final String PARAMETER_REQUIRED_EXCEPTION = "ru.frostman.web.thr.ParameterRequiredException";
     private static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
+    private static final String JAVIN_SESSION = "ru.frostman.web.session.JavinSession";
+    private static final String JAVIN_SESSIONS = "ru.frostman.web.session.JavinSessions";
 
     public static void enhance(Map<String, AppClass> classes, ClassPool classPool, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
@@ -312,6 +314,10 @@ class ActionsEnhancer {
             } else if (parameterType.equals(getCtClass(classPool, MODEL))) {
                 // ru.frostman.web.controller.Model type resolved as current model
                 body.append(MODEL).append(" $param$").append(idx).append(" = mav.getModel();");
+            } else if (parameterType.equals(getCtClass(classPool, JAVIN_SESSION))) {
+                // ru.frostman.web.session.JavinSession type resolved as current current session
+                body.append(JAVIN_SESSION).append(" $param$").append(idx).append(" = " + JAVIN_SESSIONS
+                        + ".getSession(request, response);");
             } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
                 // iff annotated with @Param but not String
                 if (!parameterType.equals(getCtClass(classPool, JAVA_LANG_STRING))) {

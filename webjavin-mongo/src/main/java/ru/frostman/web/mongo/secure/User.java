@@ -16,9 +16,10 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.mongo;
+package ru.frostman.web.mongo.secure;
 
 import com.google.code.morphia.annotations.*;
+import ru.frostman.web.mongo.BaseEntity;
 import ru.frostman.web.secure.userdetails.Credentials;
 import ru.frostman.web.secure.userdetails.Role;
 import ru.frostman.web.secure.userdetails.UserDetails;

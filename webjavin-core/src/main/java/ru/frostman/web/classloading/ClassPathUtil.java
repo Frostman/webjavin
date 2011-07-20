@@ -25,11 +25,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 /**
  * @author slukjanov aka Frostman
@@ -80,5 +83,39 @@ class ClassPathUtil {
                 classNames.add(className);
             }
         }
+    }
+
+//    if ((filePath.indexOf("!") > 0) & (filePath.indexOf(".jar") > 0)) {
+//               String jarPath = filePath.substring(0, filePath.indexOf("!"))
+//                  .substring(filePath.indexOf(":") + 1);
+//               //WINDOWS HACK
+//               if (jarPath.indexOf(":") >= 0) jarPath = jarPath.substring(1);
+//               classes.addAll(getFromJARFile(jarPath, path));
+//            }
+    //todo
+    //todo
+    //todo REPLACE GET PLUGIN PACKAGES WITH PLUGIN APP CLASSES
+    //todo it is some problems when we developing plugin, but then we not scaning jars
+    //todo если сделать так, то можно будет тупо добавлять список классов без классфайлов после сканирования класспаса
+
+    //todo impl scanning jars
+    private static void scanJarFile(String packageName, File jar, List<ClassFile> classes, Set<String> classNames) throws IOException {
+        JarInputStream jarFile = new JarInputStream(new FileInputStream(jar));
+        JarEntry jarEntry;
+        do {
+            jarEntry = jarFile.getNextJarEntry();
+            if (jarEntry != null) {
+                String fileName = jarEntry.getName();
+
+                String className = packageName + "." + fileName.substring(0, fileName.length() - CLASS.length());
+                if (classNames.contains(className)) {
+                    continue;
+                }
+
+                //todo null instead of File
+                classes.add(new ClassFile(className, null));
+                classNames.add(className);
+            }
+        } while (jarEntry != null);
     }
 }

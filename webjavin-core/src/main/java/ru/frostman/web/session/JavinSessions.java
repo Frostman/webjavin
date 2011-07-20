@@ -16,59 +16,53 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.dispatch;
+package ru.frostman.web.session;
 
-import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.thr.JavinRuntimeException;
-import ru.frostman.web.thr.NotFoundException;
-import ru.frostman.web.util.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class Dispatcher {
-    private final List<ActionDefinition> actions;
+public class JavinSessions {
+    private static final Logger log = LoggerFactory.getLogger(JavinSessions.class);
 
-    public Dispatcher(List<ActionDefinition> actions) {
-        this.actions = Lists.newLinkedList(actions);
-    }
+    private static SessionManager sessionManager;
 
-    public ActionInvoker dispatch(String requestUrl, HttpMethod requestMethod, HttpServletRequest request
-            , HttpServletResponse response) {
+    public static boolean update() {
+        String sessionManagerName = JavinConfig.getCurrentConfig().getApp().getSessionManager();
 
-        ActionInvoker invoker = null;
-
-        for (ActionDefinition definition : actions) {
-            if (definition.matches(requestUrl, requestMethod)) {
-                invoker = definition.initInvoker(request, response);
-
-                break;
-            }
-        }
-
-        if (invoker == null) {
-            sendNotFound(request, response);
-        } else {
-            try {
-                invoker.invoke();
-            } catch (NotFoundException e) {
-                sendNotFound(request, response);
-            }
-        }
-
-        return invoker;
-    }
-
-    private void sendNotFound(HttpServletRequest request, HttpServletResponse response) {
+        Class<?> sessionManagerClass = null;
         try {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
-        } catch (IOException e) {
-            throw new JavinRuntimeException("Exception while sending 404:Not found", e);
+            sessionManagerClass = Class.forName(sessionManagerName);
+        } catch (ClassNotFoundException e) {
+            throw new JavinRuntimeException("Can't load session manager class with specified name: " + sessionManagerName, e);
         }
+
+        if (SessionManager.class.isAssignableFrom(sessionManagerClass)) {
+            try {
+                sessionManager = (SessionManager) sessionManagerClass.newInstance();
+            } catch (Throwable th) {
+                throw new JavinRuntimeException("Cant instantiate specified session manager: " + sessionManagerName, th);
+            }
+        } else {
+            throw new JavinRuntimeException("Specified session manager isn't inherited from SessionManager: " + sessionManagerName);
+        }
+
+        //todo think about this
+        return true;
+    }
+
+    public static JavinSession getSession(HttpServletRequest request, HttpServletResponse response) {
+        return sessionManager.getSession(request, response);
+    }
+
+    public static JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create) {
+        return sessionManager.getSession(request, response, create);
     }
 }

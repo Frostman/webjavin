@@ -16,46 +16,23 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.mongo;
+package ru.frostman.web;
 
-import com.google.code.morphia.annotations.Entity;
-import ru.frostman.web.secure.userdetails.Role;
+import com.google.common.collect.Lists;
+import ru.frostman.web.plugin.Plugin;
+
+import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
  */
-@Entity
-public class UserRole extends BaseEntity implements Role {
-    private int weight;
-
-    private String name;
-
-    public UserRole() {
-    }
-
-    public UserRole(int weight, String name) {
-        this.weight = weight;
-        this.name = name;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+public class IndigoPlugin extends Plugin {
+    public IndigoPlugin() {
+        super(0);
     }
 
     @Override
-    public int compareTo(Role role) {
-        return weight - role.getWeight();
+    public List<String> getPluginsAppPackages() {
+        return Lists.newArrayList("ru.frostman.web.indigo");
     }
 }

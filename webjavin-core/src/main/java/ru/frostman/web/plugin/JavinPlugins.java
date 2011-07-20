@@ -19,7 +19,10 @@
 package ru.frostman.web.plugin;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import javassist.ClassPool;
+import javassist.CtClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.classloading.AppClass;
@@ -74,6 +77,8 @@ public class JavinPlugins extends Plugin {
                 }
 
                 newPlugins.add(plugin);
+            } else {
+                throw new JavinPluginException("There is class not inherited from Plugin in plugins list: " + pluginClassName);
             }
         }
 
@@ -90,11 +95,18 @@ public class JavinPlugins extends Plugin {
         return instance;
     }
 
+    private List<String> appPackages;
+
     @Override
     public void onLoad() {
+        appPackages = Lists.newLinkedList();
+
         for (Plugin plugin : plugins) {
             try {
                 plugin.onLoad();
+
+                //todo write in docs that it works like this
+                appPackages.addAll(plugin.getPluginsAppPackages());
             } catch (Exception e) {
                 throw new JavinPluginException("Exception while executing onLoad() on plugin with main class: "
                         + plugin.getClass().getName(), e);
@@ -124,5 +136,22 @@ public class JavinPlugins extends Plugin {
                         + plugin.getClass().getName(), e);
             }
         }
+    }
+
+    @Override
+    public void enhanceClass(Map<String, AppClass> classes, ClassPool classPool, CtClass ctClass) {
+        for (Plugin plugin : plugins) {
+            try {
+                plugin.enhanceClass(classes, classPool, ctClass);
+            } catch (Exception e) {
+                throw new JavinPluginException("Exception while executing enhanceClass() on plugin with main class: "
+                        + plugin.getClass().getName(), e);
+            }
+        }
+    }
+
+    @Override
+    public List<String> getPluginsAppPackages() {
+        return appPackages;
     }
 }
