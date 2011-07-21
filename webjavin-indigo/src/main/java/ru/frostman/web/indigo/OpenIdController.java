@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
 import ru.frostman.web.annotation.Param;
-import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.Controllers;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.session.JavinSession;
@@ -53,10 +52,17 @@ public class OpenIdController {
     private static final Logger log = LoggerFactory.getLogger(OpenIdController.class);
 
     private final static String YAHOO_ENDPOINT = "https://me.yahoo.com";
-    private final static String GOOGLE_ENDPOINT = "https://www.google.com/accounts/o8/id";
+    public final static String GOOGLE_ENDPOINT = "https://www.google.com/accounts/o8/id";
 
-    private static final String OPENID_DISCOVERY = "openid-discovery";
-    private static final String CALLBACK_URL = "/javin/indigo/openid/callback";
+    public static final String PARAM_PROVIDER = "provider";
+    public static final String PARAM_TARGET = "targetUrl";
+
+    public static final String ATTR_OPENID_DISCOVERY = "javin.openid.discovery";
+    public static final String ATTR_JAVIN_AUTH_EMAIL = "javin.auth.email";
+    public static final String ATTR_JAVIN_AUTH_SOURCE = "javin.auth.source";
+
+    public static final String AUTH_URL = "/javin/indigo/openid/sendAuth";
+    public static final String CALLBACK_URL = "/javin/indigo/openid/callback";
 
     //todo think about thread safety
     private static final ConsumerManager manager = new ConsumerManager();
@@ -64,9 +70,9 @@ public class OpenIdController {
     //todo remove test url
     // http://localhost:8080/test/javin/indigo/openid/sendAuth?identifier=https://www.google.com/accounts/o8/id&targetUrl=/test
 
-    @Action("/javin/indigo/openid/sendAuth")
-    public View sendAuthRequest(@Param("identifier") String userSuppliedString, JavinSession session,
-                                @Param("targetUrl") String targetUrl, HttpServletRequest request) throws OpenIDException {
+    @Action(AUTH_URL)
+    public View sendAuthRequest(@Param(PARAM_PROVIDER) String userSuppliedString, JavinSession session,
+                                @Param(PARAM_TARGET) String targetUrl) throws OpenIDException {
         // perform discovery on the user-supplied identifier
         List discoveries = manager.discover(userSuppliedString);
 
@@ -75,10 +81,10 @@ public class OpenIdController {
         DiscoveryInformation discovered = manager.associate(discoveries);
 
         // store the discovery information in the user's session
-        session.setAttribute(OPENID_DISCOVERY, discovered);
+        session.setAttribute(ATTR_OPENID_DISCOVERY, discovered);
 
         // obtain a AuthRequest message to be sent to the OpenID provider
-        String callbackUrl = JavinConfig.get().getAddress() + Controllers.url(CALLBACK_URL) + "?targetUrl=" + targetUrl;
+        String callbackUrl = Controllers.urlFull(CALLBACK_URL) + "?targetUrl=" + targetUrl;
         AuthRequest authReq = manager.authenticate(discovered, callbackUrl);
 
         FetchRequest fetch = FetchRequest.createFetchRequest();
@@ -108,7 +114,7 @@ public class OpenIdController {
         ParameterList response = new ParameterList(request.getParameterMap());
 
         // retrieve the previously stored discovery information
-        DiscoveryInformation discovered = (DiscoveryInformation) session.getAttribute(OPENID_DISCOVERY);
+        DiscoveryInformation discovered = (DiscoveryInformation) session.getAttribute(ATTR_OPENID_DISCOVERY);
 
         // extract the receiving URL from the HTTP request
         StringBuffer receivingURL = request.getRequestURL();
@@ -132,10 +138,12 @@ public class OpenIdController {
                 List emails = fetchResp.getAttributeValues("email");
                 String email = (String) emails.get(0);
 
+                //todo store credentials in session
+                session.setAttribute(ATTR_JAVIN_AUTH_EMAIL, email);
+                session.setAttribute(ATTR_JAVIN_AUTH_SOURCE, "openid");
+
                 log.info("OpenId login done with email: " + email);
             }
-
-            //todo store credentials in session
         }
 
         return redirect(targetUrl + "?verified=" + (verified != null));
