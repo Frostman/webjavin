@@ -18,54 +18,33 @@
 
 package ru.frostman.web.classloading;
 
-import com.google.common.io.Files;
-import ru.frostman.web.util.Hex;
-import ru.frostman.web.util.MessageDigestPool;
+import com.google.common.io.ByteStreams;
+import ru.frostman.web.thr.JavinRuntimeException;
 
-import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @author slukjanov aka Frostman
  */
-class ClassFile {
-    protected final String className;
-    private final File file;
-    protected byte[] bytes;
+public class StaticClassFile extends ClassFile {
 
-    public ClassFile(String className, File file) {
-        this.className = className;
-        this.file = file;
-    }
+    public StaticClassFile(String className) {
+        super(className, null);
 
-    public String getClassName() {
-        return className;
-    }
-
-    public synchronized byte[] getBytes() {
-        if (bytes == null) {
-            try {
-                bytes = Files.toByteArray(file);
-            } catch (IOException e) {
-                throw new RuntimeException("Can't read class file: ", e);
-            }
+        String realPath = className.replace('.', '/') + ".class";
+        try {
+            bytes = ByteStreams.toByteArray(Thread.currentThread().getContextClassLoader().getResourceAsStream(realPath));
+        } catch (IOException e) {
+            throw new JavinRuntimeException("Can't read bytecode of class: " + className);
         }
-
-        return bytes;
     }
 
+    @Override
     public long getLastModified() {
-        return file.lastModified();
+        return 0;
     }
 
     public String getHashCode() {
-        try {
-            return Hex.encode(Files.getDigest(file, MessageDigestPool.get("sha-1")));
-        } catch (IOException e) {
-            throw new RuntimeException("Can't read file: ", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        return className;
     }
 }
