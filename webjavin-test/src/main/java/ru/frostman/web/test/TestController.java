@@ -25,7 +25,6 @@ import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.session.JavinSession;
 
-import static ru.frostman.web.controller.Controllers.forward;
 import static ru.frostman.web.controller.Controllers.view;
 
 /**
@@ -35,12 +34,8 @@ import static ru.frostman.web.controller.Controllers.view;
 public class TestController {
 
     @Action("/test")
-    public View test(Model model, @Param(value = "a", required = false) String a, JavinSession session) {
-        model.put("page", "test");
-
-        if ("f".equals(a)) {
-            return forward("/qwe");
-        }
+    public View test(Model model, @Param(value = "verified", required = false) boolean verified, JavinSession session) {
+        model.put("page", "test").put("verified", verified);
 
         return view("test.ftl");
     }

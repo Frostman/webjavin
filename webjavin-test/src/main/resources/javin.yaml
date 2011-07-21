@@ -1,5 +1,8 @@
 mode: DEV
 
+context: test
+address: http://localhost:8080/
+
 classes:
       packages: [
           "ru.frostman.web.test",
