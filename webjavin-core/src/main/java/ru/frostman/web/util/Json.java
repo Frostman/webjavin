@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * @author slukjanov aka Frostman
  */
-public class JsonUtil {
+public class Json {
     private static final String[] generatedProperties = {Model.REQUEST, Model.RESPONSE};
     private static final ObjectMapper mapper = new ObjectMapper();
 

@@ -25,7 +25,7 @@ import ru.frostman.web.view.ContentTypes;
 
 import java.io.PrintWriter;
 
-import static ru.frostman.web.util.JsonUtil.renderModelToJson;
+import static ru.frostman.web.util.Json.renderModelToJson;
 
 /**
  * @author slukjanov aka Frostman

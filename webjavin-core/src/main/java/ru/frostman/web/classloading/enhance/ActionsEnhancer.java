@@ -55,7 +55,7 @@ class ActionsEnhancer {
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String DEFAULT_ACTION_CATCH = "ru.frostman.web.thr.DefaultActionCatch";
     private static final String ACTION_EXCEPTION = "ru.frostman.web.dispatch.ActionException";
-    private static final String JSON_UTIL = "ru.frostman.web.util.JsonUtil";
+    private static final String JSON_UTIL = "ru.frostman.web.util.Json";
     private static final String JSON_NODE = "org.codehaus.jackson.JsonNode";
     private static final String REQUEST_BODY_JSON = "requestBodyJson";
     private static final String PARAMETER_REQUIRED_EXCEPTION = "ru.frostman.web.thr.ParameterRequiredException";

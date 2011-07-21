@@ -19,7 +19,7 @@
 package ru.frostman.web.classloading;
 
 import com.google.common.io.Files;
-import ru.frostman.web.util.Hex;
+import ru.frostman.web.util.Codec;
 import ru.frostman.web.util.MessageDigestPool;
 
 import java.io.File;
@@ -61,7 +61,7 @@ class ClassFile {
 
     public String getHashCode() {
         try {
-            return Hex.encode(Files.getDigest(file, MessageDigestPool.get("sha-1")));
+            return Codec.encodeHex(Files.getDigest(file, MessageDigestPool.get("sha-1")));
         } catch (IOException e) {
             throw new RuntimeException("Can't read file: ", e);
         } catch (NoSuchAlgorithmException e) {
