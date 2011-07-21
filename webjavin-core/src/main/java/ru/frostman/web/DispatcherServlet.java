@@ -39,7 +39,7 @@ public class DispatcherServlet extends HttpServlet {
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             //response.setHeader("Transfer-Encoding", "chunked");
-            response.setHeader("Server", JavinConfig.getCurrentConfig().getApp().getServerHeader());
+            response.setHeader("Server", JavinConfig.get().getApp().getServerHeader());
 
             if (Javin.getMode().isDevelopmentMode()) {
                 Javin.getClasses().update();
