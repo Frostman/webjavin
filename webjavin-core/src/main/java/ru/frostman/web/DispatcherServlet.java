@@ -21,6 +21,7 @@ package ru.frostman.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.config.JavinConfig;
+import ru.frostman.web.session.JavinSessions;
 import ru.frostman.web.util.HttpMethod;
 
 import javax.servlet.ServletException;
@@ -37,6 +38,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         try {
             //response.setHeader("Transfer-Encoding", "chunked");
             response.setHeader("Server", JavinConfig.get().getApp().getServerHeader());
@@ -44,6 +46,8 @@ public class DispatcherServlet extends HttpServlet {
             if (Javin.getMode().isDevelopmentMode()) {
                 Javin.getClasses().update();
             }
+
+            JavinSessions.checkSession(request, response);
 
             Javin.getClasses().getDispatcher()
                     .dispatch(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()), request, response);

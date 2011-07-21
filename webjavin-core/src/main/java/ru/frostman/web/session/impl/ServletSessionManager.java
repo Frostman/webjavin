@@ -27,7 +27,13 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author slukjanov aka Frostman
  */
-public class ServletSessionManager extends SessionManager{
+public class ServletSessionManager extends SessionManager {
+    @Override
+    public boolean checkSession(HttpServletRequest request, HttpServletResponse response) {
+        //todo impl
+        return true;
+    }
+
     @Override
     public JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create) {
         //todo think about caching decorators

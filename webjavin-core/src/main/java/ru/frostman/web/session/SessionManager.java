@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public abstract class SessionManager {
 
+    public abstract boolean checkSession(HttpServletRequest request, HttpServletResponse response);
+
     public JavinSession getSession(HttpServletRequest request, HttpServletResponse response) {
         return getSession(request, response, true);
     }

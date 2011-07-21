@@ -65,4 +65,8 @@ public class JavinSessions {
     public static JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create) {
         return sessionManager.getSession(request, response, create);
     }
+
+    public static void checkSession(HttpServletRequest request, HttpServletResponse response) {
+        sessionManager.checkSession(request, response);
+    }
 }

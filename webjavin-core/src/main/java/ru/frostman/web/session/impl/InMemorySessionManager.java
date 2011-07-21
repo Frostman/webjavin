@@ -37,6 +37,12 @@ public class InMemorySessionManager extends SessionManager {
             .makeMap();
 
     @Override
+    public boolean checkSession(HttpServletRequest request, HttpServletResponse response) {
+        // todo impl
+        return true;
+    }
+
+    @Override
     public JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create) {
         //todo impl
         return null;
