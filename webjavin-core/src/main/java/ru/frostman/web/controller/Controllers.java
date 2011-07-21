@@ -122,4 +122,8 @@ public class Controllers {
 
         return context + "/" + relativeUrl;
     }
+
+    public static String urlFull(String relativeUrl) {
+        return JavinConfig.get().getAddress() + url(relativeUrl);
+    }
 }
