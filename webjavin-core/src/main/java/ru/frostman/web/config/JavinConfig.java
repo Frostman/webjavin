@@ -20,6 +20,8 @@ package ru.frostman.web.config;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import ru.frostman.web.JavinContextListener;
@@ -35,10 +37,13 @@ import java.util.List;
  * @author slukjanov aka Frostman
  */
 public class JavinConfig {
+    private static final Logger log = LoggerFactory.getLogger(JavinConfig.class);
+
     private static JavinConfig currentConfig;
 
     private JavinMode mode = JavinMode.DEV;
     private String context = null;
+    private String address = null;
     private List<String> plugins = Lists.newLinkedList();
 
     private ClassesConfig classes = new ClassesConfig();
@@ -62,6 +67,7 @@ public class JavinConfig {
 
             // some hacks
             ensureContext(config);
+            ensureAddress(config);
 
             boolean changed = false;
             if (!config.equals(currentConfig)) {
@@ -84,16 +90,32 @@ public class JavinConfig {
         if (context.endsWith("/")) {
             context = context.substring(0, context.length() - 1);
         }
-        if (context.length() == 0) {
-            context = "/";
+        if (!context.startsWith("/")) {
+            context = "/" + context;
         }
         config.context = context;
+    }
+
+    private static void ensureAddress(JavinConfig config) {
+        String address = config.address;
+        if (address == null) {
+            throw new JavinRuntimeException("javin.yaml - Address isn't specified");
+        }
+
+        if (!address.contains("://")) {
+            throw new JavinRuntimeException("javin.yaml - Address should contains schema (http:// for example)");
+        }
+
+        if (address.endsWith("/")) {
+            address = address.substring(0, address.length() - 1);
+        }
+        config.address = address;
     }
 
     /**
      * @return current JavinConfig
      */
-    public static JavinConfig getCurrentConfig() {
+    public static JavinConfig get() {
         return currentConfig;
     }
 
@@ -123,6 +145,14 @@ public class JavinConfig {
 
     public void setPlugins(List<String> plugins) {
         this.plugins = plugins;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public ClassesConfig getClasses() {
@@ -164,6 +194,7 @@ public class JavinConfig {
 
             return mode == config.mode
                     && Objects.equal(context, config.context)
+                    && Objects.equal(address, config.address)
                     && Objects.equal(plugins, config.plugins)
                     && Objects.equal(classes, config.classes)
                     && Objects.equal(templates, config.templates)

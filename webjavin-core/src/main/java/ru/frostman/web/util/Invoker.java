@@ -30,10 +30,10 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class Invoker {
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
-            JavinConfig.getCurrentConfig().getApp().getPool().getCorePoolSize(),
-            JavinConfig.getCurrentConfig().getApp().getPool().getMaximumPoolSize(),
-            JavinConfig.getCurrentConfig().getApp().getPool().getKeepAliveTime(),
-            JavinConfig.getCurrentConfig().getApp().getPool().getTimeUnit(),
+            JavinConfig.get().getApp().getPool().getCorePoolSize(),
+            JavinConfig.get().getApp().getPool().getMaximumPoolSize(),
+            JavinConfig.get().getApp().getPool().getKeepAliveTime(),
+            JavinConfig.get().getApp().getPool().getTimeUnit(),
             new LinkedBlockingQueue<Runnable>(), new JavinThreadFactory("javin-executor")
     );
 
