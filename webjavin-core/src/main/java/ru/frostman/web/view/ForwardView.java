@@ -51,7 +51,7 @@ public class ForwardView extends View {
             count = 0;
         }
 
-        final int maxForwardsCount = JavinConfig.getCurrentConfig().getApp().getMaxForwardsCount();
+        final int maxForwardsCount = JavinConfig.get().getApp().getMaxForwardsCount();
         if (count > maxForwardsCount) {
             throw new JavinRuntimeException("Forwards count more than specified value (" + maxForwardsCount + ")");
         }
