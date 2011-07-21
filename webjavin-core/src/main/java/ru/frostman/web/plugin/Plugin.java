@@ -51,7 +51,7 @@ public abstract class Plugin implements Comparable<Plugin> {
     public void enhanceClass(Map<String, AppClass> classes, ClassPool classPool, CtClass ctClass) {
     }
 
-    public List<String> getPluginsAppPackages() {
+    public List<String> getAppClassesPackages() {
         return Lists.newLinkedList();
     }
 

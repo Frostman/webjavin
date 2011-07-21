@@ -56,7 +56,7 @@ public class JavinPlugins extends Plugin {
      * @return aggregated plugin to run handlers
      */
     public static Plugin reload() {
-        List<String> pluginClassNames = JavinConfig.getCurrentConfig().getPlugins();
+        List<String> pluginClassNames = JavinConfig.get().getPlugins();
 
         Set<Plugin> newPlugins = Sets.newTreeSet();
         for (String pluginClassName : pluginClassNames) {
@@ -106,7 +106,7 @@ public class JavinPlugins extends Plugin {
                 plugin.onLoad();
 
                 //todo write in docs that it works like this
-                appPackages.addAll(plugin.getPluginsAppPackages());
+                appPackages.addAll(plugin.getAppClassesPackages());
             } catch (Exception e) {
                 throw new JavinPluginException("Exception while executing onLoad() on plugin with main class: "
                         + plugin.getClass().getName(), e);
@@ -151,7 +151,7 @@ public class JavinPlugins extends Plugin {
     }
 
     @Override
-    public List<String> getPluginsAppPackages() {
+    public List<String> getAppClassesPackages() {
         return appPackages;
     }
 }

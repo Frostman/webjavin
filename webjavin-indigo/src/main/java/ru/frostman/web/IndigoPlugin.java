@@ -32,7 +32,7 @@ public class IndigoPlugin extends Plugin {
     }
 
     @Override
-    public List<String> getPluginsAppPackages() {
+    public List<String> getAppClassesPackages() {
         return Lists.newArrayList("ru.frostman.web.indigo");
     }
 }
