@@ -34,6 +34,9 @@ public class AppConfig {
     private String sessionManager = "ru.frostman.web.session.impl.ServletSessionManager";
     private PoolConfig pool = new PoolConfig();
 
+    // generated
+    private byte[] secretBytes;
+
     public String getSecret() {
         return secret;
     }
@@ -96,5 +99,13 @@ public class AppConfig {
         }
 
         return false;
+    }
+
+    public byte[] getSecretBytes() {
+        if (secretBytes == null) {
+            secretBytes = secret.getBytes();
+        }
+
+        return secretBytes;
     }
 }
