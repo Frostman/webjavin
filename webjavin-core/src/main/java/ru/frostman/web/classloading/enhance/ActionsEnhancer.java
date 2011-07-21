@@ -319,21 +319,30 @@ class ActionsEnhancer {
                 body.append(JAVIN_SESSION).append(" $param$").append(idx).append(" = " + JAVIN_SESSIONS
                         + ".getSession(request, response);");
             } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
-                // iff annotated with @Param but not String
-                if (!parameterType.equals(getCtClass(classPool, JAVA_LANG_STRING))) {
-                    throw new ActionEnhancerException("Auto converted method argument type " + parameterType.getName()
+                Param paramAnnotation = isAnnotatedWith(annotations[idx], Param.class);
+
+                if (parameterType.equals(getCtClass(classPool, JAVA_LANG_STRING))) {
+                    body.append("String $param$").append(idx).append(" = request.getParameter(\"")
+                            .append(paramAnnotation.value()).append("\");");
+                } else if (parameterType.equals(CtClass.booleanType)) {
+                    body.append("boolean $param$").append(idx).append(" = java.lang.Boolean.parseBoolean(request.getParameter(\"")
+                            .append(paramAnnotation.value()).append("\"));");
+                } else if (parameterType.equals(getCtClass(classPool, JAVA_LANG_BOOLEAN))) {
+                    body.append("java.lang.Boolean $param$").append(idx).append(" = java.lang.Boolean.valueOf(request.getParameter(\"")
+                            .append(paramAnnotation.value()).append("\"));");
+                } else {
+                    throw new ActionEnhancerException("Auto converted @Param method argument type " + parameterType.getName()
+                            + " (arg #" + idx + ")"
                             + " is currently unsupported: " + behavior.getLongName());
                 }
 
-                Param paramAnnotation = isAnnotatedWith(annotations[idx], Param.class);
-                body.append("String $param$").append(idx).append(" = request.getParameter(\"")
-                        .append(paramAnnotation.value()).append("\");");
                 if (paramAnnotation.required()) {
                     // append checking parameter for not null
-                    body.append("if($param$").append(idx).append(" == null) {" +
-                            "throw new " + PARAMETER_REQUIRED_EXCEPTION + "(\"required param: \"+" + idx + ");"
-                            + "}");
+                    body.append("if($param$").append(idx).append(" == null) {")
+                            .append("throw new ").append(PARAMETER_REQUIRED_EXCEPTION)
+                            .append("(\"required param: \"+").append(idx).append(");" + "}");
                 }
+
             } else if (isAnnotatedWith(annotations[idx], JsonParam.class) != null) {
                 JsonParam paramAnnotation = isAnnotatedWith(annotations[idx], JsonParam.class);
 
@@ -363,9 +372,9 @@ class ActionsEnhancer {
 
                 if (paramAnnotation.required()) {
                     // append checking parameter for not null
-                    body.append("if($param$").append(idx).append(" == null) {" +
-                            "throw new " + PARAMETER_REQUIRED_EXCEPTION + "(\"required param: \"+" + idx + ");"
-                            + "}");
+                    body.append("if($param$").append(idx).append(" == null) {")
+                            .append("throw new ").append(PARAMETER_REQUIRED_EXCEPTION)
+                            .append("(\"required param: \"+").append(idx).append(");" + "}");
                 }
             } else if (isAnnotatedWith(annotations[idx], Pjax.class) != null) {
                 if (parameterType.equals(CtClass.booleanType)) {
