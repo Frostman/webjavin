@@ -114,7 +114,7 @@ public class Controllers {
      * @return absolute url of specified relativeUrl
      */
     public static String url(String relativeUrl) {
-        String context = JavinConfig.getCurrentConfig().getContext();
+        String context = JavinConfig.get().getContext();
 
         if (relativeUrl.length() != 0 && relativeUrl.charAt(0) == '/') {
             return context + relativeUrl;
