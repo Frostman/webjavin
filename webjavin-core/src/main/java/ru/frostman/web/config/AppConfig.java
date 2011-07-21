@@ -20,15 +20,27 @@ package ru.frostman.web.config;
 
 import com.google.common.base.Objects;
 
+import java.util.UUID;
+
 /**
  * @author slukjanov aka Frostman
  */
 public class AppConfig {
+    //todo think about default value and checking user value
+    private String secret = UUID.randomUUID().toString();
     private int asyncQueueLength = 100;
     private int maxForwardsCount = 5;
     private String serverHeader = "WebJavin";
     private String sessionManager = "ru.frostman.web.session.impl.ServletSessionManager";
     private PoolConfig pool = new PoolConfig();
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
 
     public int getAsyncQueueLength() {
         return asyncQueueLength;
@@ -75,7 +87,8 @@ public class AppConfig {
         if (obj instanceof AppConfig) {
             AppConfig config = (AppConfig) obj;
 
-            return asyncQueueLength == config.asyncQueueLength
+            return Objects.equal(secret, config.secret)
+                    && asyncQueueLength == config.asyncQueueLength
                     && maxForwardsCount == config.maxForwardsCount
                     && Objects.equal(serverHeader, config.serverHeader)
                     && Objects.equal(sessionManager, config.sessionManager)
