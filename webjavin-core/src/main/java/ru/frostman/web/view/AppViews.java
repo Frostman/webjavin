@@ -40,20 +40,20 @@ public class AppViews {
     public AppViews() {
         freemarker = new Configuration();
 
-        int updateInterval = JavinConfig.getCurrentConfig().getMode().isProductionMode()
-                ? JavinConfig.getCurrentConfig().getTemplates().getUpdateInterval() : 0;
+        int updateInterval = JavinConfig.get().getMode().isProductionMode()
+                ? JavinConfig.get().getTemplates().getUpdateInterval() : 0;
         freemarker.setTemplateUpdateDelay(updateInterval);
 
         freemarker.setDefaultEncoding("utf-8");
         freemarker.setOutputEncoding("utf-8");
 
-        int maxStrongSize = JavinConfig.getCurrentConfig().getTemplates().getMaxCacheStrongSize();
-        int maxSoftSize = JavinConfig.getCurrentConfig().getTemplates().getMaxCacheSoftSize();
+        int maxStrongSize = JavinConfig.get().getTemplates().getMaxCacheStrongSize();
+        int maxSoftSize = JavinConfig.get().getTemplates().getMaxCacheSoftSize();
         freemarker.setCacheStorage(new MruCacheStorage(maxStrongSize, maxSoftSize));
 
         try {
             freemarker.setDirectoryForTemplateLoading(new File(Javin.getApplicationPath()
-                    + JavinConfig.getCurrentConfig().getTemplates().getPath()));
+                    + JavinConfig.get().getTemplates().getPath()));
         } catch (IOException e) {
             throw new JavinRuntimeException("Exception while initializing AppViews", e);
         }

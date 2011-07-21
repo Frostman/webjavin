@@ -103,7 +103,7 @@ public class AppClasses {
      * @return true iff class loader changed
      */
     public boolean update() {
-        if (ready && System.currentTimeMillis() - lastUpdate < JavinConfig.getCurrentConfig().getClasses().getUpdateInterval()) {
+        if (ready && System.currentTimeMillis() - lastUpdate < JavinConfig.get().getClasses().getUpdateInterval()) {
             return false;
         }
 
@@ -125,16 +125,15 @@ public class AppClasses {
             //todo about not reloading plugins if nothing changes
             JavinPlugins.reload();
 
-            List<String> packagesToScan = Lists.newLinkedList();
-            packagesToScan.addAll(JavinPlugins.get().getPluginsAppPackages());
-            packagesToScan.addAll(JavinConfig.getCurrentConfig().getClasses().getPackages());
+            List<String> packageNames = Lists.newLinkedList();
+            packageNames.addAll(JavinConfig.get().getClasses().getPackages());
+            packageNames.addAll(JavinPlugins.get().getAppClassesPackages());
 
-            //todo not scan plugins classes for changes
-            List<ClassFile> foundClasses = ClassPathUtil.findClassFiles(packagesToScan);
+            List<ClassFile> classFiles = ClassPathUtil.findClassFiles(packageNames);
 
             Set<String> existedClassNames = Sets.newHashSet(classes.keySet());
             Set<String> foundClassNames = Sets.newHashSet();
-            for (ClassFile classFile : foundClasses) {
+            for (ClassFile classFile : classFiles) {
                 final String className = classFile.getClassName();
                 foundClassNames.add(className);
 

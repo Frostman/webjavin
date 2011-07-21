@@ -51,7 +51,7 @@ public abstract class ActionInvoker implements Runnable {
     }
 
     public void invoke() {
-        if (async && Javin.isAsyncApiSupported() && Javin.getInvoker().getQueueSize() < JavinConfig.getCurrentConfig().getApp().getAsyncQueueLength()) {
+        if (async && Javin.isAsyncApiSupported() && Javin.getInvoker().getQueueSize() < JavinConfig.get().getApp().getAsyncQueueLength()) {
             asyncContext = request.startAsync(request, response);
             Javin.getInvoker().execute(this);
         } else {
