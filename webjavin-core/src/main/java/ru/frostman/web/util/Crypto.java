@@ -18,25 +18,26 @@
 
 package ru.frostman.web.util;
 
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.thr.JavinRuntimeException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
+ * Provides cryptography features such as hmac.
+ *
  * @author slukjanov aka Frostman
  */
 public class Crypto {
     public static final String HMAC_ALGORITHM = "HmacSHA384";
 
     public static String sign(String message) {
-        //todo impl using app secret key
-        return null;
+        return sign(message, JavinConfig.get().getApp().getSecretBytes());
     }
 
-    public static boolean checkSign(String message, String sign) {
-        //todo impl using app secret key
-        return false;
+    public static boolean checkSign(String message, String signature) {
+        return checkSign(message, signature, JavinConfig.get().getApp().getSecretBytes());
     }
 
     public static String sign(String message, byte[] key) {
