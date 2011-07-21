@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
 import ru.frostman.web.annotation.Param;
+import ru.frostman.web.config.JavinConfig;
+import ru.frostman.web.controller.Controllers;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.session.JavinSession;
 
@@ -59,9 +61,12 @@ public class OpenIdController {
     //todo think about thread safety
     private static final ConsumerManager manager = new ConsumerManager();
 
+    //todo remove test url
+    // http://localhost:8080/test/javin/indigo/openid/sendAuth?identifier=https://www.google.com/accounts/o8/id&targetUrl=/test
+
     @Action("/javin/indigo/openid/sendAuth")
     public View sendAuthRequest(@Param("identifier") String userSuppliedString, JavinSession session,
-                                @Param("targetUrl") String targetUrl) throws OpenIDException {
+                                @Param("targetUrl") String targetUrl, HttpServletRequest request) throws OpenIDException {
         // perform discovery on the user-supplied identifier
         List discoveries = manager.discover(userSuppliedString);
 
@@ -73,20 +78,20 @@ public class OpenIdController {
         session.setAttribute(OPENID_DISCOVERY, discovered);
 
         // obtain a AuthRequest message to be sent to the OpenID provider
-        String callbackUrl = CALLBACK_URL + "?targetUrl=" + targetUrl;
-        AuthRequest authReq = manager.authenticate(discovered, CALLBACK_URL);
+        String callbackUrl = JavinConfig.get().getAddress() + Controllers.url(CALLBACK_URL) + "?targetUrl=" + targetUrl;
+        AuthRequest authReq = manager.authenticate(discovered, callbackUrl);
 
         FetchRequest fetch = FetchRequest.createFetchRequest();
         if (userSuppliedString.startsWith(GOOGLE_ENDPOINT)) {
             fetch.addAttribute("email", "http://axschema.org/contact/email", true);
-            fetch.addAttribute("firstName", "http://axschema.org/namePerson/first", true);
-            fetch.addAttribute("lastName", "http://axschema.org/namePerson/last", true);
+//            fetch.addAttribute("firstName", "http://axschema.org/namePerson/first", true);
+//            fetch.addAttribute("lastName", "http://axschema.org/namePerson/last", true);
         } else if (userSuppliedString.startsWith(YAHOO_ENDPOINT)) {
             fetch.addAttribute("email", "http://axschema.org/contact/email", true);
-            fetch.addAttribute("fullname", "http://axschema.org/namePerson", true);
+//            fetch.addAttribute("fullname", "http://axschema.org/namePerson", true);
         } else { // works for myOpenID
-            fetch.addAttribute("fullname", "http://schema.openid.net/namePerson", true);
             fetch.addAttribute("email", "http://schema.openid.net/contact/email", true);
+//            fetch.addAttribute("fullname", "http://schema.openid.net/namePerson", true);
         }
 
         // attach the extension to the authentication request
@@ -133,6 +138,6 @@ public class OpenIdController {
             //todo store credentials in session
         }
 
-        return redirect(targetUrl);
+        return redirect(targetUrl + "?verified=" + (verified != null));
     }
 }
