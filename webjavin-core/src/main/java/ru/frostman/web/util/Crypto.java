@@ -18,27 +18,45 @@
 
 package ru.frostman.web.util;
 
+import ru.frostman.web.thr.JavinRuntimeException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 /**
  * @author slukjanov aka Frostman
  */
-public final class Hex {
+public class Crypto {
+    public static final String HMAC_ALGORITHM = "HmacSHA384";
 
-    private static final char[] HEX = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-    };
+    public static String sign(String message) {
+        //todo impl using app secret key
+        return null;
+    }
 
-    public static String encode(byte[] bytes) {
-        final int nBytes = bytes.length;
-        char[] result = new char[2 * nBytes];
+    public static boolean checkSign(String message, String sign) {
+        //todo impl using app secret key
+        return false;
+    }
 
-        int j = 0;
-        for (int i = 0; i < nBytes; i++) {
-            // Char for top 4 bits
-            result[j++] = HEX[(0xF0 & bytes[i]) >>> 4];
-            // Bottom 4
-            result[j++] = HEX[(0x0F & bytes[i])];
+    public static String sign(String message, byte[] key) {
+        if (key.length == 0) {
+            return message;
         }
 
-        return new String(result);
+        try {
+            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA384");
+            mac.init(signingKey);
+            byte[] signature = mac.doFinal(message.getBytes("utf-8"));
+
+            return Codec.encodeBase64(signature);
+        } catch (Exception e) {
+            throw new JavinRuntimeException(e);
+        }
+    }
+
+    public static boolean checkSign(String message, String signature, byte[] key) {
+        return signature.equals(sign(message, key));
     }
 }
