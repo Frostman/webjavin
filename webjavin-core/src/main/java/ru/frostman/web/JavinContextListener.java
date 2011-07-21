@@ -43,7 +43,7 @@ public class JavinContextListener implements ServletContextListener {
 
             freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
 
-            Javin.setMode(JavinConfig.getCurrentConfig().getMode());
+            Javin.setMode(JavinConfig.get().getMode());
             Javin.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
             Javin.setServletApiMinorVersion(sce.getServletContext().getMinorVersion());
 

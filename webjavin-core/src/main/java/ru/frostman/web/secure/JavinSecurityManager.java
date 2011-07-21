@@ -43,7 +43,7 @@ public class JavinSecurityManager {
     private Map<Integer, SecureExpression> expressions = Maps.newHashMap();
 
     public JavinSecurityManager() {
-        String userServiceProviderClassName = JavinConfig.getCurrentConfig().getSecure().getUserServiceProvider();
+        String userServiceProviderClassName = JavinConfig.get().getSecure().getUserServiceProvider();
         Class<?> userServiceProviderClass;
         try {
             userServiceProviderClass = Class.forName(userServiceProviderClassName);

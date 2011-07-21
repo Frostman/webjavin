@@ -35,9 +35,9 @@ public class JavinSessions {
     private static SessionManager sessionManager;
 
     public static boolean update() {
-        String sessionManagerName = JavinConfig.getCurrentConfig().getApp().getSessionManager();
+        String sessionManagerName = JavinConfig.get().getApp().getSessionManager();
 
-        Class<?> sessionManagerClass = null;
+        Class<?> sessionManagerClass;
         try {
             sessionManagerClass = Class.forName(sessionManagerName);
         } catch (ClassNotFoundException e) {
@@ -55,7 +55,7 @@ public class JavinSessions {
         }
 
         //todo think about this
-        return true;
+        return false;
     }
 
     public static JavinSession getSession(HttpServletRequest request, HttpServletResponse response) {
