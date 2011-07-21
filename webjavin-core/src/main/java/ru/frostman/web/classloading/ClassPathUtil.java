@@ -52,11 +52,19 @@ class ClassPathUtil {
                 while (resources.hasMoreElements()) {
                     URL resource = resources.nextElement();
                     Preconditions.checkNotNull(resource, "no resource for: {}", packageName);
-                    String fullPath = resource.getFile();
+                    String filePath = resource.getFile();
 
-                    File dir = new File(fullPath);
+                    File dir = new File(filePath);
                     if (dir.exists()) {
                         scanDirectory(packageName, dir, classes, classNames);
+                    } else if ((filePath.indexOf("!") > 0) && (filePath.indexOf(".jar") > 0)) {
+                        String jarPath = filePath.substring(0, filePath.indexOf("!")).substring(filePath.indexOf(":") + 1);
+                        // WINDOWS HACK
+                        if (jarPath.contains(":")) {
+                            jarPath = jarPath.substring(1);
+                        }
+
+                        scanJarFile(packageName, new File(jarPath), classes, classNames);
                     }
                 }
             } catch (IOException e) {
@@ -67,7 +75,7 @@ class ClassPathUtil {
         return classes;
     }
 
-    private static void scanDirectory(String packageName, File dir, List<ClassFile> classes, Set<String> classNames) {
+    private static void scanDirectory(String packageName, File dir, List<ClassFile> classes, Set<String> classNames) throws IOException {
         File[] files = dir.listFiles();
         for (File file : files) {
             String fileName = file.getName();
@@ -85,20 +93,6 @@ class ClassPathUtil {
         }
     }
 
-//    if ((filePath.indexOf("!") > 0) & (filePath.indexOf(".jar") > 0)) {
-//               String jarPath = filePath.substring(0, filePath.indexOf("!"))
-//                  .substring(filePath.indexOf(":") + 1);
-//               //WINDOWS HACK
-//               if (jarPath.indexOf(":") >= 0) jarPath = jarPath.substring(1);
-//               classes.addAll(getFromJARFile(jarPath, path));
-//            }
-    //todo
-    //todo
-    //todo REPLACE GET PLUGIN PACKAGES WITH PLUGIN APP CLASSES
-    //todo it is some problems when we developing plugin, but then we not scaning jars
-    //todo если сделать так, то можно будет тупо добавлять список классов без классфайлов после сканирования класспаса
-
-    //todo impl scanning jars
     private static void scanJarFile(String packageName, File jar, List<ClassFile> classes, Set<String> classNames) throws IOException {
         JarInputStream jarFile = new JarInputStream(new FileInputStream(jar));
         JarEntry jarEntry;
@@ -107,13 +101,22 @@ class ClassPathUtil {
             if (jarEntry != null) {
                 String fileName = jarEntry.getName();
 
-                String className = packageName + "." + fileName.substring(0, fileName.length() - CLASS.length());
+                if (!fileName.endsWith(".class")) {
+                    continue;
+                }
+
+                String className = fileName.replace("/", ".").substring(0, fileName.length() - CLASS.length());
+
                 if (classNames.contains(className)) {
                     continue;
                 }
 
-                //todo null instead of File
-                classes.add(new ClassFile(className, null));
+                String currPackage = className.substring(0, className.lastIndexOf("."));
+                if (!packageName.equals(currPackage)) {
+                    continue;
+                }
+
+                classes.add(new StaticClassFile(className));
                 classNames.add(className);
             }
         } while (jarEntry != null);
