@@ -23,6 +23,7 @@ import ru.frostman.web.session.SessionManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author slukjanov aka Frostman
@@ -37,6 +38,7 @@ public class ServletSessionManager extends SessionManager {
     @Override
     public JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create) {
         //todo think about caching decorators
-        return new ServletSession(request.getSession(create));
+        HttpSession session = request.getSession(create);
+        return session == null ? null : new ServletSession(session);
     }
 }

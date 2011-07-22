@@ -31,9 +31,12 @@ import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.Dispatcher;
 import ru.frostman.web.plugin.JavinPlugins;
 import ru.frostman.web.secure.JavinSecurityManager;
+import ru.frostman.web.session.JavinSession;
 import ru.frostman.web.session.JavinSessions;
 import ru.frostman.web.thr.JavinRuntimeException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +48,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class AppClasses {
     private static final Logger log = LoggerFactory.getLogger(AppClasses.class);
+
+    private static final String ATTR_CLASSES_UUID = "javin.classes.uuid";
 
     /**
      * Lock that used to synchronize all invokes of method update()
@@ -59,7 +64,7 @@ public class AppClasses {
     /**
      * Instance uuid
      */
-    private UUID uuid;
+    private String uuid;
 
     /**
      * All application classes stored by name
@@ -89,7 +94,7 @@ public class AppClasses {
     private boolean forceReload;
 
     public AppClasses() {
-        uuid = UUID.randomUUID();
+        uuid = UUID.randomUUID().toString();
 
         if (Javin.getMode().isProductionMode()) {
             update();
@@ -263,7 +268,32 @@ public class AppClasses {
         return securityManager;
     }
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
+    }
+
+    public void checkSession(HttpServletRequest request, HttpServletResponse response) {
+        JavinSession session = JavinSessions.getSession(request, response, false);
+
+        if (session == null) {
+            return;
+        }
+
+        String classesUuid = (String) session.getAttribute(ATTR_CLASSES_UUID);
+
+        if (classesUuid != null && (!uuid.equals(classesUuid))) {
+            session.invalidate();
+        }
+    }
+
+    public void attachUuid(HttpServletRequest request, HttpServletResponse response) {
+        JavinSession session = JavinSessions.getSession(request, response, false);
+
+        if (session == null) {
+            return;
+        }
+
+        //todo think about overhead of each time writing value
+        session.setAttribute(ATTR_CLASSES_UUID, uuid);
     }
 }

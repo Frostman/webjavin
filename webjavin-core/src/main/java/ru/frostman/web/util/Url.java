@@ -16,35 +16,11 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.session.impl;
-
-import com.google.common.collect.MapMaker;
-import ru.frostman.web.session.JavinSession;
-import ru.frostman.web.session.SessionManager;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
+package ru.frostman.web.util;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class InMemorySessionManager extends SessionManager {
-    private ConcurrentMap<String, JavinSession> sessions = new MapMaker()
-            //todo remove hard code
-            .expireAfterAccess(30, TimeUnit.MINUTES)
-            .makeMap();
+public class Url {
 
-    @Override
-    public boolean checkSession(HttpServletRequest request, HttpServletResponse response) {
-        // todo impl
-        return true;
-    }
-
-    @Override
-    public JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create) {
-        //todo impl
-        return null;
-    }
 }

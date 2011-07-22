@@ -18,9 +18,12 @@
 
 package ru.frostman.web.session.impl;
 
+import com.google.common.collect.Maps;
 import ru.frostman.web.session.JavinSession;
 
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -30,6 +33,7 @@ public class InMemorySession implements JavinSession {
     private String id = UUID.randomUUID().toString();
     private long creationTime;
     private long lastAccessedTime;
+    private Map<String, Object> attributes = Maps.newLinkedHashMap();
 
     @Override
     public String getId() {
@@ -48,28 +52,44 @@ public class InMemorySession implements JavinSession {
 
     @Override
     public Object getAttribute(String name) {
-        //todo impl
-        return null;
+        return attributes.get(name);
     }
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        //todo impl
-        return null;
+        return new AttrNamesEnumeration(attributes.keySet().iterator());
     }
 
     @Override
     public void setAttribute(String name, Object value) {
-        //todo impl
+        attributes.put(name, value);
     }
 
     @Override
     public void removeAttribute(String name) {
-        //todo impl
+        attributes.remove(name);
     }
 
     @Override
     public void invalidate() {
         //todo impl
+    }
+
+    private static class AttrNamesEnumeration implements Enumeration<String> {
+        private final Iterator<String> iterator;
+
+        private AttrNamesEnumeration(Iterator<String> iterator) {
+            this.iterator = iterator;
+        }
+
+        @Override
+        public boolean hasMoreElements() {
+            return iterator.hasNext();
+        }
+
+        @Override
+        public String nextElement() {
+            return iterator.next();
+        }
     }
 }

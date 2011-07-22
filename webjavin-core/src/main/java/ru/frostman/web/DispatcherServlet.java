@@ -48,9 +48,12 @@ public class DispatcherServlet extends HttpServlet {
             }
 
             JavinSessions.checkSession(request, response);
+            Javin.getClasses().checkSession(request, response);
 
             Javin.getClasses().getDispatcher()
                     .dispatch(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()), request, response);
+
+            Javin.getClasses().attachUuid(request, response);
         } catch (Throwable th) {
             try {
                 log.debug("Sending error: ", th);
