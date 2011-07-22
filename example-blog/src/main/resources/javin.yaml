@@ -1,0 +1,18 @@
+mode: DEV
+
+context: blog
+address: http://localhost:8080/
+
+classes:
+      packages: [
+          "ru.frostman.example.blog"
+      ]
+      updateInterval: 500
+
+templates:
+      path: "/WEB-INF/view"
+
+plugins: [
+      "ru.frostman.web.MongoPlugin",
+      "ru.frostman.web.IndigoPlugin"
+]
