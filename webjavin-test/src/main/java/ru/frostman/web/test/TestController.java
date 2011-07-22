@@ -51,7 +51,7 @@ public class TestController {
     public View indigo(Model model) {
         model.put("page", "qwe");
 
-        return view("/indigo/openid/auth.ftl");
+        return view("/indigo/auth.ftl");
     }
 
 }
