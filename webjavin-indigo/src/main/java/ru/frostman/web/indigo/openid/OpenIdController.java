@@ -16,7 +16,7 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.indigo;
+package ru.frostman.web.indigo.openid;
 
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerManager;
@@ -61,7 +61,7 @@ public class OpenIdController {
     public static final String ATTR_JAVIN_AUTH_EMAIL = "javin.auth.email";
     public static final String ATTR_JAVIN_AUTH_SOURCE = "javin.auth.source";
 
-    public static final String AUTH_URL = "/javin/indigo/openid/sendAuth";
+    public static final String AUTH_REDIRECT_URL = "/javin/indigo/openid/sendAuth";
     public static final String CALLBACK_URL = "/javin/indigo/openid/callback";
 
     //todo think about thread safety
@@ -70,7 +70,7 @@ public class OpenIdController {
     //todo remove test url
     // http://localhost:8080/test/javin/indigo/openid/sendAuth?identifier=https://www.google.com/accounts/o8/id&targetUrl=/test
 
-    @Action(AUTH_URL)
+    @Action(AUTH_REDIRECT_URL)
     public View sendAuthRequest(@Param(PARAM_PROVIDER) String userSuppliedString, JavinSession session,
                                 @Param(PARAM_TARGET) String targetUrl) throws OpenIDException {
         // perform discovery on the user-supplied identifier

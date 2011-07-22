@@ -18,23 +18,32 @@
 
 package ru.frostman.web.indigo;
 
-import ru.frostman.web.controller.Controllers;
+import ru.frostman.web.annotation.Action;
+import ru.frostman.web.annotation.Controller;
+import ru.frostman.web.controller.Model;
+import ru.frostman.web.controller.View;
 
-import static ru.frostman.web.indigo.OpenIdController.*;
+import static ru.frostman.web.controller.Controllers.json;
+import static ru.frostman.web.controller.Controllers.view;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class OpenId {
+@Controller
+public class IndigoController {
+    public static final String AUTH_URL = "/javin/indigo/auth";
+    public static final String SUPPORTED_PROVIDERS_URL = "/javin/indigo/providers";
 
-    public static String getAuthUrl(String openIdProvider, String targetUrl) {
-        return Controllers.url(AUTH_URL) + "?"
-                + PARAM_PROVIDER + "=" + openIdProvider + "&"
-                + PARAM_TARGET + "=" + targetUrl;
+    @Action(AUTH_URL)
+    public View authFrame(Model model) {
+
+        return view("/indigo/auth.ftl");
     }
 
-    public static String getGoogleAuthUrl(String targetUrl) {
-        return getAuthUrl(GOOGLE_ENDPOINT, targetUrl);
+    @Action(SUPPORTED_PROVIDERS_URL)
+    public View supportedProviders() {
+
+        return json();
     }
 
 }
