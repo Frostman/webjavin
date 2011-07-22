@@ -18,10 +18,7 @@
 
 package ru.frostman.web.view;
 
-import freemarker.cache.FileTemplateLoader;
-import freemarker.cache.MruCacheStorage;
-import freemarker.cache.MultiTemplateLoader;
-import freemarker.cache.TemplateLoader;
+import freemarker.cache.*;
 import freemarker.template.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,10 +68,7 @@ public class AppViews {
 
             log.debug("Freemarker :: application templates path: {}", appTemplatesPath);
 
-            File pluginsTemplatesPath = new File(Javin.getApplicationPath() + JAVIN_PLUGINS_VIEW);
-            FileTemplateLoader pluginsTemplateLoader = new FileTemplateLoader(pluginsTemplatesPath);
-
-            log.debug("Freemarker :: plugins templates path: {}", pluginsTemplatesPath);
+            ClassTemplateLoader pluginsTemplateLoader = new ClassTemplateLoader(Javin.class, JAVIN_PLUGINS_VIEW);
 
             freemarker.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{appTemplateLoader, pluginsTemplateLoader}));
         } catch (IOException e) {
