@@ -47,4 +47,11 @@ public class TestController {
         return view("test.ftl");
     }
 
+    @Action("/indigo")
+    public View indigo(Model model) {
+        model.put("page", "qwe");
+
+        return view("/indigo/openid/auth.ftl");
+    }
+
 }
