@@ -18,8 +18,13 @@
 
 package ru.frostman.web.view;
 
+import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MruCacheStorage;
+import freemarker.cache.MultiTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.View;
@@ -33,8 +38,13 @@ import java.io.IOException;
  * @author slukjanov aka Frostman
  */
 public class AppViews {
+    private static final Logger log = LoggerFactory.getLogger(AppViews.class);
+
+    public static final String JAVIN_PLUGINS_VIEW = "/javin/plugins/view";
+
     private static final String FORWARD = "forward:";
     private static final String REDIRECT = "redirect:";
+
     private final Configuration freemarker;
 
     public AppViews() {
@@ -44,6 +54,8 @@ public class AppViews {
                 ? JavinConfig.get().getTemplates().getUpdateInterval() : 0;
         freemarker.setTemplateUpdateDelay(updateInterval);
 
+        log.debug("Freemarker :: template update interval: {}", updateInterval);
+
         freemarker.setDefaultEncoding("utf-8");
         freemarker.setOutputEncoding("utf-8");
 
@@ -51,12 +63,25 @@ public class AppViews {
         int maxSoftSize = JavinConfig.get().getTemplates().getMaxCacheSoftSize();
         freemarker.setCacheStorage(new MruCacheStorage(maxStrongSize, maxSoftSize));
 
+        log.debug("Freemarker :: MRU cache {} -- {}", maxStrongSize, maxSoftSize);
+
         try {
-            freemarker.setDirectoryForTemplateLoading(new File(Javin.getApplicationPath()
-                    + JavinConfig.get().getTemplates().getPath()));
+            File appTemplatesPath = new File(Javin.getApplicationPath() + JavinConfig.get().getTemplates().getPath());
+            FileTemplateLoader appTemplateLoader = new FileTemplateLoader(appTemplatesPath);
+
+            log.debug("Freemarker :: application templates path: {}", appTemplatesPath);
+
+            File pluginsTemplatesPath = new File(Javin.getApplicationPath() + JAVIN_PLUGINS_VIEW);
+            FileTemplateLoader pluginsTemplateLoader = new FileTemplateLoader(pluginsTemplatesPath);
+
+            log.debug("Freemarker :: plugins templates path: {}", pluginsTemplatesPath);
+
+            freemarker.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{appTemplateLoader, pluginsTemplateLoader}));
         } catch (IOException e) {
             throw new JavinRuntimeException("Exception while initializing AppViews", e);
         }
+
+        log.debug("Javin views successfully initialized.");
     }
 
     public View getViewByName(String name) {
