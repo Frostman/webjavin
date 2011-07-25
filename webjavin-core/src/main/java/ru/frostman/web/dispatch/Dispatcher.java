@@ -28,8 +28,10 @@ import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.NotFoundException;
 import ru.frostman.web.util.HttpMethod;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -39,6 +41,14 @@ import java.util.Map;
  * @author slukjanov aka Frostman
  */
 public class Dispatcher {
+    private static final MimetypesFileTypeMap MIME_MAP = new MimetypesFileTypeMap();
+
+    static {
+        MIME_MAP.addMimeTypes("application/javascript js");
+        MIME_MAP.addMimeTypes("text/css css");
+        MIME_MAP.addMimeTypes("image/png png");
+    }
+
     private final List<ActionDefinition> actions;
 
     public Dispatcher(List<ActionDefinition> actions) {
@@ -97,7 +107,12 @@ public class Dispatcher {
                     String resource = Javin.getApplicationPath() + entry.getValue().getTarget() + "/" + url.substring(fullUrl.length() - 1);
 
                     try {
-                        FileInputStream resourceStream = new FileInputStream(resource);
+                        File resourceFile = new File(resource);
+                        FileInputStream resourceStream = new FileInputStream(resourceFile);
+
+                        String contentType = MIME_MAP.getContentType(resourceFile);
+                        response.setContentType(contentType);
+
                         IOUtils.copy(resourceStream, response.getWriter());
                     } catch (IOException e) {
                         throw new JavinRuntimeException("Exception while streaming resource: " + resource, e);
