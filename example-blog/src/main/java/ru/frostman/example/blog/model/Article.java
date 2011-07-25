@@ -18,8 +18,13 @@
 
 package ru.frostman.example.blog.model;
 
+import com.google.code.morphia.annotations.Entity;
+import ru.frostman.web.mongo.BaseEntity;
+
 /**
  * @author slukjanov aka Frostman
  */
-public class Article {
+@Entity
+public class Article extends BaseEntity {
+
 }

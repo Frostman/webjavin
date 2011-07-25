@@ -18,8 +18,19 @@
 
 package ru.frostman.example.blog.controller;
 
+import ru.frostman.web.annotation.Action;
+import ru.frostman.web.controller.View;
+
+import static ru.frostman.web.controller.Controllers.view;
+
 /**
  * @author slukjanov aka Frostman
  */
 public class MainController {
+
+    @Action({"/", "/index", "/index.html"})
+    public View index() {
+        return view("index.ftl");
+    }
+
 }

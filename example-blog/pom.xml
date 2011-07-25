@@ -49,6 +49,33 @@
             <artifactId>webjavin-indigo</artifactId>
             <version>${webjavin.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>[2.1_3,)</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.proxytoys</groupId>
+            <artifactId>proxytoys</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
+
+        <!--Servlet API-->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>3.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
