@@ -20,6 +20,7 @@ package ru.frostman.web.config;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -30,6 +31,7 @@ import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Javin framework configuration.
@@ -50,6 +52,8 @@ public class JavinConfig {
     private TemplatesConfig templates = new TemplatesConfig();
     private AppConfig app = new AppConfig();
     private SecureConfig secure = new SecureConfig();
+
+    private Map<String, StaticResource> statics = Maps.newLinkedHashMap();
 
     static {
         update();
@@ -187,6 +191,14 @@ public class JavinConfig {
         this.secure = secure;
     }
 
+    public Map<String, StaticResource> getStatics() {
+        return statics;
+    }
+
+    public void setStatics(Map<String, StaticResource> statics) {
+        this.statics = statics;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof JavinConfig) {
@@ -199,7 +211,8 @@ public class JavinConfig {
                     && Objects.equal(classes, config.classes)
                     && Objects.equal(templates, config.templates)
                     && Objects.equal(app, config.app)
-                    && Objects.equal(secure, config.secure);
+                    && Objects.equal(secure, config.secure)
+                    && Objects.equal(statics, config.statics);
         }
 
         return false;

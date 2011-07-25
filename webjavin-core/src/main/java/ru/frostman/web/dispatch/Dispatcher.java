@@ -19,15 +19,21 @@
 package ru.frostman.web.dispatch;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.io.IOUtils;
+import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
+import ru.frostman.web.config.StaticResource;
+import ru.frostman.web.controller.Controllers;
 import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.NotFoundException;
 import ru.frostman.web.util.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
@@ -39,20 +45,26 @@ public class Dispatcher {
         this.actions = Lists.newLinkedList(actions);
     }
 
-    public ActionInvoker dispatch(String requestUrl, HttpMethod requestMethod, HttpServletRequest request
+    public void dispatch(String requestUrl, HttpMethod requestMethod, HttpServletRequest request
             , HttpServletResponse response) {
 
         if (JavinConfig.get().getContext().equals(requestUrl)) {
             requestUrl += "/";
         }
 
+        if (dispatchStatic(requestUrl, requestMethod, request, response)) {
+            return;
+        }
+
         ActionInvoker invoker = null;
 
-        for (ActionDefinition definition : actions) {
-            if (definition.matches(requestUrl, requestMethod)) {
-                invoker = definition.initInvoker(request, response);
+        if (invoker == null) {
+            for (ActionDefinition definition : actions) {
+                if (definition.matches(requestUrl, requestMethod)) {
+                    invoker = definition.initInvoker(request, response);
 
-                break;
+                    break;
+                }
             }
         }
 
@@ -65,8 +77,37 @@ public class Dispatcher {
                 sendNotFound(request, response);
             }
         }
+    }
 
-        return invoker;
+    private boolean dispatchStatic(String url, HttpMethod requestMethod, HttpServletRequest request,
+                                   HttpServletResponse response) {
+
+        //todo think about this
+        if (url.contains("..")) {
+            return false;
+        }
+
+        if (requestMethod.equals(HttpMethod.GET))
+            //todo impl caching, think about regexp in statics
+            //todo compile expressions on AppClasses#update
+
+            for (Map.Entry<String, StaticResource> entry : JavinConfig.get().getStatics().entrySet()) {
+                String fullUrl = Controllers.url(entry.getKey());
+                if (url.startsWith(fullUrl)) {
+                    String resource = Javin.getApplicationPath() + entry.getValue().getTarget() + "/" + url.substring(fullUrl.length() - 1);
+
+                    try {
+                        FileInputStream resourceStream = new FileInputStream(resource);
+                        IOUtils.copy(resourceStream, response.getWriter());
+                    } catch (IOException e) {
+                        throw new JavinRuntimeException("Exception while streaming resource: " + resource, e);
+                    }
+
+                    return true;
+                }
+            }
+
+        return false;
     }
 
     private void sendNotFound(HttpServletRequest request, HttpServletResponse response) {
