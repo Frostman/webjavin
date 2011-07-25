@@ -19,6 +19,7 @@
 package ru.frostman.web.dispatch;
 
 import com.google.common.collect.Lists;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.NotFoundException;
 import ru.frostman.web.util.HttpMethod;
@@ -40,6 +41,10 @@ public class Dispatcher {
 
     public ActionInvoker dispatch(String requestUrl, HttpMethod requestMethod, HttpServletRequest request
             , HttpServletResponse response) {
+
+        if (JavinConfig.get().getContext().equals(requestUrl)) {
+            requestUrl += "/";
+        }
 
         ActionInvoker invoker = null;
 
