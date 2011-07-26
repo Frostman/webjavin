@@ -1,9 +1,46 @@
 [#ftl]
 [#import "base.ftl" as base]
 [@base.layout]
-Hello, World!
+<div>
+    Index page of simple blog
+    <hr/>
+</div>
 
-<div id="dialog" title="dialog title">
+<div data-bind='template: { name: "postTemplate",
+                            foreach: blogPosts }'></div>
+
+<script type="text/html" id="postTemplate">
+    [#noparse]
+        <button data-bind='text: title, click: function() { alert("clicked:"+ title); }'></button>
+        <div data-bind="text: content"></div>
+        <hr/>
+    [/#noparse]
+</script>
+
+<script type="text/javascript">
+    var blogPosts = [
+        {title: "post1", content: "content1"},
+        {title: "post2", content: "content2"},
+        {title: "post3", content: "content3"},
+        {title: "post4", content: "content4"}
+    ];
+
+    var viewModel = {
+
+    };
+
+    $(function() {
+        ko.applyBindings(viewModel);
+
+        var idx = 2;
+        setInterval(function() {
+            blogPosts[0].content = "content" + idx;
+            idx++;
+        }, 1000);
+    });
+</script>
+
+[#--<div id="dialog" title="dialog title">
     Dialog Content
 </div>
 
@@ -22,6 +59,6 @@ Hello, World!
             }
         });
     });
-</script>
+</script>--]
 
 [/@base.layout]
