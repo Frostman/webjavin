@@ -51,7 +51,7 @@ public class Dispatcher {
     private static final String HEADER_LAST_MODIFIED = "Last-Modified";
     private static final String HEADER_EXPIRES = "Expires";
 
-    public static final long DEFAULT_EXPIRE_TIME = 604800000L;
+    public static final long DEFAULT_EXPIRE_TIME = 604800000L; // 1 week
 
     static {
         MIME_MAP.addMimeTypes("application/javascript js");
@@ -146,9 +146,6 @@ public class Dispatcher {
                             return true;
                         }
 
-                        //todo think about random access impl
-                        FileInputStream resourceStream = new FileInputStream(resourceFile);
-
                         String contentType = MIME_MAP.getContentType(resourceFile);
                         response.setContentType(contentType);
                         //todo think about setting encoding for text
@@ -160,9 +157,11 @@ public class Dispatcher {
                         //todo add expire time into configurations
                         response.setDateHeader(HEADER_EXPIRES, System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
+                        //todo think about random access impl
+                        FileInputStream resourceStream = new FileInputStream(resourceFile);
                         IOUtils.copy(resourceStream, response.getOutputStream());
                     } catch (IOException e) {
-                        //todo think about this
+                        //todo think about this, iff FileNotFoundException then skip else do smth
                         // no operations
                         continue;
                     }
