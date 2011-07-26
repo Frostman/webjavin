@@ -12,6 +12,17 @@ classes:
 templates:
       path: "/WEB-INF/view"
 
+statics: {
+      "/static/": {
+            "secure": "",
+            "target": "/WEB-INF/static"
+      },
+      "/images/": {
+            "secure": "",
+            "target": "/WEB-INF/static/images"
+      }
+}
+
 plugins: [
       "ru.frostman.web.MongoPlugin",
       "ru.frostman.web.IndigoPlugin"
