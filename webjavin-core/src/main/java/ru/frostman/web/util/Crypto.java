@@ -23,6 +23,7 @@ import ru.frostman.web.thr.JavinRuntimeException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.MessageDigest;
 
 /**
  * Provides cryptography features such as hmac.
@@ -30,7 +31,8 @@ import javax.crypto.spec.SecretKeySpec;
  * @author slukjanov aka Frostman
  */
 public class Crypto {
-    public static final String HMAC_ALGORITHM = "HmacSHA384";
+    public static final String HMAC_ALGORITHM = "HmacSHA512";
+    public static final String HASH_ALGORITHM = "SHA-512";
 
     public static String sign(String message) {
         return sign(message, JavinConfig.get().getApp().getSecretBytes());
@@ -53,11 +55,21 @@ public class Crypto {
 
             return Codec.encodeBase64(signature);
         } catch (Exception e) {
-            throw new JavinRuntimeException(e);
+            throw new JavinRuntimeException("Exception while calculating hmac", e);
         }
     }
 
     public static boolean checkSign(String message, String signature, byte[] key) {
         return signature.equals(sign(message, key));
+    }
+
+    public static String hash(String message) {
+        try {
+            MessageDigest messageDigest = MessageDigestPool.get(HASH_ALGORITHM);
+
+            return Codec.encodeBase64(messageDigest.digest(message.getBytes("utf-8")));
+        } catch (Exception e) {
+            throw new JavinRuntimeException("Exception while calculating hash", e);
+        }
     }
 }
