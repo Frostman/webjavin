@@ -40,6 +40,8 @@ public class MessageDigestPool {
         if (messageDigest == null) {
             messageDigest = MessageDigest.getInstance(algorithm);
             pool.get().put(algorithm, messageDigest);
+        } else {
+            messageDigest.reset();
         }
 
         return messageDigest;
