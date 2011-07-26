@@ -18,6 +18,7 @@
 
 package ru.frostman.web.dispatch;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import ru.frostman.web.Javin;
@@ -26,6 +27,7 @@ import ru.frostman.web.config.StaticResource;
 import ru.frostman.web.controller.Controllers;
 import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.NotFoundException;
+import ru.frostman.web.util.Crypto;
 import ru.frostman.web.util.HttpMethod;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -42,6 +44,14 @@ import java.util.Map;
  */
 public class Dispatcher {
     private static final MimetypesFileTypeMap MIME_MAP = new MimetypesFileTypeMap();
+
+    private static final String HEADER_IF_NONE_MATCH = "If-None-Match";
+    private static final String HEADER_E_TAG = "ETag";
+    private static final String HEADER_IF_MODIFIED_SINCE = "If-Modified-Since";
+    private static final String HEADER_LAST_MODIFIED = "Last-Modified";
+    private static final String HEADER_EXPIRES = "Expires";
+
+    public static final long DEFAULT_EXPIRE_TIME = 604800000L;
 
     static {
         MIME_MAP.addMimeTypes("application/javascript js");
@@ -108,12 +118,47 @@ public class Dispatcher {
 
                     try {
                         File resourceFile = new File(resource);
+
+                        long length = resourceFile.length();
+                        long lastModified = resourceFile.lastModified();
+                        String eTag = Crypto.hash(resourceFile.getName() + "_" + length + "_" + lastModified);
+
+                        // Check headers for caching
+
+                        // If-None-Match header should contain "*" or ETag. If so, then return 304.
+                        String ifNoneMatch = request.getHeader(HEADER_IF_NONE_MATCH);
+                        if (ifNoneMatch != null && (Objects.equal(ifNoneMatch, eTag) || Objects.equal(ifNoneMatch, "*"))) {
+                            response.setHeader(HEADER_E_TAG, eTag); // Required in 304.
+
+                            //todo extract into method
+                            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+                            return true;
+                        }
+
+                        // If-Modified-Since header should be greater than LastModified. If so, then return 304.
+                        // This header is ignored if any If-None-Match header is specified.
+                        long ifModifiedSince = request.getDateHeader(HEADER_IF_MODIFIED_SINCE);
+                        if (ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
+                            response.setHeader(HEADER_E_TAG, eTag); // Required in 304.
+
+                            //todo extract into method
+                            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+                            return true;
+                        }
+
+                        //todo think about random access impl
                         FileInputStream resourceStream = new FileInputStream(resourceFile);
 
                         String contentType = MIME_MAP.getContentType(resourceFile);
                         response.setContentType(contentType);
-                        response.setCharacterEncoding(null);
                         //todo think about setting encoding for text
+                        response.setCharacterEncoding(null);
+
+                        response.setHeader(HEADER_E_TAG, eTag);
+                        response.setDateHeader(HEADER_LAST_MODIFIED, lastModified);
+
+                        //todo add expire time into configurations
+                        response.setDateHeader(HEADER_EXPIRES, System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
                         IOUtils.copy(resourceStream, response.getOutputStream());
                     } catch (IOException e) {
