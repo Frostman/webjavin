@@ -112,10 +112,14 @@ public class Dispatcher {
 
                         String contentType = MIME_MAP.getContentType(resourceFile);
                         response.setContentType(contentType);
+                        response.setCharacterEncoding(null);
+                        //todo think about setting encoding for text
 
-                        IOUtils.copy(resourceStream, response.getWriter());
+                        IOUtils.copy(resourceStream, response.getOutputStream());
                     } catch (IOException e) {
-                        throw new JavinRuntimeException("Exception while streaming resource: " + resource, e);
+                        //todo think about this
+                        // no operations
+                        continue;
                     }
 
                     return true;
