@@ -65,4 +65,12 @@ public class StaticResource {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        int result = secure != null ? secure.hashCode() : 0;
+        result = 31 * result + (target != null ? target.hashCode() : 0);
+        result = 31 * result + (int) (expire ^ (expire >>> 32));
+        return result;
+    }
 }
