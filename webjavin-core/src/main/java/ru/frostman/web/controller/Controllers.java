@@ -123,6 +123,11 @@ public class Controllers {
         return context + "/" + relativeUrl;
     }
 
+    /**
+     * @param relativeUrl to normalize
+     *
+     * @return full url of specified relativeUrl (http://server.addr/context/relativeUrl)
+     */
     public static String urlFull(String relativeUrl) {
         return JavinConfig.get().getAddress() + url(relativeUrl);
     }
