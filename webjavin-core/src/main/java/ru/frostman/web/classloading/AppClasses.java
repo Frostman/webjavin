@@ -18,6 +18,7 @@
 
 package ru.frostman.web.classloading;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -293,7 +294,8 @@ public class AppClasses {
             return;
         }
 
-        //todo think about overhead of each time writing value
-        session.setAttribute(ATTR_CLASSES_UUID, uuid);
+        if (!Objects.equal(uuid, session.getAttribute(ATTR_CLASSES_UUID))) {
+            session.setAttribute(ATTR_CLASSES_UUID, uuid);
+        }
     }
 }

@@ -19,6 +19,7 @@
 package ru.frostman.web.config;
 
 import com.google.common.base.Objects;
+import ru.frostman.web.dispatch.Dispatcher;
 
 /**
  * @author slukjanov aka Frostman
@@ -26,6 +27,7 @@ import com.google.common.base.Objects;
 public class StaticResource {
     private String secure;
     private String target;
+    private long expire = Dispatcher.DEFAULT_EXPIRE_TIME;
 
     public String getSecure() {
         return secure;
@@ -43,13 +45,22 @@ public class StaticResource {
         this.target = target;
     }
 
+    public long getExpire() {
+        return expire;
+    }
+
+    public void setExpire(long expire) {
+        this.expire = expire;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof StaticResource) {
             StaticResource resource = (StaticResource) obj;
 
             return Objects.equal(secure, resource.secure)
-                    && Objects.equal(target, resource.target);
+                    && Objects.equal(target, resource.target)
+                    && expire == resource.expire;
         }
 
         return false;

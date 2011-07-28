@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -102,8 +103,8 @@ public class Dispatcher {
     private boolean dispatchStatic(String url, HttpMethod requestMethod, HttpServletRequest request,
                                    HttpServletResponse response) {
 
-        //todo think about this
         if (url.contains("..")) {
+            // for security reasons '..' in path isn't supported
             return false;
         }
 
@@ -114,7 +115,8 @@ public class Dispatcher {
             for (Map.Entry<String, StaticResource> entry : JavinConfig.get().getStatics().entrySet()) {
                 String fullUrl = Controllers.url(entry.getKey());
                 if (url.startsWith(fullUrl)) {
-                    String resource = Javin.getApplicationPath() + entry.getValue().getTarget() + "/" + url.substring(fullUrl.length() - 1);
+                    StaticResource staticResource = entry.getValue();
+                    String resource = Javin.getApplicationPath() + staticResource.getTarget() + "/" + url.substring(fullUrl.length() - 1);
 
                     try {
                         File resourceFile = new File(resource);
@@ -123,15 +125,11 @@ public class Dispatcher {
                         long lastModified = resourceFile.lastModified();
                         String eTag = Crypto.hash(resourceFile.getName() + "_" + length + "_" + lastModified);
 
-                        // Check headers for caching
-
+                        // --- Check headers for caching ---
                         // If-None-Match header should contain "*" or ETag. If so, then return 304.
                         String ifNoneMatch = request.getHeader(HEADER_IF_NONE_MATCH);
                         if (ifNoneMatch != null && (Objects.equal(ifNoneMatch, eTag) || Objects.equal(ifNoneMatch, "*"))) {
-                            response.setHeader(HEADER_E_TAG, eTag); // Required in 304.
-
-                            //todo extract into method
-                            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+                            sendNotModified(response, eTag);
                             return true;
                         }
 
@@ -139,31 +137,26 @@ public class Dispatcher {
                         // This header is ignored if any If-None-Match header is specified.
                         long ifModifiedSince = request.getDateHeader(HEADER_IF_MODIFIED_SINCE);
                         if (ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
-                            response.setHeader(HEADER_E_TAG, eTag); // Required in 304.
-
-                            //todo extract into method
-                            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+                            sendNotModified(response, eTag);
                             return true;
                         }
 
                         String contentType = MIME_MAP.getContentType(resourceFile);
                         response.setContentType(contentType);
-                        //todo think about setting encoding for text
-                        response.setCharacterEncoding(null);
+
+                        response.setCharacterEncoding(contentType.startsWith("text") ? "utf-8" : null);
 
                         response.setHeader(HEADER_E_TAG, eTag);
                         response.setDateHeader(HEADER_LAST_MODIFIED, lastModified);
 
-                        //todo add expire time into configurations
-                        response.setDateHeader(HEADER_EXPIRES, System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
+                        response.setDateHeader(HEADER_EXPIRES, System.currentTimeMillis() + staticResource.getExpire());
 
-                        //todo think about random access impl
                         FileInputStream resourceStream = new FileInputStream(resourceFile);
                         IOUtils.copy(resourceStream, response.getOutputStream());
-                    } catch (IOException e) {
-                        //todo think about this, iff FileNotFoundException then skip else do smth
-                        // no operations
+                    } catch (FileNotFoundException e) {
                         continue;
+                    } catch (IOException e) {
+                        throw new JavinRuntimeException("Exception while sending static resource", e);
                     }
 
                     return true;
@@ -177,7 +170,16 @@ public class Dispatcher {
         try {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
         } catch (IOException e) {
-            throw new JavinRuntimeException("Exception while sending 404:Not found", e);
+            throw new JavinRuntimeException("Exception while sending 404: Not found", e);
+        }
+    }
+
+    private void sendNotModified(HttpServletResponse response, String eTag) {
+        try {
+            response.setHeader(HEADER_E_TAG, eTag); // Required in 304.
+            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+        } catch (IOException e) {
+            throw new JavinRuntimeException("Exception while sending 304: Not modified", e);
         }
     }
 }
