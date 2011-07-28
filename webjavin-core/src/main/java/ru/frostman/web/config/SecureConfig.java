@@ -45,4 +45,9 @@ public class SecureConfig {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return userServiceProvider != null ? userServiceProvider.hashCode() : 0;
+    }
 }

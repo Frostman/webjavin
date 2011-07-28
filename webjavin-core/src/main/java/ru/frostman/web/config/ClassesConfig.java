@@ -55,4 +55,11 @@ public class ClassesConfig {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        int result = packages != null ? packages.hashCode() : 0;
+        result = 31 * result + (int) (updateInterval ^ (updateInterval >>> 32));
+        return result;
+    }
 }

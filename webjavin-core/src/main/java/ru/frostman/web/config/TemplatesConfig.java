@@ -75,4 +75,13 @@ public class TemplatesConfig {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        int result = path != null ? path.hashCode() : 0;
+        result = 31 * result + updateInterval;
+        result = 31 * result + maxCacheStrongSize;
+        result = 31 * result + maxCacheSoftSize;
+        return result;
+    }
 }

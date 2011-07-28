@@ -76,4 +76,13 @@ public class PoolConfig {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        int result = corePoolSize;
+        result = 31 * result + maximumPoolSize;
+        result = 31 * result + (int) (keepAliveTime ^ (keepAliveTime >>> 32));
+        result = 31 * result + (timeUnit != null ? timeUnit.hashCode() : 0);
+        return result;
+    }
 }

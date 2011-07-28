@@ -251,6 +251,8 @@ public class AppClasses {
         } catch (Throwable th) {
             forceReload = true;
             throw new JavinRuntimeException(th);
+
+            //todo think about unlocking UPDATE_LOCK here
         } finally {
             lastUpdate = System.currentTimeMillis();
             UPDATE_LOCK.unlock();

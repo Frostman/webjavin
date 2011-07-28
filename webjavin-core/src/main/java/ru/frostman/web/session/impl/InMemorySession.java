@@ -30,10 +30,17 @@ import java.util.UUID;
  * @author slukjanov aka Frostman
  */
 public class InMemorySession implements JavinSession {
+    private InMemorySessionManager creator;
+
+    //todo think about id generation strategy
     private String id = UUID.randomUUID().toString();
     private long creationTime;
     private long lastAccessedTime;
     private Map<String, Object> attributes = Maps.newLinkedHashMap();
+
+    public InMemorySession(InMemorySessionManager creator) {
+        this.creator = creator;
+    }
 
     @Override
     public String getId() {
@@ -72,7 +79,7 @@ public class InMemorySession implements JavinSession {
 
     @Override
     public void invalidate() {
-        //todo impl
+        creator.removeSession(this);
     }
 
     private static class AttrNamesEnumeration implements Enumeration<String> {

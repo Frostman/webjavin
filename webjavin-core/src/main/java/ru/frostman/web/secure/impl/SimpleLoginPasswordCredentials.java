@@ -49,6 +49,11 @@ public class SimpleLoginPasswordCredentials implements Credentials {
     }
 
     @Override
+    public boolean isNonExpired() {
+        return nonExpired;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof SimpleLoginPasswordCredentials) {
             SimpleLoginPasswordCredentials credentials = (SimpleLoginPasswordCredentials) obj;
@@ -61,7 +66,10 @@ public class SimpleLoginPasswordCredentials implements Credentials {
     }
 
     @Override
-    public boolean isNonExpired() {
-        return nonExpired;
+    public int hashCode() {
+        int result = login != null ? login.hashCode() : 0;
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (nonExpired ? 1 : 0);
+        return result;
     }
 }

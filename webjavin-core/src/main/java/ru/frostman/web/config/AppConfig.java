@@ -20,6 +20,7 @@ package ru.frostman.web.config;
 
 import com.google.common.base.Objects;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -109,5 +110,17 @@ public class AppConfig {
         }
 
         return secretBytes;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = secret != null ? secret.hashCode() : 0;
+        result = 31 * result + asyncQueueLength;
+        result = 31 * result + maxForwardsCount;
+        result = 31 * result + (serverHeader != null ? serverHeader.hashCode() : 0);
+        result = 31 * result + (sessionManager != null ? sessionManager.hashCode() : 0);
+        result = 31 * result + (pool != null ? pool.hashCode() : 0);
+        result = 31 * result + (secretBytes != null ? Arrays.hashCode(secretBytes) : 0);
+        return result;
     }
 }

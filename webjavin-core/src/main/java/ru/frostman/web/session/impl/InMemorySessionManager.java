@@ -21,6 +21,7 @@ package ru.frostman.web.session.impl;
 import com.google.common.collect.MapMaker;
 import ru.frostman.web.session.JavinSession;
 import ru.frostman.web.session.SessionManager;
+import ru.frostman.web.util.Http;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +32,8 @@ import java.util.concurrent.TimeUnit;
  * @author slukjanov aka Frostman
  */
 public class InMemorySessionManager extends SessionManager {
+    public static final String SESSION_ID_COOKIE = "sid";
+
     private ConcurrentMap<String, JavinSession> sessions = new MapMaker()
             //todo remove hard code
             .expireAfterAccess(30, TimeUnit.MINUTES)
@@ -44,7 +47,24 @@ public class InMemorySessionManager extends SessionManager {
 
     @Override
     public JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create) {
-        //todo impl
-        return null;
+        String sid = Http.getCookieValue(SESSION_ID_COOKIE, request);
+
+        if (sid == null && !create) {
+            return null;
+        }
+
+        if (sid != null) {
+            //todo think about expired sessions and invalidated
+            return sessions.get(sid);
+        }
+
+        JavinSession session = new InMemorySession(this);
+        sessions.put(session.getId(), session);
+
+        return session;
+    }
+
+    protected void removeSession(InMemorySession session) {
+        sessions.remove(session.getId());
     }
 }

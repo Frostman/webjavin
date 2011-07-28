@@ -217,4 +217,18 @@ public class JavinConfig {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        int result = mode != null ? mode.hashCode() : 0;
+        result = 31 * result + (context != null ? context.hashCode() : 0);
+        result = 31 * result + (address != null ? address.hashCode() : 0);
+        result = 31 * result + (plugins != null ? plugins.hashCode() : 0);
+        result = 31 * result + (classes != null ? classes.hashCode() : 0);
+        result = 31 * result + (templates != null ? templates.hashCode() : 0);
+        result = 31 * result + (app != null ? app.hashCode() : 0);
+        result = 31 * result + (secure != null ? secure.hashCode() : 0);
+        result = 31 * result + (statics != null ? statics.hashCode() : 0);
+        return result;
+    }
 }
