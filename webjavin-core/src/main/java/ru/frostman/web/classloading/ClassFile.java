@@ -23,6 +23,7 @@ import ru.frostman.web.util.Codec;
 import ru.frostman.web.util.Crypto;
 import ru.frostman.web.util.MessageDigestPool;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -35,7 +36,7 @@ class ClassFile {
     private final File file;
     protected byte[] bytes;
 
-    public ClassFile(String className, File file) {
+    public ClassFile(String className, @Nullable File file) {
         this.className = className;
         this.file = file;
     }

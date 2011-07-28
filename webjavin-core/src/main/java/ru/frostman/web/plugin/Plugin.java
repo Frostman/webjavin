@@ -34,7 +34,7 @@ public abstract class Plugin implements Comparable<Plugin> {
     private int weight;
 
     protected Plugin(int weight) {
-        Preconditions.checkArgument(weight >= 0, "Plugin's weight should be >= 0");
+        Preconditions.checkArgument(weight >= 0, "Plugin weight should be >= 0");
 
         this.weight = weight;
     }

@@ -20,6 +20,8 @@ package ru.frostman.web.classloading;
 
 import javassist.CtClass;
 
+import javax.annotation.Nullable;
+
 /**
  * This class contains information about application classes.
  *
@@ -61,7 +63,7 @@ public class AppClass {
         return enhancedBytecode;
     }
 
-    public void setEnhancedBytecode(byte[] enhancedBytecode) {
+    public void setEnhancedBytecode(@Nullable byte[] enhancedBytecode) {
         this.enhancedBytecode = enhancedBytecode;
     }
 

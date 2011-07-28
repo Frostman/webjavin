@@ -74,7 +74,7 @@ public class Controllers {
     }
 
     /**
-     * @param targetUrl absolut path to redirect
+     * @param targetUrl absolute path to redirect
      *
      * @return view that redirect to specified targetUrl
      */
