@@ -32,7 +32,9 @@ import java.security.MessageDigest;
  */
 public class Crypto {
     public static final String HMAC_ALGORITHM = "HmacSHA512";
-    public static final String HASH_ALGORITHM = "SHA-512";
+
+    public static final String STRONG_HASH_ALGORITHM = "SHA-512";
+    public static final String FAST_HASH_ALGORITHM = "MD-5";
 
     public static String sign(String message) {
         return sign(message, JavinConfig.get().getApp().getSecretBytes());
@@ -65,7 +67,7 @@ public class Crypto {
 
     public static String hash(String message) {
         try {
-            MessageDigest messageDigest = MessageDigestPool.get(HASH_ALGORITHM);
+            MessageDigest messageDigest = MessageDigestPool.get(STRONG_HASH_ALGORITHM);
 
             return Codec.encodeBase64(messageDigest.digest(message.getBytes("utf-8")));
         } catch (Exception e) {

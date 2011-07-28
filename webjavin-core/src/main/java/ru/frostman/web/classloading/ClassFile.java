@@ -62,7 +62,7 @@ class ClassFile {
 
     public String getHashCode() {
         try {
-            return Codec.encodeHex(Files.getDigest(file, MessageDigestPool.get(Crypto.HASH_ALGORITHM)));
+            return Codec.encodeHex(Files.getDigest(file, MessageDigestPool.get(Crypto.FAST_HASH_ALGORITHM)));
         } catch (IOException e) {
             throw new RuntimeException("Can't read file: ", e);
         } catch (NoSuchAlgorithmException e) {
