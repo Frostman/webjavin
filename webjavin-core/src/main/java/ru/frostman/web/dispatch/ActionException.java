@@ -21,7 +21,7 @@ package ru.frostman.web.dispatch;
 /**
  * @author slukjanov aka Frostman
  */
-public class ActionException extends Throwable {
+public class ActionException extends Exception {
     public ActionException(String message) {
         super(message);
     }
