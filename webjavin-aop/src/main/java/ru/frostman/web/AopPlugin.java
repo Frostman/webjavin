@@ -23,8 +23,8 @@ import javassist.CtClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.aop.AopEnhancer;
-import ru.frostman.web.aop.MethodWrapper;
-import ru.frostman.web.aop.MethodWrappersUtil;
+import ru.frostman.web.aop.MethodInterceptor;
+import ru.frostman.web.aop.MethodInterceptors;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.plugin.Plugin;
 
@@ -37,19 +37,19 @@ import java.util.Map;
 public class AopPlugin extends Plugin {
     private static final Logger log = LoggerFactory.getLogger(AopPlugin.class);
 
-    private List<MethodWrapper> methodWrappers;
+    private List<MethodInterceptor> methodInterceptors;
 
-    protected AopPlugin() {
+    public AopPlugin() {
         super(1);
     }
 
     @Override
     public void beforeClassesEnhance(Map<String, AppClass> classes) {
-        methodWrappers = MethodWrappersUtil.findWrappers(classes);
+        methodInterceptors = MethodInterceptors.findInterceptors(classes);
     }
 
     @Override
     public void enhanceClass(Map<String, AppClass> classes, ClassPool classPool, CtClass ctClass) {
-        AopEnhancer.enhance(classPool, ctClass, methodWrappers);
+        AopEnhancer.enhance(classPool, ctClass, methodInterceptors);
     }
 }

@@ -16,7 +16,7 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.annotation;
+package ru.frostman.web.aop;
 
 import java.lang.annotation.*;
 
@@ -26,7 +26,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Wrapper {
+public @interface Interceptor {
     /**
      * @return pattern that specifies methods to be wrapped with
      */

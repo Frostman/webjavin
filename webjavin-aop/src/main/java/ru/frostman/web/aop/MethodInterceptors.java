@@ -19,9 +19,9 @@
 package ru.frostman.web.aop;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import javassist.CtClass;
 import javassist.CtMethod;
-import ru.frostman.web.annotation.Wrapper;
 import ru.frostman.web.aop.thr.AopException;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.classloading.enhance.EnhancerUtil;
@@ -33,45 +33,52 @@ import java.util.Map;
 /**
  * @author slukjanov aka Frostman
  */
-public class MethodWrappersUtil {
-    public static List<MethodWrapper> findWrappers(Map<String, AppClass> classes) {
+public class MethodInterceptors {
+
+    private static final String METHOD_INVOCATION = "ru.frostman.web.aop.MethodInvocation";
+
+    private static final Map<String, MethodInterceptor> interceptorsCache = Maps.newHashMap();
+
+    public static List<MethodInterceptor> findInterceptors(Map<String, AppClass> classes) {
         try {
-            List<MethodWrapper> methodWrappers = Lists.newLinkedList();
+            interceptorsCache.clear();
+
+            List<MethodInterceptor> methodInterceptors = Lists.newLinkedList();
 
             for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
                 CtClass ctClass = entry.getValue().getCtClass();
 
-                for (CtMethod method : EnhancerUtil.getDeclaredMethodsAnnotatedWith(Wrapper.class, ctClass)) {
+                for (CtMethod method : EnhancerUtil.getDeclaredMethodsAnnotatedWith(Interceptor.class, ctClass)) {
                     if (!EnhancerUtil.isPublicAndStatic(method)) {
-                        //todo think about static
-                        throw new AopException("Wrapper method should be public and static");
+                        throw new AopException("Interceptor method should be public and static");
                     }
 
+                    String longName = method.getLongName();
                     if (!method.getReturnType().getName().equals("java.lang.Object")) {
-                        throw new AopException("Wrapper method should return Object: " + method.getLongName());
+                        throw new AopException("Interceptor method should be void: " + longName);
                     }
 
                     CtClass[] parameterTypes = method.getParameterTypes();
-                    if (!parameterTypes[0].getName().equals("java.lang.String")
-                            || !parameterTypes[1].getName().equals("java.lang.Object")
-                            || !parameterTypes[2].getName().equals("java.lang.reflect.Method")
-                            || !parameterTypes[3].isArray() || parameterTypes[3].getName().equals("java.lang.Object")) {
-                        throw new AopException("Wrapper method should have correct signature: " + method.getLongName());
+                    if (parameterTypes.length != 1 || !parameterTypes[0].getName().equals(METHOD_INVOCATION)) {
+                        throw new AopException("Interceptor method should have correct signature: " + longName);
                     }
 
-                    //todo check body
+                    Interceptor interceptorAnn = (Interceptor) method.getAnnotation(Interceptor.class);
 
-                    //todo add to list
-                    //todo method signature: public static Object wrap(String className, Object instance, Method method, Object[] params);
+                    MethodInterceptor interceptor = new MethodInterceptor(ctClass.getName(), method.getName(), interceptorAnn.value(), longName);
+                    interceptorsCache.put(longName, interceptor);
 
-                    Wrapper wrapperAnn = (Wrapper) method.getAnnotation(Wrapper.class);
-                    methodWrappers.add(new MethodWrapper(ctClass.getName(), method.getName(), wrapperAnn.value()));
+                    methodInterceptors.add(interceptor);
                 }
             }
 
-            return methodWrappers;
+            return methodInterceptors;
         } catch (Exception e) {
             throw new JavinRuntimeException("Exception while searching method wrappers", e);
         }
+    }
+
+    public static MethodInterceptor getInterceptor(String name) {
+        return interceptorsCache.get(name);
     }
 }
