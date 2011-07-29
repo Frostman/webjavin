@@ -23,7 +23,6 @@ import ru.frostman.web.annotation.Controller;
 import ru.frostman.web.annotation.Param;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.session.JavinSession;
 
 import static ru.frostman.web.controller.Controllers.view;
 
@@ -34,7 +33,7 @@ import static ru.frostman.web.controller.Controllers.view;
 public class TestController {
 
     @Action("/test")
-    public View test(Model model, @Param(value = "verified", required = false) boolean verified, JavinSession session) {
+    public View test(Model model, @Param(value = "verified", required = false) boolean verified) {
         model.put("page", "test").put("verified", verified);
 
         return view("test.ftl");
@@ -50,7 +49,6 @@ public class TestController {
     @Action("/indigo")
     public View indigo(Model model) {
         model.put("page", "qwe");
-
         return view("/indigo/auth.ftl");
     }
 

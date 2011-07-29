@@ -40,6 +40,12 @@
 
         <dependency>
             <groupId>ru.frostman.web</groupId>
+            <artifactId>webjavin-aop</artifactId>
+            <version>${webjavin.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.frostman.web</groupId>
             <artifactId>webjavin-mongo</artifactId>
             <version>${webjavin.version}</version>
         </dependency>

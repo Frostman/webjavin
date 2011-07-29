@@ -16,26 +16,21 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.aop;
+package ru.frostman.web.test;
 
-import ru.frostman.web.classloading.AppClass;
-import ru.frostman.web.plugin.Plugin;
-
-import java.util.Map;
+import ru.frostman.web.aop.Interceptor;
+import ru.frostman.web.aop.MethodInvocation;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class AopPlugin extends Plugin {
-    public AopPlugin() {
-        super(1);
+public class TestAOP {
+
+    @Interceptor("")
+    public static Object testInterceptor(MethodInvocation mi) {
+        System.out.println("invoke: " + mi.getMethod());
+
+        return mi.proceed();
     }
 
-    @Override
-    public void onLoad() {
-    }
-
-    @Override
-    public void beforeClassesEnhance(Map<String, AppClass> classes) {
-    }
 }

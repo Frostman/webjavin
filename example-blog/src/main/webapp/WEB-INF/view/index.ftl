@@ -18,23 +18,30 @@
 </script>
 
 <script type="text/javascript">
-    var blogPosts = [
-        {title: "post1", content: "content1"},
-        {title: "post2", content: "content2"},
-        {title: "post3", content: "content3"},
-        {title: "post4", content: "content4"}
-    ];
+
+    var BlogPost = function(title, content) {
+        this.title = ko.observable(title);
+        this.content = ko.observable(content);
+    };
 
     var viewModel = {
-
     };
+
+    viewModel.blogPosts = ko.observableArray([
+        ko.observable(new BlogPost("title1", "content1")),
+        ko.observable(new BlogPost("title2", "content2")),
+        ko.observable(new BlogPost("title3", "content3")),
+        ko.observable(new BlogPost("title4", "content4"))
+    ]);
 
     $(function() {
         ko.applyBindings(viewModel);
 
         var idx = 2;
         setInterval(function() {
-            blogPosts[0].content = "content" + idx;
+            viewModel.blogPosts()[0].content = ko.observable("content" + idx);
+//            alert(viewModel.blogPosts()[0].content);
+//            viewModel.blogPosts.push(new BlogPost("title", "content" + idx));
             idx++;
         }, 1000);
     });
