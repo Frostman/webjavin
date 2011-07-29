@@ -18,6 +18,7 @@
 
 package ru.frostman.web.aop;
 
+import com.google.common.collect.Lists;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -112,15 +113,23 @@ public class AopEnhancer {
 
                 body.append("$args, new ").append(METHOD_INTERCEPTOR);
 
-                if (methodInterceptors.size() != 0) {
+                List<MethodInterceptor> interceptors = Lists.newLinkedList();
+
+                for (MethodInterceptor interceptor : methodInterceptors) {
+                    if (interceptor.matches(method)) {
+                        interceptors.add(interceptor);
+                    }
+                }
+
+                if (interceptors.size() != 0) {
                     body.append("[]{");
 
                     int i = 0;
-                    for (MethodInterceptor methodInterceptor : methodInterceptors) {
+                    for (MethodInterceptor methodInterceptor : interceptors) {
                         body.append(METHOD_INTERCEPTORS).append(".getInterceptor(\"")
                                 .append(methodInterceptor.getLongName()).append("\")");
 
-                        if (i < methodInterceptors.size() - 1) {
+                        if (i < interceptors.size() - 1) {
                             body.append(", ");
                         }
                         i++;
@@ -139,9 +148,6 @@ public class AopEnhancer {
                 body.append("($r) mi.proceed();");
 
                 method.setBody(body.append("}").toString());
-
-                //todo remove it
-                System.out.println(body.toString());
             }
         } catch (Exception e) {
             throw new JavinRuntimeException(e);

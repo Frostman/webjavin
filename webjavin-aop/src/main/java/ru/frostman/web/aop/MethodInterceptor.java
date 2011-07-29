@@ -18,6 +18,7 @@
 
 package ru.frostman.web.aop;
 
+import javassist.CtMethod;
 import ru.frostman.web.aop.thr.AopException;
 
 import java.lang.reflect.Method;
@@ -65,6 +66,12 @@ public class MethodInterceptor {
             throw new AopException("Exception while invoking method interceptor: "
                     + interceptorClassName + "#" + interceptorMethodName, e);
         }
+    }
+
+    public boolean matches(CtMethod method) {
+        //todo impl
+
+        return true;
     }
 
     public String getInterceptorClassName() {
