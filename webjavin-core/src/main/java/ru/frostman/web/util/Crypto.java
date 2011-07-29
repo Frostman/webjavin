@@ -34,7 +34,7 @@ public class Crypto {
     public static final String HMAC_ALGORITHM = "HmacSHA512";
 
     public static final String STRONG_HASH_ALGORITHM = "SHA-512";
-    public static final String FAST_HASH_ALGORITHM = "MD-5";
+    public static final String FAST_HASH_ALGORITHM = "MD5";
 
     public static String sign(String message) {
         return sign(message, JavinConfig.get().getApp().getSecretBytes());
