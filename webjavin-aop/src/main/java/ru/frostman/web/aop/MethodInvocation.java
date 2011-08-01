@@ -61,7 +61,7 @@ public class MethodInvocation {
     /**
      * Proceeds to the next interceptor in the chain
      *
-     * @return
+     * @return result of invoking next method interceptor or target method
      */
     public Object proceed() {
         MethodInterceptor interceptor;
