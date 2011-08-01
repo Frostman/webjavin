@@ -30,7 +30,6 @@
         <module>webjavin-aop</module>
 
         <module>webjavin-test</module>
-        <module>example-blog</module>
     </modules>
     <packaging>pom</packaging>
 
