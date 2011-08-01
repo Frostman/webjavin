@@ -36,36 +36,6 @@ public class AopEnhancer {
     private static final String METHOD_INTERCEPTORS = "ru.frostman.web.aop.MethodInterceptors";
 
     public static void enhance(ClassPool classPool, CtClass ctClass, List<MethodInterceptor> methodInterceptors) {
-        /*try {
-            //todo make AOP like filters in servlet-api or see AOP libs like guice
-            //todo may be rename real method to $javin$METHOD_NAME
-
-            ctClass.instrument(new ExprEditor() {
-                @Override
-                public void edit(MethodCall methodCall) throws CannotCompileException {
-                    //todo check package, className, methodName, param types == SIGNATURE
-
-                    if (!methodCall.getMethodName().equals("test")) {
-                        return;
-                    }
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("");
-
-                    methodCall.replace(sb.toString());
-                }
-            });
-        } catch (Exception e) {
-            //todo impl
-            throw new JavinRuntimeException(e);
-        }*/
-
-        //move method's code to $javin$methodName method
-        // сделать класс, который будет содержать статический метод, в который нужно передать список
-        // АОП фильтров (интерсепторов) которые по очереди будут вызваны) и этот метод возвражает объект
-        // который показывает нужно ли нам вернуть значение или выполнить реальный метод
-
-
         try {
             for (CtMethod method : ctClass.getDeclaredMethods()) {
                 if (method.getAnnotation(Interceptor.class) != null) {
