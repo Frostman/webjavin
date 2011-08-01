@@ -52,6 +52,7 @@ public class JavinConfig {
     private TemplatesConfig templates = new TemplatesConfig();
     private AppConfig app = new AppConfig();
     private SecureConfig secure = new SecureConfig();
+    private CacheConfig cache = new CacheConfig();
 
     private Map<String, StaticResource> statics = Maps.newLinkedHashMap();
 
@@ -199,6 +200,14 @@ public class JavinConfig {
         this.statics = statics;
     }
 
+    public CacheConfig getCache() {
+        return cache;
+    }
+
+    public void setCache(CacheConfig cache) {
+        this.cache = cache;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof JavinConfig) {
@@ -212,7 +221,8 @@ public class JavinConfig {
                     && Objects.equal(templates, config.templates)
                     && Objects.equal(app, config.app)
                     && Objects.equal(secure, config.secure)
-                    && Objects.equal(statics, config.statics);
+                    && Objects.equal(statics, config.statics)
+                    && Objects.equal(cache, config.cache);
         }
 
         return false;

@@ -26,6 +26,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.Javin;
+import ru.frostman.web.cache.JavinCacheManager;
 import ru.frostman.web.classloading.enhance.Enhancer;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.dispatch.ActionDefinition;
@@ -121,7 +122,8 @@ public class AppClasses {
                 start = System.currentTimeMillis();
             }
 
-            boolean needReload = JavinConfig.update() | JavinSessions.update() | forceReload;
+            boolean needReload = JavinConfig.update() | JavinSessions.update()
+                    | JavinCacheManager.update() | forceReload;
 
             if (forceReload) {
                 forceReload = false;

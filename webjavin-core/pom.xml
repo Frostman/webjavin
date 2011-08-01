@@ -32,14 +32,14 @@
     <name>webjavin-core</name>
 
     <dependencies>
-
+        <!-- Java activation -->
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>1.1.1</version>
         </dependency>
 
-        <!-- Jackson parser -->
+        <!-- JSON -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
@@ -59,18 +59,26 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Javassist -->
+        <!-- Bytecode manipulations -->
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.14.0-GA</version>
         </dependency>
 
-        <!-- Freemarker -->
+        <!-- Templates -->
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.18</version>
+        </dependency>
+
+        <!-- Caching -->
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>2.4.3</version>
+            <type>pom</type>
         </dependency>
 
         <!-- Expression Language -->
