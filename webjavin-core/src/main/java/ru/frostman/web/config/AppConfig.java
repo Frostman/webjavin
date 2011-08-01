@@ -27,10 +27,9 @@ import java.util.UUID;
  * @author slukjanov aka Frostman
  */
 public class AppConfig {
-    private static final String DEFAULT_SECRET = UUID.randomUUID().toString();
+    private static final String RANDOM_SECRET = UUID.randomUUID().toString();
 
-    //todo think about default value and checking user value
-    private String secret = DEFAULT_SECRET;
+    private String secret = RANDOM_SECRET;
     private int asyncQueueLength = 100;
     private int maxForwardsCount = 5;
     private String serverHeader = "WebJavin";
