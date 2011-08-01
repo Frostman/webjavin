@@ -74,4 +74,14 @@ public class Crypto {
             throw new JavinRuntimeException("Exception while calculating hash", e);
         }
     }
+
+    public static String fastHash(String message) {
+        try {
+            MessageDigest messageDigest = MessageDigestPool.get(FAST_HASH_ALGORITHM);
+
+            return Codec.encodeBase64(messageDigest.digest(message.getBytes("utf-8")));
+        } catch (Exception e) {
+            throw new JavinRuntimeException("Exception while calculating hash", e);
+        }
+    }
 }
