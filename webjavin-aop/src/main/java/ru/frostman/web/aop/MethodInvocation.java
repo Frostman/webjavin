@@ -39,12 +39,12 @@ public class MethodInvocation {
     private Class<?>[] argTypes;
 
     private Method method;
+    private Method targetMethod;
 
     private Object[] args;
 
     private LinkedList<MethodInterceptor> interceptors = Lists.newLinkedList();
 
-    //todo think about replacing argTypeNames with argTypes (Class<?>[]) to improve performance (add .class in enhancer)
     public MethodInvocation(String className, Object thisObject, String methodName, Class<?>[] argTypes,
                             Object[] args, MethodInterceptor... interceptors) {
         this.className = className;
@@ -69,7 +69,7 @@ public class MethodInvocation {
             interceptor = interceptors.removeFirst();
         } catch (NoSuchElementException ex) {
             try {
-                return getMethod().invoke(getThis(), getArgs());
+                return getTargetMethod().invoke(getThis(), getArgs());
             } catch (Exception e) {
                 throw new AopException("Exception while invoking target method: "
                         + getClassName() + "#" + getMethodName(), e);
@@ -79,7 +79,7 @@ public class MethodInvocation {
         return interceptor.invoke(this);
     }
 
-    public String getClassName() {
+    private String getClassName() {
         return className;
     }
 
@@ -103,7 +103,7 @@ public class MethodInvocation {
         return thisObject;
     }
 
-    public String getMethodName() {
+    private String getMethodName() {
         return methodName;
     }
 
@@ -113,18 +113,30 @@ public class MethodInvocation {
 
     public Method getMethod() {
         if (method == null) {
-            try {
-                //todo think about prepending $javin$ to method name
-                Method method = getTargetClass().getDeclaredMethod("$javin$" + getMethodName(), getArgTypes());
-                method.setAccessible(true);
-
-                this.method = method;
-            } catch (NoSuchMethodException e) {
-                throw new AopException("Method not found: " + getMethodName() + " " + Arrays.toString(getArgTypes()), e);
-            }
+            method = getMethodByName(getMethodName());
         }
 
         return method;
+    }
+
+    private Method getTargetMethod() {
+        if (targetMethod == null) {
+            targetMethod = getMethodByName("$javin$" + getMethodName());
+        }
+
+        return targetMethod;
+    }
+
+
+    private Method getMethodByName(String methodName) {
+        try {
+            Method method = getTargetClass().getDeclaredMethod(methodName, getArgTypes());
+            method.setAccessible(true);
+
+            return method;
+        } catch (NoSuchMethodException e) {
+            throw new AopException("Method not found: " + getMethodName() + " " + Arrays.toString(getArgTypes()), e);
+        }
     }
 
     public Object[] getArgs() {

@@ -69,9 +69,9 @@ public class MethodInterceptor {
     }
 
     public boolean matches(CtMethod method) {
-        //todo impl
+        //todo impl / currently only method name checked
 
-        return true;
+        return methodPattern.length() == 0 || method.getName().equals(methodPattern);
     }
 
     public String getInterceptorClassName() {
