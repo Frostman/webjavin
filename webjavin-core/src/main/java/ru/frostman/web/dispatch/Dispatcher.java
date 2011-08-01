@@ -109,46 +109,40 @@ public class Dispatcher {
         }
 
         if (requestMethod.equals(HttpMethod.GET))
-            //todo impl caching, think about regexp in statics
+            //todo impl caching in memory, think about regexp in statics
             //todo compile expressions on AppClasses#update
 
             for (Map.Entry<String, StaticResource> entry : JavinConfig.get().getStatics().entrySet()) {
                 String fullUrl = Controllers.url(entry.getKey());
                 if (url.startsWith(fullUrl)) {
                     StaticResource staticResource = entry.getValue();
-                    String resource = Javin.getApplicationPath() + staticResource.getTarget() + "/" + url.substring(fullUrl.length() - 1);
+                    String resource = Javin.getApplicationPath() + staticResource.getTarget()
+                            + "/" + url.substring(fullUrl.length() - 1);
 
                     try {
                         File resourceFile = new File(resource);
 
+                        if (!resourceFile.isFile()) {
+                            continue;
+                        }
+
                         long length = resourceFile.length();
                         long lastModified = resourceFile.lastModified();
-                        String eTag = Crypto.hash(resourceFile.getName() + "_" + length + "_" + lastModified);
+                        String eTag = Crypto.fastHash(resourceFile.getName() + "_" + length + "_" + lastModified);
 
-                        // --- Check headers for caching ---
-                        // If-None-Match header should contain "*" or ETag. If so, then return 304.
-                        String ifNoneMatch = request.getHeader(HEADER_IF_NONE_MATCH);
-                        if (ifNoneMatch != null && (Objects.equal(ifNoneMatch, eTag) || Objects.equal(ifNoneMatch, "*"))) {
-                            sendNotModified(response, eTag);
+                        if (ensureNotModified(request, response, lastModified, eTag)) {
                             return true;
                         }
 
-                        // If-Modified-Since header should be greater than LastModified. If so, then return 304.
-                        // This header is ignored if any If-None-Match header is specified.
-                        long ifModifiedSince = request.getDateHeader(HEADER_IF_MODIFIED_SINCE);
-                        if (ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
-                            sendNotModified(response, eTag);
-                            return true;
-                        }
-
+                        //todo think about fast content types resolving
                         String contentType = MIME_MAP.getContentType(resourceFile);
                         response.setContentType(contentType);
 
                         response.setCharacterEncoding(contentType.startsWith("text") ? "utf-8" : null);
 
+                        // set headers for client side caching
                         response.setHeader(HEADER_E_TAG, eTag);
                         response.setDateHeader(HEADER_LAST_MODIFIED, lastModified);
-
                         response.setDateHeader(HEADER_EXPIRES, System.currentTimeMillis() + staticResource.getExpire());
 
                         FileInputStream resourceStream = new FileInputStream(resourceFile);
@@ -162,6 +156,37 @@ public class Dispatcher {
                     return true;
                 }
             }
+
+        return false;
+    }
+
+    /**
+     * Check headers for client side caching
+     *
+     * @param request      object
+     * @param response     object
+     * @param lastModified time
+     * @param eTag         smth like uid
+     *
+     * @return true iff request processed
+     */
+    private boolean ensureNotModified(HttpServletRequest request, HttpServletResponse response, long lastModified, String eTag) {
+        // If-None-Match header should contain "*" or ETag. If so, then return 304.
+        String ifNoneMatch = request.getHeader(HEADER_IF_NONE_MATCH);
+        if (ifNoneMatch != null && (Objects.equal(ifNoneMatch, eTag) || Objects.equal(ifNoneMatch, "*"))) {
+            sendNotModified(response, eTag);
+
+            return true;
+        }
+
+        // If-Modified-Since header should be greater than LastModified. If so, then return 304.
+        // This header is ignored if any If-None-Match header is specified.
+        long ifModifiedSince = request.getDateHeader(HEADER_IF_MODIFIED_SINCE);
+        if (ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
+            sendNotModified(response, eTag);
+
+            return true;
+        }
 
         return false;
     }
