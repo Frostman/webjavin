@@ -40,6 +40,7 @@ import java.util.Set;
  */
 public class JavinPlugins extends Plugin {
     private static final Logger log = LoggerFactory.getLogger(JavinPlugins.class);
+
     private static Plugin instance;
 
     private final Set<Plugin> plugins;
