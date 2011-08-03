@@ -25,7 +25,6 @@ statics: {
 }
 
 plugins: [
-      "ru.frostman.web.AopPlugin",
       "ru.frostman.web.MongoPlugin",
       "ru.frostman.web.IndigoPlugin"
 ]

@@ -30,7 +30,7 @@ public class TestAOP {
 //    @Interceptor("ru.frostman.web.*#do*(String, *, *) ")
     //@Interceptor("ru.frostman.web.*#*do*(**) ")
     public static Object testInterceptor(MethodInvocation mi) {
-        System.out.println("invoke: " + mi.getMethod());
+        //System.out.println("invoke: " + mi.getMethod());
 
         return mi.proceed();
     }
