@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import javassist.ClassPool;
 import javassist.CtClass;
+import ru.frostman.web.aop.MethodInterceptor;
 import ru.frostman.web.classloading.AppClass;
 
 import java.util.List;
@@ -52,6 +53,10 @@ public abstract class Plugin implements Comparable<Plugin> {
     }
 
     public List<String> getAppClassesPackages() {
+        return Lists.newLinkedList();
+    }
+
+    public List<MethodInterceptor> getPluginsMethodInterceptors() {
         return Lists.newLinkedList();
     }
 

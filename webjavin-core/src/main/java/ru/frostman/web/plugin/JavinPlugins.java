@@ -25,6 +25,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.frostman.web.aop.MethodInterceptor;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.thr.JavinPluginException;
@@ -97,6 +98,7 @@ public class JavinPlugins extends Plugin {
     }
 
     private List<String> appPackages;
+    private List<MethodInterceptor> methodInterceptors;
 
     @Override
     public void onLoad() {
@@ -108,6 +110,7 @@ public class JavinPlugins extends Plugin {
 
                 //todo write in docs that it works like this
                 appPackages.addAll(plugin.getAppClassesPackages());
+                methodInterceptors.addAll(plugin.getPluginsMethodInterceptors());
             } catch (Exception e) {
                 throw new JavinPluginException("Exception while executing onLoad() on plugin with main class: "
                         + plugin.getClass().getName(), e);
@@ -154,5 +157,10 @@ public class JavinPlugins extends Plugin {
     @Override
     public List<String> getAppClassesPackages() {
         return appPackages;
+    }
+
+    @Override
+    public List<MethodInterceptor> getPluginsMethodInterceptors() {
+        return methodInterceptors;
     }
 }
