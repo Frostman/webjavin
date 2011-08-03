@@ -16,32 +16,48 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.classloading.enhance;
+package ru.frostman.web.cache;
 
-import com.google.common.collect.Sets;
-import javassist.ClassPool;
-import javassist.CtClass;
 import javassist.CtMethod;
-import ru.frostman.web.annotation.CacheEvict;
 import ru.frostman.web.annotation.Cacheable;
-
-import java.util.Set;
-
-import static ru.frostman.web.classloading.enhance.EnhancerUtil.getDeclaredMethodsAnnotatedWith;
+import ru.frostman.web.aop.MethodInterceptor;
+import ru.frostman.web.aop.MethodInvocation;
+import ru.frostman.web.thr.JavinRuntimeException;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class CacheEnhancer {
-    public static void enhance(ClassPool classPool, CtClass ctClass) {
+public class CacheableMethodInterceptor extends MethodInterceptor {
 
-        Set<CtMethod> methods = Sets.newLinkedHashSet();
-        methods.addAll(getDeclaredMethodsAnnotatedWith(Cacheable.class, ctClass));
-        methods.addAll(getDeclaredMethodsAnnotatedWith(CacheEvict.class, ctClass));
+    public CacheableMethodInterceptor() {
+        super("webjavin-cacheable-method-interceptor");
+    }
 
+    @Override
+    public Object invoke(MethodInvocation methodInvocation) {
+        return cacheable(methodInvocation);
+    }
 
-        //todo may be rename target method such as in aop
-        //todo may be caching as AOP method interceptor or use such technology of copying methods
-        //todo think about $_ param that available in javassist
+    @Override
+    public boolean matches(CtMethod method) {
+        try {
+            return method.getAnnotation(Cacheable.class) != null;
+        } catch (ClassNotFoundException e) {
+            throw new JavinRuntimeException("Can't load class while matching interceptor for @Cacheable", e);
+        }
+    }
+
+    protected static Object cacheable(MethodInvocation methodInvocation) {
+        Cacheable cacheableAnn = methodInvocation.getMethod().getAnnotation(Cacheable.class);
+        String cacheName = cacheableAnn.value();
+        String cacheKey = cacheableAnn.key();
+        String cacheCondition = cacheableAnn.condition();
+        //todo we need cache it
+
+        //todo !!!! may be create new MethodInterceptor for each annotated method ????
+        //todo it can improve performance but eat more memory
+
+        //todo impl caching
+        return methodInvocation.proceed();
     }
 }

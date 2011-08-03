@@ -19,6 +19,7 @@
 package ru.frostman.web.cache;
 
 import com.google.common.base.Objects;
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
@@ -67,5 +68,7 @@ public class JavinCacheManager {
         return false;
     }
 
-
+    public static Cache getCache(String name) {
+        return manager.getCache(name);
+    }
 }

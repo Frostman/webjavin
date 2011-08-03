@@ -35,5 +35,13 @@ public @interface Cacheable {
      */
     String value() default "";
 
-    //todo think about adding key generation strategies
+    /**
+     * @return key generation string
+     */
+    String key() default "";
+
+    /**
+     * @return condition that should be true to cache
+     */
+    String condition() default "";
 }

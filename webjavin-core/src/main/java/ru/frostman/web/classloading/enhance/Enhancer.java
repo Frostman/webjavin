@@ -94,9 +94,6 @@ public class Enhancer {
         // AOP enhance
         AopEnhancer.enhance(classPool, ctClass, methodInterceptors);
 
-        // enhance auto caching methods
-        CacheEnhancer.enhance(classPool, ctClass);
-
         // enhance security
         SecurityEnhancer.enhance(classPool, ctClass);
 

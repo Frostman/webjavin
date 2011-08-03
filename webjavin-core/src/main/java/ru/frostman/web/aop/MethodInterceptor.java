@@ -21,11 +21,13 @@ package ru.frostman.web.aop;
 import javassist.CtMethod;
 import ru.frostman.web.aop.thr.AopException;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 
 /**
  * @author slukjanov aka Frostman
  */
+//todo make MethodInterceptor interface
 public class MethodInterceptor {
     protected final String interceptorClassName;
     protected final String interceptorMethodName;
@@ -35,7 +37,12 @@ public class MethodInterceptor {
 
     private Method wrapperMethod;
 
-    public MethodInterceptor(String interceptorClassName, String interceptorMethodName, String methodPattern, String longName) {
+    public MethodInterceptor(String longName) {
+        this(null, null, null, longName);
+    }
+
+    public MethodInterceptor(@Nullable String interceptorClassName, @Nullable String interceptorMethodName,
+                             @Nullable String methodPattern, String longName) {
         this.interceptorClassName = interceptorClassName;
         this.interceptorMethodName = interceptorMethodName;
         this.methodPattern = methodPattern;
@@ -74,18 +81,6 @@ public class MethodInterceptor {
         //todo выполнять это выражение лишь один раз при enhancing
 
         return methodPattern.length() == 0 || method.getName().equals(methodPattern);
-    }
-
-    public String getInterceptorClassName() {
-        return interceptorClassName;
-    }
-
-    public String getInterceptorMethodName() {
-        return interceptorMethodName;
-    }
-
-    public String getMethodPattern() {
-        return methodPattern;
     }
 
     public String getLongName() {

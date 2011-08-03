@@ -130,6 +130,7 @@ public class MethodInvocation {
 
     private Method getMethodByName(String methodName) {
         try {
+            //todo cache such methods to improve performance
             Method method = getTargetClass().getDeclaredMethod(methodName, getArgTypes());
             method.setAccessible(true);
 
