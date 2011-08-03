@@ -23,6 +23,8 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import ru.frostman.web.aop.AopEnhancer;
+import ru.frostman.web.aop.MethodInterceptor;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.classloading.AppClasses;
 import ru.frostman.web.dispatch.ActionDefinition;
@@ -67,7 +69,7 @@ public class Enhancer {
     }
 
     public static void enhance(Map<String, AppClass> classes, AppClass appClass,
-                               List<ActionDefinition> actionDefinitions) {
+                               List<ActionDefinition> actionDefinitions, List<MethodInterceptor> methodInterceptors) {
         if (appClass.isGenerated() || appClass.getEnhancedBytecode() != null) {
             return;
         }
@@ -77,7 +79,7 @@ public class Enhancer {
         try {
             CtClass superclass = ctClass.getSuperclass();
             if (classes.containsKey(superclass.getName())) {
-                Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions);
+                Enhancer.enhance(classes, classes.get(superclass.getName()), actionDefinitions, methodInterceptors);
             }
         } catch (NotFoundException e) {
             throw new JavinRuntimeException(e);
@@ -88,6 +90,12 @@ public class Enhancer {
 
         // enhance in plugins
         JavinPlugins.get().enhanceClass(classes, classPool, ctClass);
+
+        // AOP enhance
+        AopEnhancer.enhance(classPool, ctClass, methodInterceptors);
+
+        // enhance auto caching methods
+        CacheEnhancer.enhance(classPool, ctClass);
 
         // enhance security
         SecurityEnhancer.enhance(classPool, ctClass);

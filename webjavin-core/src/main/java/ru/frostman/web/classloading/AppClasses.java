@@ -26,6 +26,8 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.Javin;
+import ru.frostman.web.aop.MethodInterceptor;
+import ru.frostman.web.aop.MethodInterceptors;
 import ru.frostman.web.cache.JavinCacheManager;
 import ru.frostman.web.classloading.enhance.Enhancer;
 import ru.frostman.web.config.JavinConfig;
@@ -219,8 +221,12 @@ public class AppClasses {
 
                 // find actions
                 List<ActionDefinition> actionDefinitions = Lists.newLinkedList();
+
+                // find method interceptors
+                List<MethodInterceptor> methodInterceptors = MethodInterceptors.findInterceptors(classes);
+
                 for (String className : Lists.newLinkedList(classes.keySet())) {
-                    Enhancer.enhance(classes, classes.get(className), actionDefinitions);
+                    Enhancer.enhance(classes, classes.get(className), actionDefinitions, methodInterceptors);
                 }
 
                 // create new class loader and load all app classes

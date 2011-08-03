@@ -55,7 +55,7 @@ public class AopEnhancer {
                 if (Modifier.isStatic(method.getModifiers())) {
                     body.append("null");
                 } else {
-                    body.append("this");
+                    body.append("$0");
                 }
                 body.append(", ");
 

@@ -16,40 +16,32 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web;
+package ru.frostman.web.classloading.enhance;
 
+import com.google.common.collect.Sets;
 import javassist.ClassPool;
 import javassist.CtClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.frostman.web.aop.AopEnhancer;
-import ru.frostman.web.aop.MethodInterceptor;
-import ru.frostman.web.aop.MethodInterceptors;
-import ru.frostman.web.classloading.AppClass;
-import ru.frostman.web.plugin.Plugin;
+import javassist.CtMethod;
+import ru.frostman.web.annotation.CacheEvict;
+import ru.frostman.web.annotation.Cacheable;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
+
+import static ru.frostman.web.classloading.enhance.EnhancerUtil.getDeclaredMethodsAnnotatedWith;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class AopPlugin extends Plugin {
-    private static final Logger log = LoggerFactory.getLogger(AopPlugin.class);
+public class CacheEnhancer {
+    public static void enhance(ClassPool classPool, CtClass ctClass) {
 
-    private List<MethodInterceptor> methodInterceptors;
+        Set<CtMethod> methods = Sets.newLinkedHashSet();
+        methods.addAll(getDeclaredMethodsAnnotatedWith(Cacheable.class, ctClass));
+        methods.addAll(getDeclaredMethodsAnnotatedWith(CacheEvict.class, ctClass));
 
-    public AopPlugin() {
-        super(1);
-    }
 
-    @Override
-    public void beforeClassesEnhance(Map<String, AppClass> classes) {
-        methodInterceptors = MethodInterceptors.findInterceptors(classes);
-    }
-
-    @Override
-    public void enhanceClass(Map<String, AppClass> classes, ClassPool classPool, CtClass ctClass) {
-        AopEnhancer.enhance(classPool, ctClass, methodInterceptors);
+        //todo may be rename target method such as in aop
+        //todo may be caching as AOP method interceptor or use such technology of copying methods
+        //todo think about $_ param that available in javassist
     }
 }

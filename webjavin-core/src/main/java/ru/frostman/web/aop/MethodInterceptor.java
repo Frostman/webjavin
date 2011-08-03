@@ -27,11 +27,11 @@ import java.lang.reflect.Method;
  * @author slukjanov aka Frostman
  */
 public class MethodInterceptor {
-    private final String interceptorClassName;
-    private final String interceptorMethodName;
-    private final String methodPattern;
+    protected final String interceptorClassName;
+    protected final String interceptorMethodName;
+    protected final String methodPattern;
 
-    private final String longName;
+    protected final String longName;
 
     private Method wrapperMethod;
 
@@ -70,6 +70,8 @@ public class MethodInterceptor {
 
     public boolean matches(CtMethod method) {
         //todo impl / currently only method name checked
+        //todo сделать MVEL выражение для фильтрации методов чтобы поддерживать ещё и аннотации и тд
+        //todo выполнять это выражение лишь один раз при enhancing
 
         return methodPattern.length() == 0 || method.getName().equals(methodPattern);
     }
