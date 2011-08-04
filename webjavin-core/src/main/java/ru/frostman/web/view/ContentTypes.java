@@ -23,6 +23,7 @@ package ru.frostman.web.view;
  */
 public class ContentTypes {
     public static final String APPLICATION_JSON = "application/json";
+    public static final String APPLICATION_JS = "application/javascript";
     public static final String TEXT_HTML = "text/html";
 
 }

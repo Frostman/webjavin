@@ -36,7 +36,7 @@ public class JsonpValueView<T> extends View {
     public JsonpValueView(T value, String callback) {
         this.value = value;
         this.callback = callback;
-        this.contentType = ContentTypes.APPLICATION_JSON;
+        this.contentType = ContentTypes.APPLICATION_JS;
         this.characterEncoding = CharacterEncodings.UTF8;
     }
 

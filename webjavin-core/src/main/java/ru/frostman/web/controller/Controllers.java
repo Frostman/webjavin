@@ -109,7 +109,7 @@ public class Controllers {
      *
      * @return view that convert specified value to jsonp
      */
-    public static <T> View json(T value, String callback) {
+    public static <T> View jsonp(T value, String callback) {
         return new JsonpValueView<T>(value, callback);
     }
 

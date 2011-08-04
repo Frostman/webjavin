@@ -103,6 +103,7 @@ public class JavinPlugins extends Plugin {
     @Override
     public void onLoad() {
         appPackages = Lists.newLinkedList();
+        methodInterceptors = Lists.newLinkedList();
 
         for (Plugin plugin : plugins) {
             try {
