@@ -46,7 +46,7 @@ public class Json {
         return writer.toString();
     }
 
-    private static void renderMapToJson(Map<String, Object> map, Writer writer) {
+    public static void renderMapToJson(Map<String, Object> map, Writer writer) {
         try {
             for (String key : generatedProperties) {
                 map.remove(key);
@@ -64,6 +64,13 @@ public class Json {
 
     public static void renderModelToJson(Model model, Writer writer) {
         renderMapToJson(model.toMap(), writer);
+    }
+
+    public static String renderValueToJson(Object value) {
+        StringWriter writer = new StringWriter();
+        renderValueToJson(value, writer);
+
+        return writer.toString();
     }
 
     public static void renderValueToJson(Object value, Writer writer) {

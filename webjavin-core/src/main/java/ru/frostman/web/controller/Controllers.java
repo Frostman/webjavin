@@ -24,6 +24,7 @@ import ru.frostman.web.view.ForwardView;
 import ru.frostman.web.view.RedirectView;
 import ru.frostman.web.view.json.JsonModelView;
 import ru.frostman.web.view.json.JsonValueView;
+import ru.frostman.web.view.json.JsonpValueView;
 
 /**
  * Helper class that provides some methods to work with Views, Models,
@@ -99,6 +100,17 @@ public class Controllers {
      */
     public static <T> View json(T value) {
         return new JsonValueView<T>(value);
+    }
+
+    /**
+     * @param value to convert to jsonp
+     * @param callback to use in jsonp
+     * @param <T>   value type
+     *
+     * @return view that convert specified value to jsonp
+     */
+    public static <T> View json(T value, String callback) {
+        return new JsonpValueView<T>(value, callback);
     }
 
     /**
