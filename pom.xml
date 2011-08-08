@@ -63,9 +63,9 @@
         </repository>
 
         <repository>
-            <id>frostman-repo</id>
-            <name>Frostman Maven Repository</name>
-            <url>http://m2.frostman.ru/snapshot</url>
+            <id>webjavin-repo</id>
+            <name>WebJavin Maven Repository</name>
+            <url>https://raw.github.com/Frostman/webjavin.repo/master/snapshot</url>
         </repository>
     </repositories>
 
@@ -151,11 +151,11 @@
     <distributionManagement>
         <repository>
             <id>repository</id>
-            <url>file:../webjavin-repo/release/</url>
+            <url>file:../webjavin.repo/release/</url>
         </repository>
         <snapshotRepository>
             <id>snapshot-repository</id>
-            <url>file:../webjavin-repo/snapshot/</url>
+            <url>file:../webjavin.repo/snapshot/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
