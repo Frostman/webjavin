@@ -11,7 +11,7 @@ classes:
       updateInterval: 500
 
 templates:
-      path: "/WEB-INF/view"
+      path: "/view"
 
 statics: {
       "/static/": {
