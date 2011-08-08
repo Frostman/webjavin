@@ -40,7 +40,8 @@ public abstract class Plugin implements Comparable<Plugin> {
         this.weight = weight;
     }
 
-    public void onLoad() {
+    public boolean reload() {
+        return false;
     }
 
     public void beforeClassesEnhance(Map<String, AppClass> classes) {

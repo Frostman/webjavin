@@ -28,10 +28,10 @@ import com.mongodb.Mongo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.mongo.config.MongoConfig;
 import ru.frostman.web.mongo.secure.LoginPasswordCredentials;
 import ru.frostman.web.mongo.secure.User;
 import ru.frostman.web.mongo.secure.UserRole;
-import ru.frostman.web.mongo.config.MongoConfig;
 import ru.frostman.web.plugin.Plugin;
 import ru.frostman.web.thr.JavinRuntimeException;
 
@@ -54,13 +54,13 @@ public class MongoPlugin extends Plugin {
     }
 
     @Override
-    public void onLoad() {
+    public boolean reload() {
         if (firstLoad) {
             MorphiaLoggerFactory.registerLogger(SLF4JLogrImplFactory.class);
             firstLoad = false;
         }
 
-        MongoConfig.update();
+        return MongoConfig.update();
     }
 
     @Override

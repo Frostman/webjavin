@@ -18,6 +18,7 @@
 
 package ru.frostman.web.plugin;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -42,52 +43,58 @@ import java.util.Set;
 public class JavinPlugins extends Plugin {
     private static final Logger log = LoggerFactory.getLogger(JavinPlugins.class);
 
-    private static Plugin instance;
+    private static JavinPlugins instance;
+
+    private final List<String> loadedPlugins;
 
     private final Set<Plugin> plugins;
 
-    private JavinPlugins(Set<Plugin> plugins) {
+    private JavinPlugins(List<String> loadedPlugins, Set<Plugin> plugins) {
         super(0);
 
+        this.loadedPlugins = loadedPlugins;
         this.plugins = plugins;
     }
 
     /**
      * Reload all Javin plugins and return aggregated plugin to run some handlers.
      *
-     * @return aggregated plugin to run handlers
+     * @return true if app classes should be reloaded
      */
-    public static Plugin reload() {
-        List<String> pluginClassNames = JavinConfig.get().getPlugins();
+    public static boolean update() {
+        if (instance != null && Objects.equal(instance.loadedPlugins, JavinConfig.get().getPlugins())) {
+            return instance.reload();
+        } else {
+            List<String> pluginClassNames = JavinConfig.get().getPlugins();
 
-        Set<Plugin> newPlugins = Sets.newTreeSet();
-        for (String pluginClassName : pluginClassNames) {
-            Class pluginRawClass;
-            try {
-                pluginRawClass = Class.forName(pluginClassName);
-            } catch (ClassNotFoundException e) {
-                log.warn("Unable to load plugin with main class: " + pluginClassName);
-                continue;
-            }
-
-            if (Plugin.class.isAssignableFrom(pluginRawClass)) {
-                Plugin plugin;
+            Set<Plugin> newPlugins = Sets.newTreeSet();
+            for (String pluginClassName : pluginClassNames) {
+                Class pluginRawClass;
                 try {
-                    plugin = (Plugin) pluginRawClass.newInstance();
-                } catch (Exception e) {
-                    throw new JavinPluginException("Exception while instantiating plugin with main class: " + pluginClassName, e);
+                    pluginRawClass = Class.forName(pluginClassName);
+                } catch (ClassNotFoundException e) {
+                    log.warn("Unable to load plugin with main class: " + pluginClassName);
+                    continue;
                 }
 
-                newPlugins.add(plugin);
-            } else {
-                throw new JavinPluginException("There is class not inherited from Plugin in plugins list: " + pluginClassName);
+                if (Plugin.class.isAssignableFrom(pluginRawClass)) {
+                    Plugin plugin;
+                    try {
+                        plugin = (Plugin) pluginRawClass.newInstance();
+                    } catch (Exception e) {
+                        throw new JavinPluginException("Exception while instantiating plugin with main class: " + pluginClassName, e);
+                    }
+
+                    newPlugins.add(plugin);
+                } else {
+                    throw new JavinPluginException("There is class not inherited from Plugin in plugins list: " + pluginClassName);
+                }
             }
+
+            instance = new JavinPlugins(pluginClassNames, ImmutableSortedSet.copyOf(newPlugins));
+
+            return instance.reload();
         }
-
-        instance = new JavinPlugins(ImmutableSortedSet.copyOf(newPlugins));
-        instance.onLoad();
-
-        return instance;
     }
 
     /**
@@ -101,22 +108,25 @@ public class JavinPlugins extends Plugin {
     private List<MethodInterceptor> methodInterceptors;
 
     @Override
-    public void onLoad() {
+    public boolean reload() {
         appPackages = Lists.newLinkedList();
         methodInterceptors = Lists.newLinkedList();
+        boolean result = false;
 
         for (Plugin plugin : plugins) {
             try {
-                plugin.onLoad();
+                result |= plugin.reload();
 
                 //todo write in docs that it works like this
                 appPackages.addAll(plugin.getAppClassesPackages());
                 methodInterceptors.addAll(plugin.getPluginsMethodInterceptors());
             } catch (Exception e) {
-                throw new JavinPluginException("Exception while executing onLoad() on plugin with main class: "
+                throw new JavinPluginException("Exception while executing update() on plugin with main class: "
                         + plugin.getClass().getName(), e);
             }
         }
+
+        return result;
     }
 
     @Override

@@ -124,16 +124,24 @@ public class AppClasses {
                 start = System.currentTimeMillis();
             }
 
-            boolean needReload = JavinConfig.update() | JavinSessions.update()
-                    | JavinCacheManager.update() | forceReload;
+            boolean needReload = false;
+
+            // update application configuration
+            needReload |= JavinConfig.update();
+
+            // update application session manager
+            needReload |= JavinSessions.update();
+
+            // update application cache manager
+            needReload |= JavinCacheManager.update();
+
+            // update plugins
+            needReload |= JavinPlugins.update();
 
             if (forceReload) {
+                needReload = true;
                 forceReload = false;
             }
-
-            // load plugins
-            //todo about not reloading plugins if nothing changes
-            JavinPlugins.reload();
 
             List<String> packageNames = Lists.newLinkedList();
             packageNames.addAll(JavinConfig.get().getClasses().getPackages());
@@ -259,8 +267,6 @@ public class AppClasses {
         } catch (Throwable th) {
             forceReload = true;
             throw new JavinRuntimeException(th);
-
-            //todo think about unlocking UPDATE_LOCK here
         } finally {
             lastUpdate = System.currentTimeMillis();
             UPDATE_LOCK.unlock();
