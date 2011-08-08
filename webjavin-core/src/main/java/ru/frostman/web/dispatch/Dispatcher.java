@@ -28,9 +28,9 @@ import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.NotFoundException;
 import ru.frostman.web.util.Crypto;
 import ru.frostman.web.util.HttpMethod;
+import ru.frostman.web.util.MimeTypes;
 import ru.frostman.web.util.Resources;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -44,8 +44,6 @@ import java.util.Map;
  * @author slukjanov aka Frostman
  */
 public class Dispatcher {
-    private static final MimetypesFileTypeMap MIME_MAP = new MimetypesFileTypeMap();
-
     private static final String HEADER_IF_NONE_MATCH = "If-None-Match";
     private static final String HEADER_E_TAG = "ETag";
     private static final String HEADER_IF_MODIFIED_SINCE = "If-Modified-Since";
@@ -53,12 +51,6 @@ public class Dispatcher {
     private static final String HEADER_EXPIRES = "Expires";
 
     public static final long DEFAULT_EXPIRE_TIME = 604800000L; // 1 week
-
-    static {
-        MIME_MAP.addMimeTypes("application/javascript js");
-        MIME_MAP.addMimeTypes("text/css css");
-        MIME_MAP.addMimeTypes("image/png png");
-    }
 
     private final List<ActionDefinition> actions;
 
@@ -133,8 +125,7 @@ public class Dispatcher {
                             return true;
                         }
 
-                        //todo think about fast content types resolving
-                        String contentType = MIME_MAP.getContentType(resourceFile);
+                        String contentType = MimeTypes.getContentType(resourceFile.getName());
                         response.setContentType(contentType);
 
                         response.setCharacterEncoding(contentType.startsWith("text") ? "utf-8" : null);

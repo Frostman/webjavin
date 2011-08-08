@@ -32,12 +32,12 @@
     <name>webjavin-core</name>
 
     <dependencies>
-
-        <!-- Java activation -->
+        <!--Servlet API-->
         <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1.1</version>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>3.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- JSON -->
@@ -50,14 +50,6 @@
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.8.3</version>
-        </dependency>
-
-        <!--Servlet API-->
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>3.0</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Bytecode manipulations -->
