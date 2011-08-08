@@ -16,11 +16,11 @@ templates:
 statics: {
       "/static/": {
             "secure": "",
-            "target": "/WEB-INF/static"
+            "target": "/static"
       },
       "/images/": {
             "secure": "",
-            "target": "/WEB-INF/static/images"
+            "target": "/static/images"
       }
 }
 
