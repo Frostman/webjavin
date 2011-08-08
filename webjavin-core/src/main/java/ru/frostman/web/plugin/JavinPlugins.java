@@ -117,7 +117,6 @@ public class JavinPlugins extends Plugin {
             try {
                 result |= plugin.reload();
 
-                //todo write in docs that it works like this
                 appPackages.addAll(plugin.getAppClassesPackages());
                 methodInterceptors.addAll(plugin.getPluginsMethodInterceptors());
             } catch (Exception e) {

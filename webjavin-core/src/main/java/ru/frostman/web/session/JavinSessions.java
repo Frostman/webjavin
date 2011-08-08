@@ -18,6 +18,7 @@
 
 package ru.frostman.web.session;
 
+import com.google.common.base.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.config.JavinConfig;
@@ -32,10 +33,15 @@ import javax.servlet.http.HttpServletResponse;
 public class JavinSessions {
     private static final Logger log = LoggerFactory.getLogger(JavinSessions.class);
 
+    private static String currentSessionManager;
     private static SessionManager sessionManager;
 
     public static boolean update() {
         String sessionManagerName = JavinConfig.get().getApp().getSessionManager();
+
+        if (Objects.equal(currentSessionManager, sessionManagerName) && sessionManager != null && sessionManager.update()) {
+            return false;
+        }
 
         Class<?> sessionManagerClass;
         try {
@@ -53,9 +59,9 @@ public class JavinSessions {
         } else {
             throw new JavinRuntimeException("Specified session manager isn't inherited from SessionManager: " + sessionManagerName);
         }
+        currentSessionManager = sessionManagerName;
 
-        //todo think about this
-        return false;
+        return true;
     }
 
     public static JavinSession getSession(HttpServletRequest request, HttpServletResponse response) {

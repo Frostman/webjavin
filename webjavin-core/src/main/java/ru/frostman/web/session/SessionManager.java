@@ -34,4 +34,5 @@ public abstract class SessionManager {
 
     public abstract JavinSession getSession(HttpServletRequest request, HttpServletResponse response, boolean create);
 
+    public abstract boolean update();
 }

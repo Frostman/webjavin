@@ -64,6 +64,11 @@ public class InMemorySessionManager extends SessionManager {
         return session;
     }
 
+    @Override
+    public boolean update() {
+        return false;
+    }
+
     protected void removeSession(InMemorySession session) {
         sessions.remove(session.getId());
     }

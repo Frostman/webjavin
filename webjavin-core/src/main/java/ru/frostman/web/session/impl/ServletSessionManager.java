@@ -41,4 +41,9 @@ public class ServletSessionManager extends SessionManager {
         HttpSession session = request.getSession(create);
         return session == null ? null : new ServletSession(session);
     }
+
+    @Override
+    public boolean update() {
+        return false;
+    }
 }
