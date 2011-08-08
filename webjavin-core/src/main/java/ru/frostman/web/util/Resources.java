@@ -31,10 +31,24 @@ import java.net.URL;
 public class Resources {
     private static final ClassLoader MAIN_CLASS_LOADER = Javin.class.getClassLoader();
 
+    /**
+     * Returns stream of the specified resource using ClassLoader that loads Javin class.
+     *
+     * @param name of the resource
+     *
+     * @return stream of the resource
+     */
     public static InputStream getResourceAsStream(String name) {
         return MAIN_CLASS_LOADER.getResourceAsStream(name);
     }
 
+    /**
+     * Returns file of the specified resource using ClassLoader that loads Javin class.
+     *
+     * @param name of the resource
+     *
+     * @return file of the resource
+     */
     public static File getResourceAsFile(String name) {
         URL url = MAIN_CLASS_LOADER.getResource(name);
         if (url == null) {
