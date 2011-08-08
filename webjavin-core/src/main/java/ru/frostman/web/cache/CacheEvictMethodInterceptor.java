@@ -27,11 +27,9 @@ import ru.frostman.web.thr.JavinRuntimeException;
 /**
  * @author slukjanov aka Frostman
  */
-public class CacheEvictMethodInterceptor extends MethodInterceptor {
+public class CacheEvictMethodInterceptor implements MethodInterceptor {
 
-    public CacheEvictMethodInterceptor() {
-        super("webjavin-cache-evict-method-interceptor");
-    }
+    private static final String name = "webjavin-cache-evict-method-interceptor";
 
     @Override
     public Object invoke(MethodInvocation methodInvocation) {
@@ -52,5 +50,10 @@ public class CacheEvictMethodInterceptor extends MethodInterceptor {
 
         //todo impl
         return methodInvocation.proceed();
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

@@ -65,7 +65,7 @@ public class MethodInterceptors {
 
                     Interceptor interceptorAnn = (Interceptor) method.getAnnotation(Interceptor.class);
 
-                    MethodInterceptor interceptor = new MethodInterceptor(ctClass.getName(), method.getName(), interceptorAnn.value(), longName);
+                    AopMethodInterceptor interceptor = new AopMethodInterceptor(ctClass.getName(), method.getName(), interceptorAnn.value(), longName);
                     interceptorsCache.put(longName, interceptor);
 
                     methodInterceptors.add(interceptor);

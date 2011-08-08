@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class AopEnhancer {
     private static final String METHOD_INVOCATION = "ru.frostman.web.aop.MethodInvocation";
-    private static final String METHOD_INTERCEPTOR = "ru.frostman.web.aop.MethodInterceptor";
+    private static final String METHOD_INTERCEPTOR = "ru.frostman.web.aop.AopMethodInterceptor";
     private static final String METHOD_INTERCEPTORS = "ru.frostman.web.aop.MethodInterceptors";
 
     public static void enhance(ClassPool classPool, CtClass ctClass, List<MethodInterceptor> methodInterceptors) {
@@ -97,7 +97,7 @@ public class AopEnhancer {
                     int i = 0;
                     for (MethodInterceptor methodInterceptor : interceptors) {
                         body.append(METHOD_INTERCEPTORS).append(".getInterceptor(\"")
-                                .append(methodInterceptor.getLongName()).append("\")");
+                                .append(methodInterceptor.getName()).append("\")");
 
                         if (i < interceptors.size() - 1) {
                             body.append(", ");

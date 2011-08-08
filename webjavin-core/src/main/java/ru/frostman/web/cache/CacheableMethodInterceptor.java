@@ -27,11 +27,9 @@ import ru.frostman.web.thr.JavinRuntimeException;
 /**
  * @author slukjanov aka Frostman
  */
-public class CacheableMethodInterceptor extends MethodInterceptor {
+public class CacheableMethodInterceptor implements MethodInterceptor {
 
-    public CacheableMethodInterceptor() {
-        super("webjavin-cacheable-method-interceptor");
-    }
+    private static final String name = "webjavin-cacheable-method-interceptor";
 
     @Override
     public Object invoke(MethodInvocation methodInvocation) {
@@ -54,10 +52,15 @@ public class CacheableMethodInterceptor extends MethodInterceptor {
         String cacheCondition = cacheableAnn.condition();
         //todo we need cache it
 
-        //todo !!!! may be create new MethodInterceptor for each annotated method ????
+        //todo !!!! may be create new AopMethodInterceptor for each annotated method ????
         //todo it can improve performance but eat more memory
 
         //todo impl caching
         return methodInvocation.proceed();
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }
