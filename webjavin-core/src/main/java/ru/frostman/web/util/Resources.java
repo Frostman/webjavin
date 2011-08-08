@@ -16,36 +16,35 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.classloading;
+package ru.frostman.web.util;
 
-import com.google.common.io.ByteStreams;
-import ru.frostman.web.thr.JavinRuntimeException;
-import ru.frostman.web.util.Resources;
+import ru.frostman.web.Javin;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class StaticClassFile extends ClassFile {
+public class Resources {
+    private static final ClassLoader MAIN_CLASS_LOADER = Javin.class.getClassLoader();
 
-    public StaticClassFile(String className) {
-        super(className, null);
+    public static InputStream getResourceAsStream(String name) {
+        return MAIN_CLASS_LOADER.getResourceAsStream(name);
+    }
 
-        String realPath = className.replace('.', '/') + ".class";
-        try {
-            bytes = ByteStreams.toByteArray(Resources.getResourceAsStream(realPath));
-        } catch (IOException e) {
-            throw new JavinRuntimeException("Can't read bytecode of class: " + className);
+    public static File getResourceAsFile(String name) {
+        URL url = MAIN_CLASS_LOADER.getResource(name);
+        if (url == null) {
+            return null;
         }
-    }
 
-    @Override
-    public long getLastModified() {
-        return 0;
-    }
-
-    public String getHashCode() {
-        return className;
+        try {
+            return new File(url.toURI());
+        } catch (URISyntaxException e) {
+            return null;
+        }
     }
 }

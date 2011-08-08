@@ -21,7 +21,6 @@ package ru.frostman.web.dispatch;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
-import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.config.StaticResource;
 import ru.frostman.web.controller.Controllers;
@@ -29,6 +28,7 @@ import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.NotFoundException;
 import ru.frostman.web.util.Crypto;
 import ru.frostman.web.util.HttpMethod;
+import ru.frostman.web.util.Resources;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
@@ -116,11 +116,10 @@ public class Dispatcher {
                 String fullUrl = Controllers.url(entry.getKey());
                 if (url.startsWith(fullUrl)) {
                     StaticResource staticResource = entry.getValue();
-                    String resource = Javin.getApplicationPath() + staticResource.getTarget()
-                            + "/" + url.substring(fullUrl.length() - 1);
+                    String resourceName = staticResource.getTarget() + "/" + url.substring(fullUrl.length() - 1);
 
                     try {
-                        File resourceFile = new File(resource);
+                        File resourceFile = Resources.getResourceAsFile(resourceName);
 
                         if (!resourceFile.isFile()) {
                             continue;
@@ -150,7 +149,7 @@ public class Dispatcher {
                     } catch (FileNotFoundException e) {
                         continue;
                     } catch (IOException e) {
-                        throw new JavinRuntimeException("Exception while sending static resource", e);
+                        throw new JavinRuntimeException("Exception while sending static resourceName", e);
                     }
 
                     return true;

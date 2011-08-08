@@ -18,7 +18,10 @@
 
 package ru.frostman.web.view;
 
-import freemarker.cache.*;
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.MruCacheStorage;
+import freemarker.cache.MultiTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,6 @@ import ru.frostman.web.controller.View;
 import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.view.freemarker.FreemarkerView;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -63,15 +65,11 @@ public class AppViews {
         log.debug("Freemarker :: MRU cache {} -- {}", maxStrongSize, maxSoftSize);
 
         try {
-            File appTemplatesPath = new File(Javin.getApplicationPath() + JavinConfig.get().getTemplates().getPath());
-            FileTemplateLoader appTemplateLoader = new FileTemplateLoader(appTemplatesPath);
-
-            log.debug("Freemarker :: application templates path: {}", appTemplatesPath);
-
+            ClassTemplateLoader appTemplateLoader = new ClassTemplateLoader(Javin.class, JavinConfig.get().getTemplates().getPath());
             ClassTemplateLoader pluginsTemplateLoader = new ClassTemplateLoader(Javin.class, JAVIN_PLUGINS_VIEW);
 
             freemarker.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{appTemplateLoader, pluginsTemplateLoader}));
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new JavinRuntimeException("Exception while initializing AppViews", e);
         }
 
