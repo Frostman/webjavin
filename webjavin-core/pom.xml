@@ -44,19 +44,19 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>1.8.3</version>
+            <version>1.8.5</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.8.3</version>
+            <version>1.8.5</version>
         </dependency>
 
         <!-- Bytecode manipulations -->
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.14.0-GA</version>
+            <version>3.15.0-GA</version>
         </dependency>
 
         <!-- Templates -->
