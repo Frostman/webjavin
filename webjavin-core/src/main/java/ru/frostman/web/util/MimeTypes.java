@@ -18,119 +18,111 @@
 
 package ru.frostman.web.util;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
+
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
 public class MimeTypes {
-    private static final BiMap<String, String> TYPES = HashBiMap.create();
-    private static final BiMap<String, String> TYPES_INVERSE = TYPES.inverse();
+    private static final Map<String, String> TYPES = Maps.newLinkedHashMap();
     private static final String DEFAULT_TYPE = "text/plain";
 
     static {
-        // Default javax.activation mime types
+        TYPES.put("htm", "text/html");
+        TYPES.put("html", "text/html");
 
-        TYPES.put("text/html", "htm");
-        TYPES.put("text/html", "html");
+        TYPES.put("txt", "text/plain");
+        TYPES.put("text", "text/plain");
 
-        TYPES.put("text/plain", "txt");
-        TYPES.put("text/plain", "text");
+        TYPES.put("gif", "image/gif");
 
-        TYPES.put("image/gif", "gif");
+        TYPES.put("ief", "image/ief");
 
-        TYPES.put("image/ief", "ief");
+        TYPES.put("jpg", "image/jpeg");
+        TYPES.put("jpeg", "image/jpeg");
 
-        TYPES.put("image/jpeg", "jpg");
-        TYPES.put("image/jpeg", "jpeg");
+        TYPES.put("tif", "image/tiff");
+        TYPES.put("tiff", "image/tiff");
 
-        TYPES.put("image/tiff", "tif");
-        TYPES.put("image/tiff", "tiff");
+        TYPES.put("png", "image/png");
 
-        TYPES.put("image/png", "png");
+        TYPES.put("ai", "application/postscript");
+        TYPES.put("eps", "application/postscript");
+        TYPES.put("ps", "application/postscript");
 
-        TYPES.put("image/x-xwindowdump", "xwd");
+        TYPES.put("rtf", "application/rtf");
 
-        TYPES.put("application/postscript", "ai");
-        TYPES.put("application/postscript", "eps");
-        TYPES.put("application/postscript", "ps");
+        TYPES.put("tex", "application/x-tex");
 
-        TYPES.put("application/rtf", "rtf");
+        TYPES.put("texi", "application/x-texinfo");
+        TYPES.put("texinfo", "application/x-texinfo");
 
-        TYPES.put("application/x-tex", "tex");
+        TYPES.put("au", "audio/basic");
 
-        TYPES.put("application/x-texinfo", "texi");
-        TYPES.put("application/x-texinfo", "texinfo");
+        TYPES.put("mid", "audio/midi");
+        TYPES.put("midi", "audio/midi");
 
-        TYPES.put("application/x-troff", "t");
-        TYPES.put("application/x-troff", "tr");
-        TYPES.put("application/x-troff", "roff");
+        TYPES.put("aifc", "audio/x-aifc");
 
-        TYPES.put("audio/basic", "au");
+        TYPES.put("aif", "audio/x-aiff");
+        TYPES.put("aiff", "audio/x-aiff");
 
-        TYPES.put("audio/midi", "mid");
-        TYPES.put("audio/midi", "midi");
+        TYPES.put("mpg", "audio/x-mpeg");
+        TYPES.put("mpeg", "audio/x-mpeg");
 
-        TYPES.put("audio/x-aifc", "aifc");
+        TYPES.put("wav", "audio/x-wav");
 
-        TYPES.put("audio/x-aiff", "aif");
-        TYPES.put("audio/x-aiff", "aiff");
+        TYPES.put("mpe", "video/mpeg");
+        TYPES.put("mpg", "video/mpeg");
+        TYPES.put("mpeg", "video/mpeg");
 
-        TYPES.put("audio/x-mpeg", "mpg");
-        TYPES.put("audio/x-mpeg", "mpeg");
+        TYPES.put("qt", "video/quicktime");
+        TYPES.put("mov", "video/quicktime");
 
-        TYPES.put("audio/x-wav", "wav");
+        TYPES.put("avi", "video/x-msvideo");
 
-        TYPES.put("video/mpeg", "mpg");
-        TYPES.put("video/mpeg", "mpeg");
-        TYPES.put("video/mpeg", "mpe");
+        TYPES.put("css", "text/css");
 
-        TYPES.put("video/quicktime", "qt");
-        TYPES.put("video/quicktime", "mov");
+        TYPES.put("csv", "text/csv");
 
-        TYPES.put("video/x-msvideo", "avi");
+        TYPES.put("png", "image/x-png");
 
-        // additional mime types
+        TYPES.put("bmp", "image/x-ms-bmp");
 
-        TYPES.put("text/css", "css");
-        TYPES.put("text/csv", "csv");
+        TYPES.put("rtf", "application/rtf");
 
-        TYPES.put("image/x-png", "png");
+        TYPES.put("pdf", "application/pdf");
 
-        TYPES.put("image/x-ms-bmp", "bmp");
+        TYPES.put("latex", "application/x-latex");
 
-        TYPES.put("application/rtf", "rtf");
-        TYPES.put("application/pdf", "pdf");
+        TYPES.put("tar", "application/x-tar");
+        TYPES.put("gtar", "application/x-gtar");
+        TYPES.put("ustar", "application/x-ustar");
 
-        TYPES.put("application/x-latex", "latex");
+        TYPES.put("zip", "application/zip");
 
-        TYPES.put("application/x-tar", "tar");
-        TYPES.put("application/x-gtar", "gtar");
-        TYPES.put("application/x-ustar", "ustar");
+        TYPES.put("uu", "application/octet-stream");
+        TYPES.put("bin", "application/octet-stream");
+        TYPES.put("com", "application/octet-stream");
+        TYPES.put("exe", "application/octet-stream");
 
-        TYPES.put("application/zip", "zip");
-
-        TYPES.put("application/octet-stream", "uu");
-        TYPES.put("application/octet-stream", "bin");
-        TYPES.put("application/octet-stream", "com");
-        TYPES.put("application/octet-stream", "exe");
-
-        TYPES.put("application/javascript", "js");
+        TYPES.put("js", "application/javascript");
     }
 
     public static String addContentType(String type, String extension) {
-        return TYPES.put(type, extension);
+        return TYPES.put(extension, type);
     }
 
-    public static String removeContentType(String type) {
-        return TYPES.remove(type);
+    public static String removeContentTypeByExtension(String extension) {
+        return TYPES.remove(extension);
     }
 
     public static String getContentType(String resourceName) {
         int dotPos = resourceName.lastIndexOf('.');
         String extension = resourceName.substring(dotPos + 1);
-        String type = TYPES_INVERSE.get(extension.toLowerCase());
+        String type = TYPES.get(extension.toLowerCase());
 
         return type != null ? type : DEFAULT_TYPE;
     }
