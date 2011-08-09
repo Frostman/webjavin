@@ -18,9 +18,39 @@
 
 package ru.frostman.web.util;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.*;
+
 /**
  * @author slukjanov aka Frostman
  */
-public class Url {
+public class ResourcesTest {
 
+    private static final String TEST_FILE = "test.file";
+
+    private void checkResource(InputStream inputStream) throws IOException {
+        Assert.assertNotNull(inputStream);
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+        Assert.assertEquals("test", br.readLine().trim());
+    }
+
+
+    @Test
+    public void testGetResourceAsStream() throws IOException {
+        checkResource(Resources.getResourceAsStream(TEST_FILE));
+    }
+
+    @Test
+    public void testGetResourceAsFile() throws IOException {
+        File file = Resources.getResourceAsFile(TEST_FILE);
+
+        Assert.assertNotNull(file);
+        Assert.assertTrue(file.isFile());
+
+        checkResource(new FileInputStream(file));
+    }
 }

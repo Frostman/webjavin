@@ -52,8 +52,6 @@ public class MimeTypes {
         TYPES.put("eps", "application/postscript");
         TYPES.put("ps", "application/postscript");
 
-        TYPES.put("rtf", "application/rtf");
-
         TYPES.put("tex", "application/x-tex");
 
         TYPES.put("texi", "application/x-texinfo");
@@ -69,9 +67,6 @@ public class MimeTypes {
         TYPES.put("aif", "audio/x-aiff");
         TYPES.put("aiff", "audio/x-aiff");
 
-        TYPES.put("mpg", "audio/x-mpeg");
-        TYPES.put("mpeg", "audio/x-mpeg");
-
         TYPES.put("wav", "audio/x-wav");
 
         TYPES.put("mpe", "video/mpeg");
@@ -86,8 +81,6 @@ public class MimeTypes {
         TYPES.put("css", "text/css");
 
         TYPES.put("csv", "text/csv");
-
-        TYPES.put("png", "image/x-png");
 
         TYPES.put("bmp", "image/x-ms-bmp");
 
@@ -127,4 +120,7 @@ public class MimeTypes {
         return type != null ? type : DEFAULT_TYPE;
     }
 
+    public static String getDefaultType() {
+        return DEFAULT_TYPE;
+    }
 }
