@@ -23,7 +23,7 @@
     <parent>
         <groupId>ru.frostman.web</groupId>
         <artifactId>webjavin-parent</artifactId>
-        <version>0.1</version>
+        <version>0.1.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>webjavin-core</artifactId>
