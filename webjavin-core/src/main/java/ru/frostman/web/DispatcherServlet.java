@@ -45,19 +45,25 @@ public class DispatcherServlet extends HttpServlet {
 
             if (Javin.getMode().isDevelopmentMode()) {
                 Javin.getClasses().update();
+                Javin.getClasses().checkSession(request, response);
             }
 
             JavinSessions.checkSession(request, response);
-            Javin.getClasses().checkSession(request, response);
 
             Javin.getClasses().getDispatcher()
                     .dispatch(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()), request, response);
 
-            Javin.getClasses().attachUuid(request, response);
+            if (Javin.getMode().isDevelopmentMode()) {
+                Javin.getClasses().attachUuid(request, response);
+            }
         } catch (Throwable th) {
             try {
                 log.debug("Sending error: ", th);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, th.getMessage());
+                if (Javin.getMode().isDevelopmentMode()) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, th.getMessage());
+                } else {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                }
             } catch (IOException e) {
                 log.warn("Exception while sending error (" + th.getMessage() + "): ", e);
             }

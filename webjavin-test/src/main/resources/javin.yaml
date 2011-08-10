@@ -8,18 +8,15 @@ classes:
           "ru.frostman.web.test",
           "ru.frostman.web.test2"
       ]
-      updateInterval: 500
 
 templates:
       path: "/view"
 
 statics: {
       "/static/": {
-            "secure": "",
             "target": "/static"
       },
       "/images/": {
-            "secure": "",
             "target": "/static/images"
       }
 }

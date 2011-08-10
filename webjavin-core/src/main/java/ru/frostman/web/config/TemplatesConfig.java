@@ -24,12 +24,30 @@ import com.google.common.base.Objects;
  * @author slukjanov aka Frostman
  */
 public class TemplatesConfig {
-    private String path;
-    private int updateInterval = 1000;
 
+    /**
+     * Path to templates, root is the classpath
+     */
+    private String path;
+
+    /**
+     * Templates update interval, used only in production mode
+     */
+    private int updateInterval = 36000000; // 10h
+
+    /**
+     * The maximum number of strongly referenced templates
+     */
     private int maxCacheStrongSize = 25;
+
+    /**
+     * The maximum number of softly referenced templates
+     */
     private int maxCacheSoftSize = 250;
 
+    /**
+     * @return path to templates, root is the classpath
+     */
     public String getPath() {
         return path;
     }
@@ -38,6 +56,9 @@ public class TemplatesConfig {
         this.path = path;
     }
 
+    /**
+     * @return templates update interval in ms, used only in production mode
+     */
     public int getUpdateInterval() {
         return updateInterval;
     }
@@ -46,6 +67,9 @@ public class TemplatesConfig {
         this.updateInterval = updateInterval;
     }
 
+    /**
+     * @return the maximum number of strongly referenced templates
+     */
     public int getMaxCacheStrongSize() {
         return maxCacheStrongSize;
     }
@@ -54,6 +78,9 @@ public class TemplatesConfig {
         this.maxCacheStrongSize = maxCacheStrongSize;
     }
 
+    /**
+     * @return the maximum number of softly referenced templates
+     */
     public int getMaxCacheSoftSize() {
         return maxCacheSoftSize;
     }

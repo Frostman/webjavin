@@ -73,6 +73,7 @@ public class JavinConfig {
             // some hacks
             ensureContext(config);
             ensureAddress(config);
+            ensureProduction(config);
 
             boolean changed = false;
             if (!config.equals(currentConfig)) {
@@ -115,6 +116,12 @@ public class JavinConfig {
             address = address.substring(0, address.length() - 1);
         }
         config.address = address;
+    }
+
+    private static void ensureProduction(JavinConfig config) {
+        if (config.getMode().isProductionMode()) {
+            //todo make some changes in config
+        }
     }
 
     /**
