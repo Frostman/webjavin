@@ -131,6 +131,11 @@ public class JavinConfig {
         return configFileName;
     }
 
+    /**
+     * Set config file name. Changes will applied at next #update() method invokation.
+     *
+     * @param configFileName to use
+     */
     public static void setConfigFileName(String configFileName) {
         JavinConfig.configFileName = configFileName;
     }
