@@ -1,12 +1,11 @@
-mode: PROD
+mode: DEV
 
 context: test
 address: http://localhost:8080/
 
 classes:
       packages: [
-          "ru.frostman.web.test",
-          "ru.frostman.web.test2"
+          "ru.frostman.web.test"
       ]
 
 templates:
