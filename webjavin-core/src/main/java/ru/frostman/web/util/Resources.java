@@ -21,6 +21,7 @@ package ru.frostman.web.util;
 import ru.frostman.web.Javin;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -39,7 +40,19 @@ public class Resources {
      * @return stream of the resource
      */
     public static InputStream getResourceAsStream(String name) {
-        return MAIN_CLASS_LOADER.getResourceAsStream(name);
+        URL url = getResource(name);
+
+        if (url != null) {
+            try {
+                // avoid caching in getResourceAsStream(...)
+                return url.openStream();
+            } catch (IOException e) {
+                //todo think about this
+                return null;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -50,7 +63,7 @@ public class Resources {
      * @return file of the resource
      */
     public static File getResourceAsFile(String name) {
-        URL url = MAIN_CLASS_LOADER.getResource(name);
+        URL url = getResource(name);
         if (url == null) {
             return null;
         }
@@ -60,5 +73,16 @@ public class Resources {
         } catch (URISyntaxException e) {
             return null;
         }
+    }
+
+    /**
+     * Returns url of the specified resource using ClassLoader that loads Javin class.
+     *
+     * @param name of the resource
+     *
+     * @return url of the resource
+     */
+    public static URL getResource(String name) {
+        return MAIN_CLASS_LOADER.getResource(name);
     }
 }
