@@ -18,6 +18,7 @@
 
 package ru.frostman.web.mongo.config;
 
+import com.google.common.base.Objects;
 import com.mongodb.DBPort;
 import com.mongodb.ServerAddress;
 
@@ -51,5 +52,24 @@ public class MongoServerAddress {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MongoServerAddress) {
+            MongoServerAddress address = (MongoServerAddress) obj;
+
+            return port == address.port && Objects.equal(host, address.host);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = host != null ? host.hashCode() : 0;
+        result = 31 * result + port;
+
+        return result;
     }
 }
