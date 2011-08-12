@@ -22,7 +22,7 @@
 
     <groupId>ru.frostman.web</groupId>
     <artifactId>webjavin-parent</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1</version>
     <modules>
         <module>webjavin-core</module>
         <module>webjavin-mongo</module>
@@ -52,7 +52,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <webjavin.version>0.1.1-SNAPSHOT</webjavin.version>
+        <webjavin.version>0.1.1</webjavin.version>
     </properties>
 
     <repositories>
@@ -66,12 +66,19 @@
             <id>webjavin-snapshot-repo</id>
             <name>WebJavin Snapshot Maven Repository</name>
             <url>https://raw.github.com/Frostman/webjavin.repo/master/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
         </repository>
 
         <repository>
             <id>webjavin-release-repo</id>
             <name>WebJavin Release Maven Repository</name>
             <url>https://raw.github.com/Frostman/webjavin.repo/master/release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
         </repository>
     </repositories>
 
