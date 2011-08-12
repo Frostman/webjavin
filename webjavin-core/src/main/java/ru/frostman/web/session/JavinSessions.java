@@ -39,7 +39,7 @@ public class JavinSessions {
     public static boolean update() {
         String sessionManagerName = JavinConfig.get().getApp().getSessionManager();
 
-        if (Objects.equal(currentSessionManager, sessionManagerName) && sessionManager != null && sessionManager.update()) {
+        if (Objects.equal(currentSessionManager, sessionManagerName) && sessionManager != null && (!sessionManager.update())) {
             return false;
         }
 

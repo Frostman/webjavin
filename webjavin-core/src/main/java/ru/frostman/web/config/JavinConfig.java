@@ -28,6 +28,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import ru.frostman.web.JavinContextListener;
 import ru.frostman.web.JavinMode;
 import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.util.Resources;
 
 import java.io.InputStream;
 import java.util.List;
@@ -40,6 +41,8 @@ import java.util.Map;
  */
 public class JavinConfig {
     private static final Logger log = LoggerFactory.getLogger(JavinConfig.class);
+
+    private static String configFileName = "/javin.yaml";
 
     private static JavinConfig currentConfig;
 
@@ -56,10 +59,6 @@ public class JavinConfig {
 
     private Map<String, StaticResource> statics = Maps.newLinkedHashMap();
 
-    static {
-        update();
-    }
-
     /**
      * Updates Javin configuration.
      *
@@ -73,7 +72,6 @@ public class JavinConfig {
             // some hacks
             ensureContext(config);
             ensureAddress(config);
-            ensureProduction(config);
 
             boolean changed = false;
             if (!config.equals(currentConfig)) {
@@ -118,12 +116,6 @@ public class JavinConfig {
         config.address = address;
     }
 
-    private static void ensureProduction(JavinConfig config) {
-        if (config.getMode().isProductionMode()) {
-            //todo make some changes in config
-        }
-    }
-
     /**
      * @return current JavinConfig
      */
@@ -132,7 +124,20 @@ public class JavinConfig {
     }
 
     private static InputStream getConfigStream() {
-        return JavinConfig.class.getResourceAsStream("/javin.yaml");
+        return Resources.getResourceAsStream(configFileName);
+    }
+
+    public static String getConfigFileName() {
+        return configFileName;
+    }
+
+    /**
+     * Set config file name. Changes will applied at next #update() method invokation.
+     *
+     * @param configFileName to use
+     */
+    public static void setConfigFileName(String configFileName) {
+        JavinConfig.configFileName = configFileName;
     }
 
     public JavinMode getMode() {

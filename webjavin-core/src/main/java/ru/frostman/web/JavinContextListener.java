@@ -34,6 +34,8 @@ import javax.servlet.ServletContextListener;
  */
 public class JavinContextListener implements ServletContextListener {
     private static final Logger log = LoggerFactory.getLogger(JavinContextListener.class);
+    private static final String JAVIN_CONFIG = "javin-config";
+
     private static ServletContext servletContext;
 
     @Override
@@ -42,6 +44,13 @@ public class JavinContextListener implements ServletContextListener {
             servletContext = sce.getServletContext();
 
             freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
+
+            String configName = sce.getServletContext().getInitParameter(JAVIN_CONFIG);
+            if (configName != null) {
+                JavinConfig.setConfigFileName(configName);
+            }
+
+            JavinConfig.update();
 
             Javin.setMode(JavinConfig.get().getMode());
             Javin.setServletApiMajorVersion(sce.getServletContext().getMajorVersion());
