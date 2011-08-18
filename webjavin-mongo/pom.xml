@@ -23,13 +23,34 @@
     <parent>
         <artifactId>webjavin-parent</artifactId>
         <groupId>ru.frostman.web</groupId>
-        <version>0.1.1</version>
+        <version>0.1.2</version>
     </parent>
 
     <artifactId>webjavin-mongo</artifactId>
     <packaging>jar</packaging>
 
     <name>webjavin-mongo</name>
+
+    <description>
+        WebJavin - Java Web Framework - Mongo module
+    </description>
+
+    <url>https://github.com/Frostman/webjavin/wiki</url>
+
+    <developers>
+        <developer>
+            <name>Sergey "Frosman" Lukjanov</name>
+            <email>me@frostman.ru</email>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <repositories>
         <repository>
@@ -75,4 +96,10 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
+
+    <scm>
+        <connection>scm:git:git@github.com:Frostman/webjavin.git</connection>
+        <developerConnection>scm:git:git@github.com:Frostman/webjavin.git</developerConnection>
+        <url>git@github.com:Frostman/webjavin.git</url>
+    </scm>
 </project>

@@ -23,13 +23,34 @@
     <parent>
         <artifactId>webjavin-parent</artifactId>
         <groupId>ru.frostman.web</groupId>
-        <version>0.1.1</version>
+        <version>0.1.2</version>
     </parent>
 
     <artifactId>webjavin-test</artifactId>
     <packaging>war</packaging>
 
     <name>webjavin-test</name>
+
+    <description>
+        WebJavin - Java Web Framework - Test module
+    </description>
+
+    <url>https://github.com/Frostman/webjavin/wiki</url>
+
+    <developers>
+        <developer>
+            <name>Sergey "Frosman" Lukjanov</name>
+            <email>me@frostman.ru</email>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <dependencies>
         <dependency>
@@ -68,17 +89,15 @@
             <version>1.0</version>
             <type>jar</type>
         </dependency>
-
-        <!--Servlet API-->
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>3.0</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
         <finalName>webjavin-test</finalName>
     </build>
+
+    <scm>
+        <connection>scm:git:git@github.com:Frostman/webjavin.git</connection>
+        <developerConnection>scm:git:git@github.com:Frostman/webjavin.git</developerConnection>
+        <url>git@github.com:Frostman/webjavin.git</url>
+    </scm>
 </project>
