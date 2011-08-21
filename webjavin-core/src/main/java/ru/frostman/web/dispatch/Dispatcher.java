@@ -113,7 +113,7 @@ public class Dispatcher {
                     try {
                         File resourceFile = Resources.getResourceAsFile(resourceName);
 
-                        if (!resourceFile.isFile()) {
+                        if (resourceFile == null || !resourceFile.isFile()) {
                             continue;
                         }
 

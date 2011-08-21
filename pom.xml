@@ -22,7 +22,7 @@
 
     <groupId>ru.frostman.web</groupId>
     <artifactId>webjavin-parent</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3-SNAPSHOT</version>
 
     <modules>
         <module>webjavin-core</module>
@@ -60,7 +60,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <webjavin.version>0.1.2</webjavin.version>
+        <webjavin.version>0.1.3-SNAPSHOT</webjavin.version>
     </properties>
 
     <dependencies>
