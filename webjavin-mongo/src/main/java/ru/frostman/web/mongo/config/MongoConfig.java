@@ -25,6 +25,7 @@ import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.util.Resources;
 
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -71,7 +72,7 @@ public class MongoConfig {
     }
 
     private static InputStream getConfigStream() {
-        return MongoConfig.class.getResourceAsStream("/mongo.yaml");
+        return Resources.getResourceAsStream("/mongo.yaml");
     }
 
     public List<ServerAddress> getMongoReplicaSet() throws UnknownHostException {
