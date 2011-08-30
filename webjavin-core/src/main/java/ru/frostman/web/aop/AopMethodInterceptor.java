@@ -29,7 +29,7 @@ import java.lang.reflect.Method;
 public class AopMethodInterceptor implements MethodInterceptor {
     protected final String interceptorClassName;
     protected final String interceptorMethodName;
-    protected final String methodPattern;
+    protected final MethodPatternMatcher matcher;
 
     protected final String longName;
 
@@ -38,7 +38,7 @@ public class AopMethodInterceptor implements MethodInterceptor {
     public AopMethodInterceptor(String interceptorClassName, String interceptorMethodName, String methodPattern, String longName) {
         this.interceptorClassName = interceptorClassName;
         this.interceptorMethodName = interceptorMethodName;
-        this.methodPattern = methodPattern;
+        matcher = new MethodPatternMatcher(methodPattern);
         this.longName = longName;
     }
 
@@ -71,11 +71,7 @@ public class AopMethodInterceptor implements MethodInterceptor {
 
     @Override
     public boolean matches(CtMethod method) {
-        //todo impl / currently only method name checked
-        //todo сделать MVEL выражение для фильтрации методов чтобы поддерживать ещё и аннотации и тд
-        //todo выполнять это выражение лишь один раз при enhancing
-
-        return methodPattern.length() == 0 || method.getName().equals(methodPattern);
+        return matcher.matches(method);
     }
 
     @Override
