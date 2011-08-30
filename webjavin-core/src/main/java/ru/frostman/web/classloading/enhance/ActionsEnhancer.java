@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static ru.frostman.web.classloading.enhance.ClassConstants.*;
 import static ru.frostman.web.classloading.enhance.EnhancerUtil.*;
 
 /**
@@ -42,26 +43,6 @@ import static ru.frostman.web.classloading.enhance.EnhancerUtil.*;
 class ActionsEnhancer {
     private static final AtomicInteger actionMethodsCount = new AtomicInteger(1);
     private static final String INSTANCE = "$instance";
-
-    private static final String HTTP_SERVLET_REQUEST = "javax.servlet.http.HttpServletRequest";
-    private static final String SERVLET_REQUEST = "javax.servlet.ServletRequest";
-    private static final String HTTP_SERVLET_RESPONSE = "javax.servlet.http.HttpServletResponse";
-    private static final String SERVLET_RESPONSE = "javax.servlet.ServletResponse";
-    private static final String ASYNC_CONTEXT = "javax.servlet.AsyncContext";
-    private static final String VIEW = "ru.frostman.web.controller.View";
-    private static final String MODEL = "ru.frostman.web.controller.Model";
-    private static final String MODEL_AND_VIEW = "ru.frostman.web.controller.ModelAndView";
-    private static final String JAVA_LANG_STRING = "java.lang.String";
-    private static final String THROWABLE = "java.lang.Throwable";
-    private static final String DEFAULT_ACTION_CATCH = "ru.frostman.web.thr.DefaultActionCatch";
-    private static final String ACTION_EXCEPTION = "ru.frostman.web.dispatch.ActionException";
-    private static final String JSON_UTIL = "ru.frostman.web.util.Json";
-    private static final String JSON_NODE = "org.codehaus.jackson.JsonNode";
-    private static final String REQUEST_BODY_JSON = "requestBodyJson";
-    private static final String PARAMETER_REQUIRED_EXCEPTION = "ru.frostman.web.thr.ParameterRequiredException";
-    private static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
-    private static final String JAVIN_SESSION = "ru.frostman.web.session.JavinSession";
-    private static final String JAVIN_SESSIONS = "ru.frostman.web.session.JavinSessions";
 
     public static void enhance(Map<String, AppClass> classes, ClassPool classPool, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
@@ -138,7 +119,7 @@ class ActionsEnhancer {
             throw new ActionEnhancerException("Only one constructor should be in controller: " + controller.getName());
         }
 
-        StringBuilder parameters = resolveParameters(classPool, constructors[0], body);
+        StringBuilder parameters = InjectEnhancer.resolveParameters(classPool, constructors[0], body);
         // instantiate controller class (with resolved parameters)
         body.append(INSTANCE).append(" = new ").append(controller.getName()).append("(").append(parameters).append(");}");
 
@@ -169,7 +150,7 @@ class ActionsEnhancer {
         CtMethod method = new CtMethod(CtClass.voidType, "action", new CtClass[]{}, actionInvoker);
 
         StringBuilder body = new StringBuilder("{");
-        StringBuilder parameters = resolveParameters(classPool, actionMethod, body);
+        StringBuilder parameters = InjectEnhancer.resolveParameters(classPool, actionMethod, body);
 
         // invoke action method in controller (with resolved parameters)
         body.append("try{ Object result = ").append(INSTANCE).append(".")
@@ -237,7 +218,7 @@ class ActionsEnhancer {
                         + invokeMethod.getLongName());
             }
 
-            StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
+            StringBuilder parameters = InjectEnhancer.resolveParameters(classPool, invokeMethod, body);
 
             // invoke method with resolved parameters
             body.append("{").append(INSTANCE).append(".")
@@ -277,7 +258,7 @@ class ActionsEnhancer {
                         + invokeMethod.getLongName());
             }
 
-            StringBuilder parameters = resolveParameters(classPool, invokeMethod, body);
+            StringBuilder parameters = InjectEnhancer.resolveParameters(classPool, invokeMethod, body);
 
             // invoke method with resolved parameters
             body.append("{").append(INSTANCE).append(".")
@@ -287,119 +268,6 @@ class ActionsEnhancer {
         }
 
         method.setBody(body.append("}").toString());
-    }
-
-    private static StringBuilder resolveParameters(ClassPool classPool, CtBehavior behavior, StringBuilder body)
-            throws ClassNotFoundException, NotFoundException {
-        Object[][] annotations = behavior.getParameterAnnotations();
-        int idx = 0;
-        boolean requestBodyJsonParsed = false;
-        StringBuilder parameters = new StringBuilder();
-        for (CtClass parameterType : behavior.getParameterTypes()) {
-            if (parameterType.equals(getCtClass(classPool, HTTP_SERVLET_REQUEST))) {
-                // javax.servlet.http.HttpServletRequest type resolved as current request
-                body.append(HTTP_SERVLET_REQUEST).append(" $param$").append(idx).append(" = request;");
-            } else if (parameterType.equals(getCtClass(classPool, SERVLET_REQUEST))) {
-                // javax.servlet.ServletRequest type resolved as current request
-                body.append(SERVLET_REQUEST).append(" $param$").append(idx).append(" = request;");
-            } else if (parameterType.equals(getCtClass(classPool, HTTP_SERVLET_RESPONSE))) {
-                // javax.servlet.http.HttpServletResponse type resolved as current response
-                body.append(HTTP_SERVLET_RESPONSE).append(" $param$").append(idx).append(" = response;");
-            } else if (parameterType.equals(getCtClass(classPool, SERVLET_RESPONSE))) {
-                // javax.servlet.ServletResponse type resolved as current response
-                body.append(SERVLET_RESPONSE).append(" $param$").append(idx).append(" = response;");
-            } else if (parameterType.equals(getCtClass(classPool, ASYNC_CONTEXT))) {
-                // javax.servlet.AsyncContext type resolved as current async context
-                body.append(ASYNC_CONTEXT).append(" $param$").append(idx).append(" = asyncContext;");
-            } else if (parameterType.equals(getCtClass(classPool, MODEL))) {
-                // ru.frostman.web.controller.Model type resolved as current model
-                body.append(MODEL).append(" $param$").append(idx).append(" = mav.getModel();");
-            } else if (parameterType.equals(getCtClass(classPool, JAVIN_SESSION))) {
-                // ru.frostman.web.session.JavinSession type resolved as current current session
-                body.append(JAVIN_SESSION).append(" $param$").append(idx).append(" = " + JAVIN_SESSIONS
-                        + ".getSession(request, response);");
-            } else if (isAnnotatedWith(annotations[idx], Param.class) != null) {
-                Param paramAnnotation = isAnnotatedWith(annotations[idx], Param.class);
-
-                if (parameterType.equals(getCtClass(classPool, JAVA_LANG_STRING))) {
-                    body.append("String $param$").append(idx).append(" = request.getParameter(\"")
-                            .append(paramAnnotation.value()).append("\");");
-                } else if (parameterType.equals(CtClass.booleanType)) {
-                    body.append("boolean $param$").append(idx).append(" = java.lang.Boolean.parseBoolean(request.getParameter(\"")
-                            .append(paramAnnotation.value()).append("\"));");
-                } else if (parameterType.equals(getCtClass(classPool, JAVA_LANG_BOOLEAN))) {
-                    body.append("java.lang.Boolean $param$").append(idx).append(" = java.lang.Boolean.valueOf(request.getParameter(\"")
-                            .append(paramAnnotation.value()).append("\"));");
-                } else {
-                    throw new ActionEnhancerException("Auto converted @Param method argument type " + parameterType.getName()
-                            + " (arg #" + idx + ")"
-                            + " is currently unsupported: " + behavior.getLongName());
-                }
-
-                if (paramAnnotation.required()) {
-                    // append checking parameter for not null
-                    body.append("if($param$").append(idx).append(" == null) {")
-                            .append("throw new ").append(PARAMETER_REQUIRED_EXCEPTION)
-                            .append("(\"required param: \"+").append(idx).append(");" + "}");
-                }
-
-            } else if (isAnnotatedWith(annotations[idx], JsonParam.class) != null) {
-                JsonParam paramAnnotation = isAnnotatedWith(annotations[idx], JsonParam.class);
-
-                if (!requestBodyJsonParsed) {
-                    requestBodyJsonParsed = true;
-
-                    body.append(JSON_NODE).append(" ").append(REQUEST_BODY_JSON).append(" = ")
-                            .append(JSON_UTIL).append(".parseJsonBody(request);");
-                }
-
-                body.append(parameterType.getName()).append(" $param$").append(idx)
-                        .append(" = (").append(parameterType.getName()).append(")")
-                        .append(JSON_UTIL).append(".getParam(")
-                        .append(REQUEST_BODY_JSON).append(", \"").append(parameterType.getName()).append("\"")
-                        .append(", new ").append(JAVA_LANG_STRING).append("[]{");
-
-                final String[] path = paramAnnotation.name();
-                int pathIdx = 0;
-                for (String str : path) {
-                    body.append("\"").append(str).append("\"");
-                    if (pathIdx < path.length - 1) {
-                        body.append(",");
-                    }
-                }
-
-                body.append("});");
-
-                if (paramAnnotation.required()) {
-                    // append checking parameter for not null
-                    body.append("if($param$").append(idx).append(" == null) {")
-                            .append("throw new ").append(PARAMETER_REQUIRED_EXCEPTION)
-                            .append("(\"required param: \"+").append(idx).append(");" + "}");
-                }
-            } else if (isAnnotatedWith(annotations[idx], Pjax.class) != null) {
-                if (parameterType.equals(CtClass.booleanType)) {
-                    body.append(parameterType.getName()).append(" $param$").append(idx)
-                            .append(" = request.getHeader(\"HTTP_X_PJAX\") != null;");
-                } else if (parameterType.equals(getCtClass(classPool, JAVA_LANG_BOOLEAN))) {
-                    body.append(parameterType.getName()).append(" $param$").append(idx)
-                            .append(" = java.lang.Boolean.valueOf(request.getHeader(\"HTTP_X_PJAX\") != null);");
-                } else {
-                    throw new ActionEnhancerException("@Pjax annotation should mark Boolean or boolean param, but not: "
-                            + parameterType.getName() + " in " + behavior.getLongName());
-                }
-            } else {
-                throw new ActionEnhancerException("Unsupported auto injected method argument type " + parameterType
-                        + ": " + behavior.getLongName());
-            }
-
-            parameters.append("$param$").append(idx);
-            if (idx < annotations.length - 1) {
-                parameters.append(",");
-            }
-            idx++;
-        }
-
-        return parameters;
     }
 
     private static String[] normalizeUrls(String[] urls) {
