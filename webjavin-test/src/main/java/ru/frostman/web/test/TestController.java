@@ -21,10 +21,11 @@ package ru.frostman.web.test;
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
 import ru.frostman.web.annotation.Param;
-import ru.frostman.web.controller.Controllers;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.mongo.secure.User;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static ru.frostman.web.controller.Controllers.view;
 
@@ -33,6 +34,14 @@ import static ru.frostman.web.controller.Controllers.view;
  */
 @Controller
 public class TestController {
+
+    private final HttpServletRequest request;
+    private final HttpServletResponse response;
+
+    public TestController(HttpServletRequest request, HttpServletResponse response) {
+        this.request = request;
+        this.response = response;
+    }
 
     @Action("/test")
     public View test(Model model, @Param(value = "verified", required = false) boolean verified) {
@@ -52,11 +61,6 @@ public class TestController {
     public View indigo(Model model) {
         model.put("page", "qwe");
         return view("/indigo/auth.ftl");
-    }
-
-    @Action("/jsonp")
-    public View jsonpTest(@Param("callback") String callback) {
-        return Controllers.jsonp(new User(), callback);
     }
 
 }
