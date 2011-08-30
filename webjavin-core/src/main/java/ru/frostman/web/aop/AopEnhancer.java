@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.Modifier;
-import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.aop.thr.AopException;
 
 import java.util.List;
 
@@ -111,7 +111,7 @@ public class AopEnhancer {
                 method.setBody(body.toString());
             }
         } catch (Exception e) {
-            throw new JavinRuntimeException(e);
+            throw new AopException("Exception while aop enhancing: " + ctClass, e);
         }
     }
 }
