@@ -20,12 +20,13 @@ package ru.frostman.web.aop;
 
 import com.google.common.collect.Maps;
 import javassist.CtMethod;
+import javassist.NotFoundException;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.compiler.ExecutableStatement;
 import ru.frostman.web.thr.JavinRuntimeException;
 
-import java.lang.reflect.Array;
+import java.lang.annotation.Annotation;
 import java.util.Map;
 
 /**
@@ -50,8 +51,12 @@ public class MethodPatternMatcher {
 
             context.addInput("any", boolean.class);
 
-            Class<?> stringArrClass = Array.newInstance(String.class, 0).getClass();
-            context.addImport("package", MethodPatternMatcher.class.getMethod("_package", stringArrClass));
+            context.addImport("package", MethodPatternMatcher.class.getMethod("_package", String.class));
+            context.addImport("class", MethodPatternMatcher.class.getMethod("_class", String.class));
+            context.addImport("method", MethodPatternMatcher.class.getMethod("_method", String.class));
+            context.addImport("return", MethodPatternMatcher.class.getMethod("_return", String.class));
+            context.addImport("annotation", MethodPatternMatcher.class.getMethod("_annotation", String.class));
+            //todo add params support
 
             if (methodPattern.trim().length() == 0) {
                 methodPattern = "any";
@@ -62,7 +67,7 @@ public class MethodPatternMatcher {
                 throw new JavinRuntimeException("Aop method interceptor pattern should return boolean");
             }
         } catch (Exception e) {
-            throw new JavinRuntimeException("Exception while compiling method interceptor patern: " + methodPattern, e);
+            throw new JavinRuntimeException("Exception while compiling method interceptor pattern: " + methodPattern, e);
         }
     }
 
@@ -76,7 +81,59 @@ public class MethodPatternMatcher {
         }
     }
 
-    public static boolean _package(String... packages) {
-        return true;
+    public static boolean _package(String packageName) {
+        return isMatches(packageName, currentMethod.get().getDeclaringClass().getPackageName());
+    }
+
+    public static boolean _class(String className) {
+        return isMatches(className, currentMethod.get().getDeclaringClass().getSimpleName());
+    }
+
+    public static boolean _method(String methodName) {
+        return isMatches(methodName, currentMethod.get().getName());
+    }
+
+    public static boolean _return(String returnType) {
+        try {
+            return isMatches(returnType, currentMethod.get().getReturnType().getName());
+        } catch (NotFoundException e) {
+            //todo think about this
+            return false;
+        }
+    }
+
+    public static boolean _annotation(String annotationName) {
+        Object[] annotationObjects = new Object[0];
+        try {
+            annotationObjects = currentMethod.get().getAnnotations();
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        for (Object object : annotationObjects) {
+            Annotation annotation = (Annotation) object;
+            if (isMatches(annotationName, annotation.annotationType().getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //todo make tests for this method
+    @SuppressWarnings({"StringEquality"})
+    static boolean isMatches(String pattern, String str) {
+        if (pattern == str || pattern.equals(str)) {
+            return true;
+        }
+
+        if (pattern.startsWith("*")) {
+            if (pattern.endsWith("*")) {
+                return str.contains(pattern.substring(1, pattern.length() - 1));
+            } else {
+                return str.endsWith(pattern.substring(1));
+            }
+        }
+
+        return pattern.endsWith("*") && str.startsWith(pattern.substring(0, pattern.length() - 1));
     }
 }
