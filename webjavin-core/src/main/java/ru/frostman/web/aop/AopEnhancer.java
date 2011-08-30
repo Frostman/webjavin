@@ -41,6 +41,18 @@ public class AopEnhancer {
                     continue;
                 }
 
+                List<MethodInterceptor> interceptors = Lists.newLinkedList();
+
+                for (MethodInterceptor interceptor : methodInterceptors) {
+                    if (interceptor.matches(method)) {
+                        interceptors.add(interceptor);
+                    }
+                }
+
+                if (interceptors.size() == 0) {
+                    continue;
+                }
+
                 CtMethod wrappedMethod = new CtMethod(method, ctClass, null);
                 String wrappedName = "$javin$" + method.getName();
                 wrappedMethod.setName(wrappedName);
@@ -56,9 +68,7 @@ public class AopEnhancer {
                 } else {
                     body.append("$0");
                 }
-                body.append(", ");
-
-                body.append("\"").append(method.getName()).append("\", new Class");
+                body.append(", \"").append(method.getName()).append("\", new Class");
 
                 CtClass[] parameterTypes = method.getParameterTypes();
 
@@ -78,45 +88,27 @@ public class AopEnhancer {
                     body.append("[0]");
                 }
 
-                body.append(", ");
+                body.append(", $args, new ").append(METHOD_INTERCEPTOR).append("[]{");
 
-                body.append("$args, new ").append(METHOD_INTERCEPTOR);
+                int i = 0;
+                for (MethodInterceptor methodInterceptor : interceptors) {
+                    body.append(METHOD_INTERCEPTORS).append(".getInterceptor(\"")
+                            .append(methodInterceptor.getName()).append("\")");
 
-                List<MethodInterceptor> interceptors = Lists.newLinkedList();
-
-                for (MethodInterceptor interceptor : methodInterceptors) {
-                    if (interceptor.matches(method)) {
-                        interceptors.add(interceptor);
+                    if (i < interceptors.size() - 1) {
+                        body.append(", ");
                     }
+                    i++;
                 }
 
-                if (interceptors.size() != 0) {
-                    body.append("[]{");
-
-                    int i = 0;
-                    for (MethodInterceptor methodInterceptor : interceptors) {
-                        body.append(METHOD_INTERCEPTORS).append(".getInterceptor(\"")
-                                .append(methodInterceptor.getName()).append("\")");
-
-                        if (i < interceptors.size() - 1) {
-                            body.append(", ");
-                        }
-                        i++;
-                    }
-
-                    body.append("}");
-                } else {
-                    body.append("[0]");
-                }
-
-                body.append(");");
+                body.append("});");
 
                 if (!method.getReturnType().equals(CtClass.voidType)) {
                     body.append("return ");
                 }
-                body.append("($r) mi.proceed();");
+                body.append("($r) mi.proceed();}");
 
-                method.setBody(body.append("}").toString());
+                method.setBody(body.toString());
             }
         } catch (Exception e) {
             throw new JavinRuntimeException(e);
