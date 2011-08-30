@@ -103,9 +103,9 @@ public class Controllers {
     }
 
     /**
-     * @param value to convert to jsonp
+     * @param value    to convert to jsonp
      * @param callback to use in jsonp
-     * @param <T>   value type
+     * @param <T>      value type
      *
      * @return view that convert specified value to jsonp
      */
