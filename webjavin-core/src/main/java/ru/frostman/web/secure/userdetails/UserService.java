@@ -23,11 +23,11 @@ import ru.frostman.web.secure.thr.UsernameAlreadyTakenException;
 /**
  * @author slukjanov aka Frostman
  */
-public interface UserService {
+public interface UserService<U extends UserDetails, C extends Credentials> {
 
-    UserDetails getUser(String username);
+    U getUser(String username);
 
-    void addUser(UserDetails userDetails) throws UsernameAlreadyTakenException;
+    void addUser(U userDetails) throws UsernameAlreadyTakenException;
 
-    UserDetails authenticate(Credentials credentials);
+    U authenticate(C credentials);
 }

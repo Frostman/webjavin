@@ -46,14 +46,14 @@ public class Model {
     }
 
     /**
-     * @return an HttpServletRequest that corresponds to this model
+     * @return an HttpServletRequest that corresponds to this secure
      */
     public HttpServletRequest getHttpServletRequest() {
         return (HttpServletRequest) map.get(REQUEST);
     }
 
     /**
-     * @return HttpServletResponse  that corresponds to this model
+     * @return HttpServletResponse  that corresponds to this secure
      */
     public HttpServletResponse getHttpServletResponse() {
         return (HttpServletResponse) map.get(RESPONSE);
@@ -67,7 +67,7 @@ public class Model {
     }
 
     /**
-     * @return true if model have no attached elements
+     * @return true if secure have no attached elements
      */
     public boolean isEmpty() {
         return map.isEmpty();
@@ -76,7 +76,7 @@ public class Model {
     /**
      * @param key to check
      *
-     * @return true if model contains parameter with specified key
+     * @return true if secure contains parameter with specified key
      */
     public boolean containsKey(String key) {
         return map.containsKey(key);
@@ -85,7 +85,7 @@ public class Model {
     /**
      * @param value to check
      *
-     * @return true if model contains specified value
+     * @return true if secure contains specified value
      */
     public boolean containsValue(Object value) {
         return map.containsValue(value);
@@ -127,7 +127,7 @@ public class Model {
     }
 
     /**
-     * Removes parameter with specified name from this model.
+     * Removes parameter with specified name from this secure.
      *
      * @param key to remove
      *
@@ -138,7 +138,7 @@ public class Model {
     }
 
     /**
-     * Removes parameter with specified name from this model.
+     * Removes parameter with specified name from this secure.
      *
      * @param key to remove
      *
@@ -191,7 +191,7 @@ public class Model {
     }
 
     /**
-     * Clear this model.
+     * Clear this secure.
      *
      * @return this
      */
@@ -202,7 +202,7 @@ public class Model {
     }
 
     /**
-     * @return new map that contains all parameters of this model
+     * @return new map that contains all parameters of this secure
      */
     public Map<String, Object> toMap() {
         return Maps.newHashMap(map);

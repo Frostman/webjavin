@@ -25,6 +25,9 @@ import java.util.List;
  * @author slukjanov aka Frostman
  */
 public interface UserDetails extends Comparable<UserDetails>, Serializable {
+    /**
+     * @return username, should be unique!
+     */
     String getUsername();
 
     List<Credentials> getCredentials();

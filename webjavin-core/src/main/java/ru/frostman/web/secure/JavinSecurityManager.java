@@ -19,7 +19,6 @@
 package ru.frostman.web.secure;
 
 import com.google.common.collect.Maps;
-import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.secure.userdetails.UserDetails;
 import ru.frostman.web.secure.userdetails.UserService;
 import ru.frostman.web.secure.userdetails.UserServiceProvider;
@@ -37,25 +36,26 @@ public class JavinSecurityManager {
     private static final ThreadLocal<UserDetails> currentUser = new ThreadLocal<UserDetails>();
     private static final ThreadLocal<String> currentRole = new ThreadLocal<String>();
 
-    private UserServiceProvider userServiceProvider;
+    private final UserServiceProvider userServiceProvider = null;
 
-    private AtomicInteger counter = new AtomicInteger();
-    private Map<Integer, SecureExpression> expressions = Maps.newHashMap();
+    private final AtomicInteger counter = new AtomicInteger();
+    private final Map<Integer, SecureExpression> expressions = Maps.newHashMap();
 
     public JavinSecurityManager() {
-        String userServiceProviderClassName = JavinConfig.get().getSecure().getUserServiceProvider();
-        Class<?> userServiceProviderClass;
-        try {
-            userServiceProviderClass = Class.forName(userServiceProviderClassName);
-        } catch (ClassNotFoundException e) {
-            throw new SecurityException("Can't load UserServiceProvider impl: " + userServiceProviderClassName);
-        }
-
-        try {
-            userServiceProvider = (UserServiceProvider) userServiceProviderClass.newInstance();
-        } catch (Exception e) {
-            throw new SecurityException("Can't instantiate UserServiceProvider impl: " + userServiceProviderClassName);
-        }
+        //todo fix me
+//        String userServiceProviderClassName = JavinConfig.get().getSecure().getUserServiceProvider();
+//        Class<?> userServiceProviderClass;
+//        try {
+//            userServiceProviderClass = Class.forName(userServiceProviderClassName);
+//        } catch (ClassNotFoundException e) {
+//            throw new SecurityException("Can't load UserServiceProvider impl: " + userServiceProviderClassName);
+//        }
+//
+//        try {
+//            userServiceProvider = (UserServiceProvider) userServiceProviderClass.newInstance();
+//        } catch (Exception e) {
+//            throw new SecurityException("Can't instantiate UserServiceProvider impl: " + userServiceProviderClassName);
+//        }
     }
 
     public UserService getUserService() {
