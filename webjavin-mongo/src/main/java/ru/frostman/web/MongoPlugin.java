@@ -29,9 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.mongo.config.MongoConfig;
-import ru.frostman.web.mongo.secure.LoginPasswordCredentials;
-import ru.frostman.web.mongo.secure.User;
-import ru.frostman.web.mongo.secure.UserRole;
 import ru.frostman.web.plugin.Plugin;
 import ru.frostman.web.thr.JavinRuntimeException;
 
@@ -78,10 +75,8 @@ public class MongoPlugin extends Plugin {
             }
         }
 
-        morphia.map(User.class).map(UserRole.class).map(LoginPasswordCredentials.class);
-
         try {
-            mongo = new Mongo(MongoConfig.getCurrentConfig().getMongoReplicaSet());
+            mongo = new Mongo(MongoConfig.get().getMongoReplicaSet());
 
             String mongoVersion = mongo.getVersion();
             log.debug("Successfully connected to MongoDB v." + mongoVersion);

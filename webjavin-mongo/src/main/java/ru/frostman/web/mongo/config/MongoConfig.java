@@ -67,7 +67,7 @@ public class MongoConfig {
         }
     }
 
-    public static MongoConfig getCurrentConfig() {
+    public static MongoConfig get() {
         return currentConfig;
     }
 
