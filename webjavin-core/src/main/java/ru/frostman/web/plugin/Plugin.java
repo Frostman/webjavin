@@ -24,6 +24,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import ru.frostman.web.aop.MethodInterceptor;
 import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.inject.InjectionRule;
 
 import java.util.List;
 import java.util.Map;
@@ -61,8 +62,12 @@ public abstract class Plugin implements Comparable<Plugin> {
         return Lists.newLinkedList();
     }
 
+    public List<InjectionRule> getCustomInjections() {
+        return Lists.newLinkedList();
+    }
+
     @Override
-    public int compareTo(Plugin p) {
+    public final int compareTo(Plugin p) {
         int res = weight < p.weight ? -1 : (weight != p.weight ? 1 : 0);
 
         if (res != 0) {

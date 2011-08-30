@@ -16,45 +16,34 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.secure.impl;
+package ru.frostman.web.plugin;
 
-import ru.frostman.web.secure.userdetails.Role;
+import com.google.common.collect.Lists;
+import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.inject.InjectionRule;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class SimpleRole implements Role {
+class JavinPlugin extends Plugin {
 
-    private int weight;
+    private final List<InjectionRule> injectionRules = Lists.newLinkedList();
+    ;
 
-    private String name;
-
-    public SimpleRole() {
-    }
-
-    public SimpleRole(int weight, String name) {
-        this.weight = weight;
-        this.name = name;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    JavinPlugin() {
+        super(0);
     }
 
     @Override
-    public int compareTo(Role role) {
-        return weight - role.getWeight();
+    public void beforeClassesEnhance(Map<String, AppClass> classes) {
+        //todo iterate and generate rules
+    }
+
+    @Override
+    public List<InjectionRule> getCustomInjections() {
+        return injectionRules;
     }
 }

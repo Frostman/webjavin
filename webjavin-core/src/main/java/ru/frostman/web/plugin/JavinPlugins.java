@@ -19,7 +19,6 @@
 package ru.frostman.web.plugin;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import javassist.ClassPool;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import ru.frostman.web.aop.MethodInterceptor;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.config.JavinConfig;
+import ru.frostman.web.inject.InjectionRule;
 import ru.frostman.web.thr.JavinPluginException;
 
 import java.util.List;
@@ -47,12 +47,17 @@ public class JavinPlugins extends Plugin {
 
     private final List<String> loadedPlugins;
 
-    private final Set<Plugin> plugins;
+    private final List<Plugin> plugins;
 
-    private JavinPlugins(List<String> loadedPlugins, Set<Plugin> plugins) {
+    private JavinPlugins(List<String> loadedPlugins, List<Plugin> plugins) {
         super(0);
 
+        // prepend main Javin plugin
+
+        loadedPlugins.add(0, JavinPlugin.class.getName());
         this.loadedPlugins = loadedPlugins;
+
+        plugins.add(0, new JavinPlugin());
         this.plugins = plugins;
     }
 
@@ -91,7 +96,7 @@ public class JavinPlugins extends Plugin {
                 }
             }
 
-            instance = new JavinPlugins(pluginClassNames, ImmutableSortedSet.copyOf(newPlugins));
+            instance = new JavinPlugins(pluginClassNames, Lists.<Plugin>newLinkedList(newPlugins));
 
             return instance.reload();
         }
@@ -106,11 +111,13 @@ public class JavinPlugins extends Plugin {
 
     private List<String> appPackages;
     private List<MethodInterceptor> methodInterceptors;
+    private List<InjectionRule> customInjections;
 
     @Override
     public boolean reload() {
         appPackages = Lists.newLinkedList();
         methodInterceptors = Lists.newLinkedList();
+        customInjections = Lists.newLinkedList();
         boolean result = false;
 
         for (Plugin plugin : plugins) {
@@ -119,6 +126,7 @@ public class JavinPlugins extends Plugin {
 
                 appPackages.addAll(plugin.getAppClassesPackages());
                 methodInterceptors.addAll(plugin.getPluginsMethodInterceptors());
+                customInjections.addAll(plugin.getCustomInjections());
             } catch (Exception e) {
                 throw new JavinPluginException("Exception while executing update() on plugin with main class: "
                         + plugin.getClass().getName(), e);
@@ -172,5 +180,9 @@ public class JavinPlugins extends Plugin {
     @Override
     public List<MethodInterceptor> getPluginsMethodInterceptors() {
         return methodInterceptors;
+    }
+
+    public List<InjectionRule> getCustomInjections() {
+        return customInjections;
     }
 }
