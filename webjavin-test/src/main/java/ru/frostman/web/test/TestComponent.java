@@ -26,7 +26,6 @@ import ru.frostman.web.annotation.Component;
 @Component
 public class TestComponent {
     public TestComponent() {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 
     public String g() {
