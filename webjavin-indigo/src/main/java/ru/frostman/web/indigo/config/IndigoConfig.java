@@ -16,60 +16,57 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.secure.impl;
+package ru.frostman.web.indigo.config;
 
-import com.google.common.base.Objects;
-import ru.frostman.web.secure.userdetails.Credentials;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.util.Resources;
+
+import java.io.InputStream;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class SimpleLoginPasswordCredentials implements Credentials {
-    private String login;
-    private String password;
-    private boolean nonExpired;
+public class IndigoConfig {
+    private static final Logger log = LoggerFactory.getLogger(IndigoConfig.class);
 
-    public SimpleLoginPasswordCredentials() {
-    }
+    private static IndigoConfig currentConfig;
 
-    public String getLogin() {
-        return login;
-    }
+    /**
+     * Updates Javin configuration.
+     *
+     * @return true if something changes
+     */
+    public synchronized static boolean update() {
+        try {
+            Yaml yaml = new Yaml(new Constructor(IndigoConfig.class));
+            IndigoConfig config = (IndigoConfig) yaml.load(getConfigStream());
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
+            boolean changed = false;
+            if (!config.equals(currentConfig)) {
+                changed = true;
 
-    public String getPassword() {
-        return password;
-    }
+                currentConfig = config;
+            }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public boolean isNonExpired() {
-        return nonExpired;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof SimpleLoginPasswordCredentials) {
-            SimpleLoginPasswordCredentials credentials = (SimpleLoginPasswordCredentials) obj;
-
-            return Objects.equal(login, credentials.login)
-                    && Objects.equal(password, credentials.password);
+            return changed;
+        } catch (Exception e) {
+            throw new JavinRuntimeException("Can't load Indigo configuration", e);
         }
-
-        return false;
     }
 
-    @Override
-    public int hashCode() {
-        int result = login != null ? login.hashCode() : 0;
-        result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (nonExpired ? 1 : 0);
-        return result;
+    /**
+     * @return current IndigoConfig
+     */
+    public static IndigoConfig get() {
+        return currentConfig;
     }
+
+    private static InputStream getConfigStream() {
+        return Resources.getResourceAsStream("indigo.yaml");
+    }
+
 }
