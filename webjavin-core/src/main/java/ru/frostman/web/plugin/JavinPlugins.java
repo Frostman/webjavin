@@ -101,7 +101,7 @@ public class JavinPlugins extends Plugin {
                 }
             }
 
-            instance = new JavinPlugins(pluginClassNames, Lists.<Plugin>newLinkedList(newPlugins));
+            instance = new JavinPlugins(Lists.<String>newLinkedList(pluginClassNames), Lists.<Plugin>newLinkedList(newPlugins));
 
             return instance.reload();
         }
