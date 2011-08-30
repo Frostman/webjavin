@@ -19,6 +19,7 @@
 package ru.frostman.web.aop;
 
 import com.google.common.collect.Maps;
+import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import org.mvel2.MVEL;
@@ -54,7 +55,7 @@ public class MethodPatternMatcher {
             context.addImport("method", MethodPatternMatcher.class.getMethod("_method", String.class));
             context.addImport("return", MethodPatternMatcher.class.getMethod("_return", String.class));
             context.addImport("annotation", MethodPatternMatcher.class.getMethod("_annotation", String.class));
-            //todo add params support
+            context.addImport("params", MethodPatternMatcher.class.getMethod("_params", String.class));
 
             if (methodPattern.trim().length() == 0) {
                 methodPattern = "any";
@@ -95,7 +96,6 @@ public class MethodPatternMatcher {
         try {
             return isMatches(returnType, currentMethod.get().getReturnType().getName());
         } catch (NotFoundException e) {
-            //todo think about this
             return false;
         }
     }
@@ -117,12 +117,43 @@ public class MethodPatternMatcher {
         return false;
     }
 
+    public static boolean _params(String paramsString) {
+        String[] params = paramsString.split(",");
+        CtClass[] parameterTypes;
+        try {
+            parameterTypes = currentMethod.get().getParameterTypes();
+        } catch (NotFoundException e) {
+            return false;
+        }
+
+        if (parameterTypes.length != params.length) {
+            return false;
+        }
+
+        int idx = 0;
+        for (String param : params) {
+            if (!isMatches(param, parameterTypes[idx].getName())) {
+                return false;
+            }
+            idx++;
+        }
+
+        return true;
+    }
+
     //todo make tests for this method
-    @SuppressWarnings({"StringEquality"})
+    @SuppressWarnings({"StringEquality", "ConstantConditions"})
     static boolean isMatches(String pattern, String str) {
         if (pattern == str || pattern.equals(str)) {
             return true;
         }
+
+        if (pattern == null) {
+            return false;
+        }
+
+        pattern = pattern.trim();
+        str = str.trim();
 
         if (pattern.startsWith("*")) {
             if (pattern.endsWith("*")) {
