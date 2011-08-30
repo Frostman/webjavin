@@ -18,49 +18,18 @@
 
 package ru.frostman.web.test;
 
-import ru.frostman.web.annotation.Action;
-import ru.frostman.web.annotation.Controller;
-import ru.frostman.web.annotation.Param;
-import ru.frostman.web.controller.Model;
-import ru.frostman.web.controller.View;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static ru.frostman.web.controller.Controllers.view;
+import ru.frostman.web.annotation.Component;
 
 /**
  * @author slukjanov aka Frostman
  */
-@Controller
-public class TestController {
-
-    private final HttpServletRequest request;
-    private final HttpServletResponse response;
-
-    public TestController(HttpServletRequest request, HttpServletResponse response) {
-        this.request = request;
-        this.response = response;
+@Component
+public class TestComponent {
+    public TestComponent() {
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 
-    @Action("/test")
-    public View test(Model model, @Param(value = "verified", required = false) boolean verified, TestComponent comp) {
-        model.put("page", "test" + comp.g()).put("verified", verified);
-
-        return view("test.ftl");
+    public String g() {
+        return "g2";
     }
-
-    @Action("/qwe")
-    public View qwe(Model model) {
-        model.put("page", "qwe");
-
-        return view("test.ftl");
-    }
-
-    @Action("/indigo")
-    public View indigo(Model model) {
-        model.put("page", "qwe");
-        return view("/indigo/auth.ftl");
-    }
-
 }
