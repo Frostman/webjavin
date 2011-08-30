@@ -49,8 +49,14 @@ class ActionsEnhancer {
                                List<ActionDefinition> actionDefinitions) {
         for (CtMethod actionMethod : getDeclaredMethodsAnnotatedWith(Action.class, controller)) {
             try {
+                Controller controllerAnn = (Controller) controller.getAnnotation(Controller.class);
+                if (controllerAnn == null) {
+                    throw new ActionEnhancerException("Class with @Action marked methods should be marked with @Controller");
+                }
+                String urlPrefix = controllerAnn.value();
+
                 Action actionAnnotation = (Action) actionMethod.getAnnotation(Action.class);
-                String[] urls = normalizeUrls(actionAnnotation.value());
+                String[] urls = normalizeUrls(actionAnnotation.value(), urlPrefix);
                 HttpMethod[] methods = actionAnnotation.method();
                 boolean async = actionAnnotation.async();
 
@@ -270,9 +276,9 @@ class ActionsEnhancer {
         method.setBody(body.append("}").toString());
     }
 
-    private static String[] normalizeUrls(String[] urls) {
+    private static String[] normalizeUrls(String[] urls, String urlPrefix) {
         for (int i = 0; i < urls.length; i++) {
-            urls[i] = Controllers.url(urls[i]);
+            urls[i] = Controllers.url(urlPrefix + urls[i]);
         }
 
         return urls;
