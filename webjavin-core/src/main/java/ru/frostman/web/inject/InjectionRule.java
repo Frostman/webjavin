@@ -16,19 +16,17 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.secure.impl;
+package ru.frostman.web.inject;
 
-import ru.frostman.web.secure.userdetails.UserService;
-import ru.frostman.web.secure.userdetails.UserServiceProvider;
+import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class InMemoryUserServiceProvider implements UserServiceProvider {
-    private UserService userService = new InMemoryUserService();
+public interface InjectionRule {
+    List<String> classNames();
 
-    @Override
-    public UserService get() {
-        return userService;
-    }
+    List<String> annotations();
+
+    String initCode();
 }
