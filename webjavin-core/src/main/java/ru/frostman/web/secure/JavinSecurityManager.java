@@ -76,11 +76,11 @@ public class JavinSecurityManager {
         }
     }
 
-    public static boolean isAuthenticated() {
+    public static boolean _isAuthenticated() {
         return currentUser.get() != null;
     }
 
-    public static boolean hasRole(String role) {
+    public static boolean _hasRole(String role) {
         return currentRole.get().equals(role);
     }
 
