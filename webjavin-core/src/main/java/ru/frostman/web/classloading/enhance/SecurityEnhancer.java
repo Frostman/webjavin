@@ -19,7 +19,6 @@
 package ru.frostman.web.classloading.enhance;
 
 import com.google.common.collect.Lists;
-import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import ru.frostman.web.Javin;
@@ -33,7 +32,7 @@ import java.util.List;
  */
 public class SecurityEnhancer {
 
-    public static void enhance(ClassPool classPool, CtClass ctClass) {
+    public static void enhance(CtClass ctClass) {
         for (CtMethod method : EnhancerUtil.getDeclaredMethodsAnnotatedWith(Secure.class, ctClass)) {
             try {
                 Secure secureAnnotation = (Secure) method.getAnnotation(Secure.class);

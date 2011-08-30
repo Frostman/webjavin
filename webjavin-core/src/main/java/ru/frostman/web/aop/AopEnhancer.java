@@ -19,7 +19,6 @@
 package ru.frostman.web.aop;
 
 import com.google.common.collect.Lists;
-import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.Modifier;
@@ -35,7 +34,7 @@ public class AopEnhancer {
     private static final String METHOD_INTERCEPTOR = "ru.frostman.web.aop.AopMethodInterceptor";
     private static final String METHOD_INTERCEPTORS = "ru.frostman.web.aop.MethodInterceptors";
 
-    public static void enhance(ClassPool classPool, CtClass ctClass, List<MethodInterceptor> methodInterceptors) {
+    public static void enhance(CtClass ctClass, List<MethodInterceptor> methodInterceptors) {
         try {
             for (CtMethod method : ctClass.getDeclaredMethods()) {
                 if (method.getAnnotation(Interceptor.class) != null) {

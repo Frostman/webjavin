@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static ru.frostman.web.classloading.enhance.ClassConstants.*;
+import static ru.frostman.web.classloading.enhance.Enhancer.classPool;
 import static ru.frostman.web.classloading.enhance.EnhancerUtil.*;
 
 /**
@@ -44,7 +45,7 @@ class ActionsEnhancer {
     private static final AtomicInteger actionMethodsCount = new AtomicInteger(1);
     private static final String INSTANCE = "$instance";
 
-    public static void enhance(Map<String, AppClass> classes, ClassPool classPool, CtClass controller,
+    public static void enhance(Map<String, AppClass> classes, CtClass controller,
                                List<ActionDefinition> actionDefinitions) {
         for (CtMethod actionMethod : getDeclaredMethodsAnnotatedWith(Action.class, controller)) {
             try {
@@ -58,7 +59,7 @@ class ActionsEnhancer {
                             + actionMethod.getLongName());
                 }
 
-                CtClass actionInvoker = generateActionInvoker(classPool, actionMethod, async);
+                CtClass actionInvoker = generateActionInvoker(actionMethod, async);
 
                 AppClass generated = new AppClass();
                 generated.setName(actionInvoker.getName());
@@ -79,35 +80,35 @@ class ActionsEnhancer {
         }
     }
 
-    private static CtClass generateActionInvoker(ClassPool classPool, CtMethod actionMethod, boolean async)
+    private static CtClass generateActionInvoker(CtMethod actionMethod, boolean async)
             throws CannotCompileException, ClassNotFoundException, NotFoundException {
 
         final CtClass controller = actionMethod.getDeclaringClass();
 
         CtClass actionInvoker = classPool.makeClass(controller.getName() + "$action$" + actionMethod.getName()
                 + "$" + actionMethodsCount.getAndIncrement());
-        actionInvoker.setSuperclass(getCtClass(classPool, "ru.frostman.web.dispatch.ActionInvoker"));
+        actionInvoker.setSuperclass(getCtClass("ru.frostman.web.dispatch.ActionInvoker"));
 
         CtField instanceField = new CtField(controller, "$instance", actionInvoker);
         actionInvoker.addField(instanceField);
 
-        generateActionInvokerConstructor(classPool, actionInvoker, controller);
+        generateActionInvokerConstructor(actionInvoker, controller);
 
-        generateActionInvokerBefore(classPool, actionInvoker, controller);
-        generateActionInvokerAction(classPool, actionInvoker, actionMethod);
-        generateActionInvokerAfter(classPool, actionInvoker, controller);
+        generateActionInvokerBefore(actionInvoker, controller);
+        generateActionInvokerAction(actionInvoker, actionMethod);
+        generateActionInvokerAfter(actionInvoker, controller);
 
-        generateActionInvokerCatchError(classPool, actionInvoker, controller);
-        generateActionInvokerIsAsync(classPool, actionInvoker, async);
+        generateActionInvokerCatchError(actionInvoker, controller);
+        generateActionInvokerIsAsync(actionInvoker, async);
 
         return actionInvoker;
     }
 
-    private static void generateActionInvokerConstructor(ClassPool classPool, CtClass actionInvoker, CtClass controller)
+    private static void generateActionInvokerConstructor(CtClass actionInvoker, CtClass controller)
             throws CannotCompileException, ClassNotFoundException, NotFoundException {
         CtConstructor constructor = new CtConstructor(new CtClass[]{
-                getCtClass(classPool, "javax.servlet.http.HttpServletRequest"),
-                getCtClass(classPool, "javax.servlet.http.HttpServletResponse")
+                getCtClass("javax.servlet.http.HttpServletRequest"),
+                getCtClass("javax.servlet.http.HttpServletResponse")
         }, actionInvoker);
 
         StringBuilder body = new StringBuilder();
@@ -119,7 +120,7 @@ class ActionsEnhancer {
             throw new ActionEnhancerException("Only one constructor should be in controller: " + controller.getName());
         }
 
-        StringBuilder parameters = InjectEnhancer.resolveParameters(classPool, constructors[0], body);
+        StringBuilder parameters = InjectEnhancer.resolveParameters(constructors[0], body);
         // instantiate controller class (with resolved parameters)
         body.append(INSTANCE).append(" = new ").append(controller.getName()).append("(").append(parameters).append(");}");
 
@@ -128,19 +129,18 @@ class ActionsEnhancer {
         actionInvoker.addConstructor(constructor);
     }
 
-    private static void generateActionInvokerBefore(ClassPool classPool, CtClass actionInvoker, CtClass controller)
+    private static void generateActionInvokerBefore(CtClass actionInvoker, CtClass controller)
             throws CannotCompileException, NotFoundException, ClassNotFoundException {
         CtMethod method = new CtMethod(CtClass.voidType, "before", new CtClass[]{}, actionInvoker);
 
         List<CtMethod> methodList = getMethodsAnnotatedWith(Before.class, controller);
 
-        generateActionInvokerMethodInvocations(classPool, method, methodList);
+        generateActionInvokerMethodInvocations(method, methodList);
 
         actionInvoker.addMethod(method);
     }
 
-    private static void generateActionInvokerAction(ClassPool classPool, CtClass actionInvoker,
-                                                    CtMethod actionMethod)
+    private static void generateActionInvokerAction(CtClass actionInvoker, CtMethod actionMethod)
             throws CannotCompileException, NotFoundException, ClassNotFoundException {
 
         if (!isPublicAndNonStatic(actionMethod)) {
@@ -150,20 +150,20 @@ class ActionsEnhancer {
         CtMethod method = new CtMethod(CtClass.voidType, "action", new CtClass[]{}, actionInvoker);
 
         StringBuilder body = new StringBuilder("{");
-        StringBuilder parameters = InjectEnhancer.resolveParameters(classPool, actionMethod, body);
+        StringBuilder parameters = InjectEnhancer.resolveParameters(actionMethod, body);
 
         // invoke action method in controller (with resolved parameters)
         body.append("try{ Object result = ").append(INSTANCE).append(".")
                 .append(actionMethod.getName()).append("(").append(parameters).append(");");
 
         CtClass returnType = actionMethod.getReturnType();
-        if (returnType.equals(getCtClass(classPool, VIEW))) {
+        if (returnType.equals(getCtClass(VIEW))) {
             // iff return type is View then change current ModelAndView's view
             body.append("mav.setView((").append(VIEW).append(") result").append(");");
-        } else if (returnType.equals(getCtClass(classPool, MODEL_AND_VIEW))) {
+        } else if (returnType.equals(getCtClass(MODEL_AND_VIEW))) {
             // iff return type is ModelAndView then change current ModelAndView
             body.append("mav = (").append(MODEL_AND_VIEW).append(") result;");
-        } else if (returnType.equals(getCtClass(classPool, JAVA_LANG_STRING))) {
+        } else if (returnType.equals(getCtClass(JAVA_LANG_STRING))) {
             // iff return type is String then change ModelAndView's view to resolved view by name
             body.append("mav.setView(ru.frostman.web.Javin.getViews().getViewByName((")
                     .append(JAVA_LANG_STRING).append(") result").append("));");
@@ -183,21 +183,21 @@ class ActionsEnhancer {
         actionInvoker.addMethod(method);
     }
 
-    private static void generateActionInvokerAfter(ClassPool classPool, CtClass actionInvoker, CtClass controller)
+    private static void generateActionInvokerAfter(CtClass actionInvoker, CtClass controller)
             throws CannotCompileException, NotFoundException, ClassNotFoundException {
         CtMethod method = new CtMethod(CtClass.voidType, "after", new CtClass[]{}, actionInvoker);
 
         List<CtMethod> methodList = getMethodsAnnotatedWith(After.class, controller);
 
-        generateActionInvokerMethodInvocations(classPool, method, methodList);
+        generateActionInvokerMethodInvocations(method, methodList);
 
         actionInvoker.addMethod(method);
     }
 
-    private static void generateActionInvokerCatchError(ClassPool classPool, CtClass actionInvoker, CtClass controller)
+    private static void generateActionInvokerCatchError(CtClass actionInvoker, CtClass controller)
             throws CannotCompileException, NotFoundException, ClassNotFoundException {
         CtMethod method = new CtMethod(CtClass.voidType, "catchError",
-                new CtClass[]{getCtClass(classPool, "java.lang.Throwable")}, actionInvoker);
+                new CtClass[]{getCtClass("java.lang.Throwable")}, actionInvoker);
 
         List<CtMethod> methods = getMethodsAnnotatedWith(Catch.class, controller);
         if (methods.size() > 1) {
@@ -218,7 +218,7 @@ class ActionsEnhancer {
                         + invokeMethod.getLongName());
             }
 
-            StringBuilder parameters = InjectEnhancer.resolveParameters(classPool, invokeMethod, body);
+            StringBuilder parameters = InjectEnhancer.resolveParameters(invokeMethod, body);
 
             // invoke method with resolved parameters
             body.append("{").append(INSTANCE).append(".")
@@ -237,7 +237,7 @@ class ActionsEnhancer {
         actionInvoker.addMethod(method);
     }
 
-    private static void generateActionInvokerIsAsync(ClassPool classPool, CtClass actionInvoker, boolean async)
+    private static void generateActionInvokerIsAsync(CtClass actionInvoker, boolean async)
             throws CannotCompileException {
         CtMethod method = new CtMethod(CtClass.booleanType, "isAsync", new CtClass[]{}, actionInvoker);
 
@@ -246,7 +246,7 @@ class ActionsEnhancer {
         actionInvoker.addMethod(method);
     }
 
-    private static void generateActionInvokerMethodInvocations(ClassPool classPool, CtMethod method, List<CtMethod> methods)
+    private static void generateActionInvokerMethodInvocations(CtMethod method, List<CtMethod> methods)
             throws NotFoundException, CannotCompileException, ClassNotFoundException {
         StringBuilder body = new StringBuilder("{");
         for (CtMethod invokeMethod : methods) {
@@ -258,7 +258,7 @@ class ActionsEnhancer {
                         + invokeMethod.getLongName());
             }
 
-            StringBuilder parameters = InjectEnhancer.resolveParameters(classPool, invokeMethod, body);
+            StringBuilder parameters = InjectEnhancer.resolveParameters(invokeMethod, body);
 
             // invoke method with resolved parameters
             body.append("{").append(INSTANCE).append(".")

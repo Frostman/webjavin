@@ -28,5 +28,9 @@ public interface InjectionRule {
 
     List<String> annotations();
 
+    String name();
+
     String initCode();
+
+    String prependCode();
 }

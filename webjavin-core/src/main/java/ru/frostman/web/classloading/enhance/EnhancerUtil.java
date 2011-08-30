@@ -19,22 +19,27 @@
 package ru.frostman.web.classloading.enhance;
 
 import com.google.common.collect.Lists;
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.Modifier;
 import ru.frostman.web.thr.BytecodeManipulationException;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+
+import static ru.frostman.web.classloading.enhance.Enhancer.classPool;
 
 /**
  * @author slukjanov aka Frostman
  */
 public class EnhancerUtil {
 
-    public static CtClass createCtClass(ClassPool classPool, String superClassName, String genClassName
-            , String... interfaces) throws BytecodeManipulationException {
+    public static CtClass createCtClass(String superClassName, String genClassName, String... interfaces)
+            throws BytecodeManipulationException {
 
         CtClass superClass;
-        superClass = getCtClass(classPool, superClassName);
+        superClass = getCtClass(superClassName);
 
         CtClass genCtClass = classPool.makeClass(genClassName);
         try {
@@ -54,7 +59,7 @@ public class EnhancerUtil {
         return genCtClass;
     }
 
-    public static CtClass getCtClass(ClassPool classPool, String className) throws BytecodeManipulationException {
+    public static CtClass getCtClass(String className) throws BytecodeManipulationException {
         try {
             return classPool.get(className);
         } catch (Exception e) {
@@ -62,8 +67,8 @@ public class EnhancerUtil {
         }
     }
 
-    public static List<CtMethod> getDeclaredMethodsAnnotatedWith(Class<? extends Annotation> annotation
-            , CtClass ctClass) throws BytecodeManipulationException {
+    public static List<CtMethod> getDeclaredMethodsAnnotatedWith(Class<? extends Annotation> annotation, CtClass ctClass)
+            throws BytecodeManipulationException {
         try {
             List<CtMethod> annotated = Lists.newLinkedList();
 
@@ -91,8 +96,8 @@ public class EnhancerUtil {
      * @throws ru.frostman.web.thr.BytecodeManipulationException
      *          iff any error
      */
-    public static List<CtMethod> getMethodsAnnotatedWith(Class<? extends Annotation> annotation
-            , CtClass ctClass) throws BytecodeManipulationException {
+    public static List<CtMethod> getMethodsAnnotatedWith(Class<? extends Annotation> annotation, CtClass ctClass)
+            throws BytecodeManipulationException {
         try {
             List<CtMethod> annotated = Lists.newLinkedList();
 

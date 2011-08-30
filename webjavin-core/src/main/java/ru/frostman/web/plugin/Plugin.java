@@ -20,7 +20,6 @@ package ru.frostman.web.plugin;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import javassist.ClassPool;
 import javassist.CtClass;
 import ru.frostman.web.aop.MethodInterceptor;
 import ru.frostman.web.classloading.AppClass;
@@ -51,7 +50,7 @@ public abstract class Plugin implements Comparable<Plugin> {
     public void afterClassesEnhance(Map<String, AppClass> classes) {
     }
 
-    public void enhanceClass(Map<String, AppClass> classes, ClassPool classPool, CtClass ctClass) {
+    public void enhanceClass(Map<String, AppClass> classes, CtClass ctClass) {
     }
 
     public List<String> getAppClassesPackages() {

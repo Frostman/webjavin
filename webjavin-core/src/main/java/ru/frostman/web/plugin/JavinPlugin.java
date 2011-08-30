@@ -19,9 +19,17 @@
 package ru.frostman.web.plugin;
 
 import com.google.common.collect.Lists;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import ru.frostman.web.annotation.Component;
 import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.classloading.enhance.InjectEnhancer;
+import ru.frostman.web.inject.BaseInjection;
 import ru.frostman.web.inject.InjectionRule;
+import ru.frostman.web.thr.ActionEnhancerException;
+import ru.frostman.web.thr.BytecodeManipulationException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +39,6 @@ import java.util.Map;
 class JavinPlugin extends Plugin {
 
     private final List<InjectionRule> injectionRules = Lists.newLinkedList();
-    ;
 
     JavinPlugin() {
         super(0);
@@ -39,7 +46,39 @@ class JavinPlugin extends Plugin {
 
     @Override
     public void beforeClassesEnhance(Map<String, AppClass> classes) {
-        //todo iterate and generate rules
+        for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
+            AppClass appClass = entry.getValue();
+            try {
+                CtClass ctClass = appClass.getCtClass();
+                Component componentAnn = (Component) ctClass.getAnnotation(Component.class);
+
+                if (componentAnn == null) {
+                    continue;
+                }
+
+                String name = componentAnn.value();
+                List<String> classNames = Lists.newLinkedList();
+                classNames.add(appClass.getName());
+                classNames.addAll(Arrays.asList(componentAnn.implement()));
+                List<String> annotationsNames = Lists.newLinkedList(Arrays.asList(componentAnn.annotated()));
+
+                StringBuilder body = new StringBuilder();
+                StringBuilder initCode = new StringBuilder();
+
+                CtConstructor[] constructors = ctClass.getConstructors();
+                if (constructors.length != 1) {
+                    throw new ActionEnhancerException("Only one constructor should be in component: " + ctClass.getName());
+                }
+
+                //todo impl singleton mode
+                StringBuilder parameters = InjectEnhancer.resolveParameters(constructors[0], body);
+                initCode.append("new ").append(ctClass.getName()).append("(").append(parameters).append(")");
+
+                injectionRules.add(new BaseInjection(annotationsNames, classNames, name, initCode.toString(), body.toString()));
+            } catch (Exception e) {
+                throw new BytecodeManipulationException("Exception while searching components in class: " + appClass.getName(), e);
+            }
+        }
     }
 
     @Override

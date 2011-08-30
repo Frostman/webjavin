@@ -40,7 +40,7 @@ import java.util.Map;
  * @author slukjanov aka Frostman
  */
 public class Enhancer {
-    private static final ClassPool classPool = new ClassPool();
+    public static final ClassPool classPool = new ClassPool();
 
     static {
         classPool.appendClassPath(new ClassClassPath(AppClasses.class));
@@ -86,16 +86,16 @@ public class Enhancer {
         }
 
         // enhance actions
-        ActionsEnhancer.enhance(classes, classPool, ctClass, actionDefinitions);
+        ActionsEnhancer.enhance(classes, ctClass, actionDefinitions);
 
         // enhance in plugins
-        JavinPlugins.get().enhanceClass(classes, classPool, ctClass);
+        JavinPlugins.get().enhanceClass(classes, ctClass);
 
         // AOP enhance
-        AopEnhancer.enhance(classPool, ctClass, methodInterceptors);
+        AopEnhancer.enhance(ctClass, methodInterceptors);
 
         // enhance security
-        SecurityEnhancer.enhance(classPool, ctClass);
+        SecurityEnhancer.enhance(ctClass);
 
         try {
             appClass.setEnhancedBytecode(ctClass.toBytecode());

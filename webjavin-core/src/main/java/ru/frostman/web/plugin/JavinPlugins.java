@@ -21,7 +21,6 @@ package ru.frostman.web.plugin;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import javassist.ClassPool;
 import javassist.CtClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +47,12 @@ public class JavinPlugins extends Plugin {
     private final List<String> loadedPlugins;
 
     private final List<Plugin> plugins;
+
+    private List<String> appPackages;
+
+    private List<MethodInterceptor> methodInterceptors;
+
+    private List<InjectionRule> customInjections;
 
     private JavinPlugins(List<String> loadedPlugins, List<Plugin> plugins) {
         super(0);
@@ -109,15 +114,12 @@ public class JavinPlugins extends Plugin {
         return instance;
     }
 
-    private List<String> appPackages;
-    private List<MethodInterceptor> methodInterceptors;
-    private List<InjectionRule> customInjections;
-
     @Override
     public boolean reload() {
         appPackages = Lists.newLinkedList();
         methodInterceptors = Lists.newLinkedList();
-        customInjections = Lists.newLinkedList();
+        customInjections = null;
+
         boolean result = false;
 
         for (Plugin plugin : plugins) {
@@ -126,7 +128,6 @@ public class JavinPlugins extends Plugin {
 
                 appPackages.addAll(plugin.getAppClassesPackages());
                 methodInterceptors.addAll(plugin.getPluginsMethodInterceptors());
-                customInjections.addAll(plugin.getCustomInjections());
             } catch (Exception e) {
                 throw new JavinPluginException("Exception while executing update() on plugin with main class: "
                         + plugin.getClass().getName(), e);
@@ -161,10 +162,10 @@ public class JavinPlugins extends Plugin {
     }
 
     @Override
-    public void enhanceClass(Map<String, AppClass> classes, ClassPool classPool, CtClass ctClass) {
+    public void enhanceClass(Map<String, AppClass> classes, CtClass ctClass) {
         for (Plugin plugin : plugins) {
             try {
-                plugin.enhanceClass(classes, classPool, ctClass);
+                plugin.enhanceClass(classes, ctClass);
             } catch (Exception e) {
                 throw new JavinPluginException("Exception while executing enhanceClass() on plugin with main class: "
                         + plugin.getClass().getName(), e);
@@ -183,6 +184,19 @@ public class JavinPlugins extends Plugin {
     }
 
     public List<InjectionRule> getCustomInjections() {
+        if (customInjections == null) {
+            customInjections = Lists.newLinkedList();
+
+            for (Plugin plugin : plugins) {
+                try {
+                    customInjections.addAll(plugin.getCustomInjections());
+                } catch (Exception e) {
+                    throw new JavinPluginException("Exception while getting custom injections on plugin with main class: "
+                            + plugin.getClass().getName(), e);
+                }
+            }
+        }
+
         return customInjections;
     }
 }
