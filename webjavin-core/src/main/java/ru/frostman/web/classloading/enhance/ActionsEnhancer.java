@@ -49,11 +49,7 @@ class ActionsEnhancer {
                                List<ActionDefinition> actionDefinitions) {
         for (CtMethod actionMethod : getDeclaredMethodsAnnotatedWith(Action.class, controller)) {
             try {
-                Controller controllerAnn = (Controller) controller.getAnnotation(Controller.class);
-                if (controllerAnn == null) {
-                    throw new ActionEnhancerException("Class with @Action marked methods should be marked with @Controller");
-                }
-                String urlPrefix = controllerAnn.value();
+                String urlPrefix = extractUrlPrefix(controller);
 
                 Action actionAnnotation = (Action) actionMethod.getAnnotation(Action.class);
                 String[] urls = normalizeUrls(actionAnnotation.value(), urlPrefix);
@@ -84,6 +80,15 @@ class ActionsEnhancer {
                 throw new ActionEnhancerException("Error while enhancing action: " + actionMethod.getLongName(), e);
             }
         }
+    }
+
+    private static String extractUrlPrefix(CtClass controller) throws ClassNotFoundException {
+        Controller controllerAnn = (Controller) controller.getAnnotation(Controller.class);
+        String urlPrefix = "";
+        if (controllerAnn != null) {
+            urlPrefix = controllerAnn.value();
+        }
+        return urlPrefix;
     }
 
     private static CtClass generateActionInvoker(CtMethod actionMethod, boolean async)
