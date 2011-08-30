@@ -26,7 +26,7 @@ import ru.frostman.web.aop.MethodInvocation;
  */
 public class TestAOP {
 
-    @Interceptor("package('*frostman*') && method('test')")
+    @Interceptor("package('*frostman*') && annotation('*Action')")
     public static Object testInterceptor(MethodInvocation mi) {
         System.out.println("invoke: " + mi.getMethod());
 

@@ -126,7 +126,7 @@ public class MethodPatternMatcher {
 
         if (pattern.startsWith("*")) {
             if (pattern.endsWith("*")) {
-                return str.contains(pattern.substring(1, Math.max(0, pattern.length() - 1)));
+                return str.contains(pattern.substring(1, Math.max(1, pattern.length() - 1)));
             } else {
                 return str.endsWith(pattern.substring(1));
             }
