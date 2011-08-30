@@ -42,8 +42,6 @@ public class MethodPatternMatcher {
 
     private final ExecutableStatement expression;
 
-    // package('ru.frostman*') && class('*') && method('*') && return('*') && annotation ()
-
     public MethodPatternMatcher(String methodPattern) {
         try {
             ParserContext context = new ParserContext();
@@ -128,12 +126,12 @@ public class MethodPatternMatcher {
 
         if (pattern.startsWith("*")) {
             if (pattern.endsWith("*")) {
-                return str.contains(pattern.substring(1, pattern.length() - 1));
+                return str.contains(pattern.substring(1, Math.max(0, pattern.length() - 1)));
             } else {
                 return str.endsWith(pattern.substring(1));
             }
         }
 
-        return pattern.endsWith("*") && str.startsWith(pattern.substring(0, pattern.length() - 1));
+        return pattern.endsWith("*") && str.startsWith(pattern.substring(0, Math.max(0, pattern.length() - 1)));
     }
 }
