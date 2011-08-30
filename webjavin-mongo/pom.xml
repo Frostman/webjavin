@@ -23,7 +23,7 @@
     <parent>
         <artifactId>webjavin-parent</artifactId>
         <groupId>ru.frostman.web</groupId>
-        <version>0.1.3-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>webjavin-mongo</artifactId>
