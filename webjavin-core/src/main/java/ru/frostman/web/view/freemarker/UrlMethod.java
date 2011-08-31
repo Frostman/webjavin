@@ -32,7 +32,7 @@ public class UrlMethod implements TemplateMethodModel {
     @Override
     public Object exec(List args) throws TemplateModelException {
         if (args.size() != 1) {
-            throw new TemplateModelException("Wrong arguments number: required 1 argument");
+            throw new TemplateModelException("url: wrong arguments number: required 1 argument");
         }
 
         return new SimpleScalar(Controllers.url((String) args.get(0)));
