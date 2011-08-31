@@ -9,9 +9,6 @@ classes:
           "ru.frostman.web.test2"
       ]
 
-templates:
-      path: "/view"
-
 statics: {
       "/static/": {
             "target": "/static"
