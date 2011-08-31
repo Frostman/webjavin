@@ -82,12 +82,12 @@ public class Dispatcher {
         }
 
         if (invoker == null) {
-            sendNotFound(request, response);
+            sendNotFound(response, request.getRequestURI());
         } else {
             try {
                 invoker.invoke();
             } catch (NotFoundException e) {
-                sendNotFound(request, response);
+                sendNotFound(response, e.getMessage());
             }
         }
     }
@@ -181,9 +181,9 @@ public class Dispatcher {
         return false;
     }
 
-    private void sendNotFound(HttpServletRequest request, HttpServletResponse response) {
+    private void sendNotFound(HttpServletResponse response, String msg) {
         try {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, msg != null ? msg : "");
         } catch (IOException e) {
             throw new JavinRuntimeException("Exception while sending 404: Not found", e);
         }
