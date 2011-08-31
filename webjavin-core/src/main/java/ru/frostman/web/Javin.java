@@ -18,9 +18,17 @@
 
 package ru.frostman.web;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import ru.frostman.web.classloading.AppClasses;
+import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.util.Invoker;
+import ru.frostman.web.util.Resources;
 import ru.frostman.web.view.AppViews;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * Main class of Javin framework, that encapsulates most of all
@@ -30,6 +38,21 @@ import ru.frostman.web.view.AppViews;
  * @author slukjanov aka Frostman
  */
 public final class Javin {
+    private static String version = "unknown";
+
+    static {
+        try {
+            version = CharStreams.readFirstLine(new InputSupplier<Reader>() {
+                @Override
+                public Reader getInput() throws IOException {
+                    return new InputStreamReader(Resources.getResourceAsStream("version"), "UTF-8");
+                }
+            });
+        } catch (Exception e) {
+            throw new JavinRuntimeException("Can't load WebJavin's version", e);
+        }
+    }
+
     /**
      * Current application mode
      */
@@ -64,6 +87,13 @@ public final class Javin {
      * Executor
      */
     private static Invoker invoker;
+
+    /**
+     * @return WebJavin's version
+     */
+    public static String getVersion() {
+        return version;
+    }
 
     /**
      * @return current application mode

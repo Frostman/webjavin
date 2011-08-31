@@ -18,6 +18,7 @@
 
 package ru.frostman.web.test;
 
+import ru.frostman.web.Javin;
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
 import ru.frostman.web.annotation.Param;
@@ -48,7 +49,7 @@ public class TestController {
     public View test(Model model, @Param(value = "verified", required = false) boolean verified, TestComponent comp) {
         model.put("page", "test" + comp.g() + "<br>"
                 + I18n.get("ru", "test")
-        ).put("verified", verified);
+        ).put("verified", verified).put("version", Javin.getVersion());
 
         return view("test.ftl");
     }

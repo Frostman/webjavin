@@ -7,4 +7,12 @@ Page: ${page!} <br>
 Verified: ${verified?string} <br>
 [/#if]
 
-test
+test<br>
+<br>
+
+[#if version??]
+WebJavin version: ${version!} <br>
+[/#if]
+
+
+
