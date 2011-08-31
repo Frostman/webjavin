@@ -41,4 +41,6 @@ public class ClassConstants {
     public static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
     public static final String JAVIN_SESSION = "ru.frostman.web.session.JavinSession";
     public static final String JAVIN_SESSIONS = "ru.frostman.web.session.JavinSessions";
+    public static final String CSRF_PROTECTOR = "ru.frostman.web.secure.CsrfProtector";
+    public static final String CSRF_TOKEN_EXCEPTION = "ru.frostman.web.thr.CsrfTokenNotValidException";
 }
