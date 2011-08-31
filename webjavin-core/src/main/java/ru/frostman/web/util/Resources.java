@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
@@ -86,13 +84,5 @@ public class Resources {
      */
     public static URL getResource(String name) {
         return MAIN_CLASS_LOADER.getResource(name);
-    }
-
-    public static List<URL> getResources(String name) {
-        try {
-            return Collections.list(MAIN_CLASS_LOADER.getResources(name));
-        } catch (IOException e) {
-            return null;
-        }
     }
 }
