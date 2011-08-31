@@ -28,7 +28,7 @@ public class TemplatesConfig {
     /**
      * Path to templates, root is the classpath
      */
-    private String path;
+    private String path = "/view";
 
     /**
      * Templates update interval, used only in production mode
