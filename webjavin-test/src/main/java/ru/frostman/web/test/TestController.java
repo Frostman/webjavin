@@ -21,6 +21,7 @@ package ru.frostman.web.test;
 import ru.frostman.web.Javin;
 import ru.frostman.web.annotation.Action;
 import ru.frostman.web.annotation.Controller;
+import ru.frostman.web.annotation.CsrfProtected;
 import ru.frostman.web.annotation.Param;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
@@ -54,6 +55,7 @@ public class TestController {
         return view("test.ftl");
     }
 
+    @CsrfProtected
     @Action("/qwe")
     public View qwe(Model model) {
         model.put("page", "qwe");
