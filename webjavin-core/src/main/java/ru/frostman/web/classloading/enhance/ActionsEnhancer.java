@@ -163,6 +163,11 @@ class ActionsEnhancer {
         StringBuilder body = new StringBuilder("{");
         StringBuilder parameters = InjectEnhancer.resolveParameters(actionMethod, body);
 
+        if (actionMethod.getAnnotation(CsrfProtected.class) != null) {
+            body.append("if(!" + CSRF_PROTECTOR + ".checkToken(request, response)) { throw new "
+                    + CSRF_TOKEN_EXCEPTION + "(\"CSRF protection token is not valid\"); }");
+        }
+
         // invoke action method in controller (with resolved parameters)
         body.append("try{ Object result = ").append(INSTANCE).append(".")
                 .append(actionMethod.getName()).append("(").append(parameters).append(");");
