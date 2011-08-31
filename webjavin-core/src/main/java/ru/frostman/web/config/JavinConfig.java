@@ -56,6 +56,7 @@ public class JavinConfig {
     private AppConfig app = new AppConfig();
     private SecureConfig secure = new SecureConfig();
     private CacheConfig cache = new CacheConfig();
+    private I18nConfig i18n = new I18nConfig();
 
     private Map<String, StaticResource> statics = Maps.newLinkedHashMap();
 
@@ -220,6 +221,14 @@ public class JavinConfig {
         this.cache = cache;
     }
 
+    public I18nConfig getI18n() {
+        return i18n;
+    }
+
+    public void setI18n(I18nConfig i18n) {
+        this.i18n = i18n;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof JavinConfig) {
@@ -234,7 +243,8 @@ public class JavinConfig {
                     && Objects.equal(app, config.app)
                     && Objects.equal(secure, config.secure)
                     && Objects.equal(statics, config.statics)
-                    && Objects.equal(cache, config.cache);
+                    && Objects.equal(cache, config.cache)
+                    && Objects.equal(i18n, config.i18n);
         }
 
         return false;
@@ -250,7 +260,10 @@ public class JavinConfig {
         result = 31 * result + (templates != null ? templates.hashCode() : 0);
         result = 31 * result + (app != null ? app.hashCode() : 0);
         result = 31 * result + (secure != null ? secure.hashCode() : 0);
+        result = 31 * result + (cache != null ? cache.hashCode() : 0);
+        result = 31 * result + (i18n != null ? i18n.hashCode() : 0);
         result = 31 * result + (statics != null ? statics.hashCode() : 0);
+
         return result;
     }
 }
