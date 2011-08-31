@@ -47,7 +47,6 @@ public class Resources {
                 // avoid caching in getResourceAsStream(...)
                 return url.openStream();
             } catch (IOException e) {
-                //todo think about this
                 return null;
             }
         }
