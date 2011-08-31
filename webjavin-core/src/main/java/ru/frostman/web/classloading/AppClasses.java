@@ -33,6 +33,7 @@ import ru.frostman.web.classloading.enhance.Enhancer;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.Dispatcher;
+import ru.frostman.web.i18n.I18n;
 import ru.frostman.web.plugin.JavinPlugins;
 import ru.frostman.web.secure.JavinSecurityManager;
 import ru.frostman.web.session.JavinSession;
@@ -137,6 +138,10 @@ public class AppClasses {
 
             // update plugins
             needReload |= JavinPlugins.update();
+
+            // update i18n
+            //todo think about needReload iff changed
+            I18n.update();
 
             if (forceReload) {
                 needReload = true;
