@@ -33,6 +33,7 @@ import java.io.PrintWriter;
  */
 public class FreemarkerView extends View {
     private static final UrlMethod URL_METHOD = new UrlMethod();
+    private static final CsrfTokenMethod CSRF_TOKEN_METHOD = new CsrfTokenMethod();
 
     private final Template template;
 
@@ -51,6 +52,7 @@ public class FreemarkerView extends View {
     @Override
     public void process(Model model, PrintWriter writer) {
         model.put("url", URL_METHOD);
+        model.put("csrfToken", CSRF_TOKEN_METHOD);
 
         try {
             template.process(model, writer);
