@@ -77,6 +77,13 @@
             <version>1.6.2</version>
         </dependency>
 
+        <!--todo think about moving to-->
+        <!--<dependency>-->
+        <!--<groupId>ch.qos.logback</groupId>-->
+        <!--<artifactId>logback-classic</artifactId>-->
+        <!--<version>0.9.29</version>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
