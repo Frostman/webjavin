@@ -63,7 +63,7 @@ public class EnhancerUtil {
         try {
             return classPool.get(className);
         } catch (Exception e) {
-            throw new BytecodeManipulationException("Error in loading expected class", e);
+            return null;
         }
     }
 
