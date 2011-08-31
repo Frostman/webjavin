@@ -140,7 +140,6 @@ public class AppClasses {
             needReload |= JavinPlugins.update();
 
             // update i18n
-            //todo think about needReload iff changed
             I18n.update();
 
             if (forceReload) {
