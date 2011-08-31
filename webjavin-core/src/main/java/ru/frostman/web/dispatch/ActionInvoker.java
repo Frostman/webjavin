@@ -22,6 +22,7 @@ import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.ModelAndView;
 import ru.frostman.web.controller.View;
+import ru.frostman.web.thr.CsrfTokenNotValidException;
 import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.NotFoundException;
 import ru.frostman.web.thr.ParameterRequiredException;
@@ -78,6 +79,8 @@ public abstract class ActionInvoker implements Runnable {
             process();
         } catch (ParameterRequiredException e) {
             throw new NotFoundException(e);
+        } catch (CsrfTokenNotValidException e) {
+            throw new NotFoundException(e.getMessage());
         } catch (Throwable th) {
             throw new JavinRuntimeException("Exception while executing action", th);
         }
