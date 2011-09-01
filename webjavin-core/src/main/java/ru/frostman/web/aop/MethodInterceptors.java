@@ -49,7 +49,7 @@ public class MethodInterceptors {
                 CtClass ctClass = entry.getValue().getCtClass();
 
                 for (CtMethod method : EnhancerUtil.getDeclaredMethodsAnnotatedWith(Interceptor.class, ctClass)) {
-                    if (!EnhancerUtil.isPublicAndStatic(method)) {
+                    if (EnhancerUtil.isNonPublicAndNonStatic(method)) {
                         throw new AopException("Interceptor method should be public and static");
                     }
 

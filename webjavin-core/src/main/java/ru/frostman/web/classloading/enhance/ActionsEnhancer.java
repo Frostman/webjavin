@@ -154,7 +154,7 @@ class ActionsEnhancer {
     private static void generateActionInvokerAction(CtClass actionInvoker, CtMethod actionMethod)
             throws CannotCompileException, NotFoundException, ClassNotFoundException {
 
-        if (!isPublicAndNonStatic(actionMethod)) {
+        if (isNonPublicAndStatic(actionMethod)) {
             throw new ActionEnhancerException("Action method should be public and non static: " + actionMethod.getLongName());
         }
 
@@ -225,7 +225,7 @@ class ActionsEnhancer {
         for (CtMethod invokeMethod : methods) {
             if (invokeMethod.getReturnType() != CtClass.voidType) {
                 throw new ActionEnhancerException("Method marked with @Catch should return void: " + invokeMethod.getLongName());
-            } else if (!isPublicAndNonStatic(invokeMethod)) {
+            } else if (isNonPublicAndStatic(invokeMethod)) {
                 throw new ActionEnhancerException("Method marked with @Catch should be public and non static: "
                         + invokeMethod.getLongName());
             } else if (invokeMethod.getParameterTypes().length < 1 ||
@@ -269,7 +269,7 @@ class ActionsEnhancer {
             if (invokeMethod.getReturnType() != CtClass.voidType) {
                 throw new ActionEnhancerException("Method marked with @After or @Before should return void: "
                         + invokeMethod.getLongName());
-            } else if (!isPublicAndNonStatic(invokeMethod)) {
+            } else if (isNonPublicAndStatic(invokeMethod)) {
                 throw new ActionEnhancerException("Method marked with @After or @Before should be public and non static: "
                         + invokeMethod.getLongName());
             }

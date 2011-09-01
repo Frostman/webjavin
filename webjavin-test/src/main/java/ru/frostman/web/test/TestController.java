@@ -27,9 +27,6 @@ import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.i18n.I18n;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import static ru.frostman.web.controller.Controllers.view;
 
 /**
@@ -37,14 +34,6 @@ import static ru.frostman.web.controller.Controllers.view;
  */
 @Controller
 public class TestController {
-
-    private final HttpServletRequest request;
-    private final HttpServletResponse response;
-
-    public TestController(HttpServletRequest request, HttpServletResponse response) {
-        this.request = request;
-        this.response = response;
-    }
 
     @Action("/test")
     public View test(Model model, @Param(value = "verified", required = false) boolean verified, TestComponent comp) {

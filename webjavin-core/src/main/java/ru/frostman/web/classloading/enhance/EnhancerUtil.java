@@ -130,16 +130,16 @@ public class EnhancerUtil {
         return null;
     }
 
-    public static boolean isPublicAndNonStatic(CtMethod method) {
+    public static boolean isNonPublicAndStatic(CtMethod method) {
         int mod = method.getModifiers();
 
-        return Modifier.isPublic(mod) && (!Modifier.isStatic(mod));
+        return !Modifier.isPublic(mod) && Modifier.isStatic(mod);
     }
 
-    public static boolean isPublicAndStatic(CtMethod method) {
+    public static boolean isNonPublicAndNonStatic(CtMethod method) {
         int mod = method.getModifiers();
 
-        return Modifier.isPublic(mod) && Modifier.isStatic(mod);
+        return !Modifier.isPublic(mod) && !Modifier.isStatic(mod);
     }
 
 }
