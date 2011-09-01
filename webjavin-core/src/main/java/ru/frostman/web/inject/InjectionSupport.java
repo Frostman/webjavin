@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * @author slukjanov aka Frostman
  */
-public class InjectionPlugin {
+public class InjectionSupport {
     public static void findInjectionRules(Map<String, AppClass> classes, List<InjectionRule> injectionRules) {
         for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
             AppClass appClass = entry.getValue();

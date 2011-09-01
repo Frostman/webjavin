@@ -25,7 +25,7 @@ import ru.frostman.web.inject.InjectionRule;
 import java.util.List;
 import java.util.Map;
 
-import static ru.frostman.web.inject.InjectionPlugin.findInjectionRules;
+import static ru.frostman.web.inject.InjectionSupport.findInjectionRules;
 
 /**
  * @author slukjanov aka Frostman
