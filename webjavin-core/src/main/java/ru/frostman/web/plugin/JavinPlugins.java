@@ -127,7 +127,7 @@ public class JavinPlugins extends Plugin {
                 result |= plugin.reload();
 
                 appPackages.addAll(plugin.getAppClassesPackages());
-                methodInterceptors.addAll(plugin.getPluginsMethodInterceptors());
+                methodInterceptors.addAll(plugin.getMethodInterceptors());
             } catch (Exception e) {
                 throw new JavinPluginException("Exception while executing update() on plugin with main class: "
                         + plugin.getClass().getName(), e);
@@ -179,17 +179,17 @@ public class JavinPlugins extends Plugin {
     }
 
     @Override
-    public List<MethodInterceptor> getPluginsMethodInterceptors() {
+    public List<MethodInterceptor> getMethodInterceptors() {
         return methodInterceptors;
     }
 
-    public List<InjectionRule> getCustomInjections() {
+    public List<InjectionRule> getInjections() {
         if (customInjections == null) {
             customInjections = Lists.newLinkedList();
 
             for (Plugin plugin : plugins) {
                 try {
-                    customInjections.addAll(plugin.getCustomInjections());
+                    customInjections.addAll(plugin.getInjections());
                 } catch (Exception e) {
                     throw new JavinPluginException("Exception while getting custom injections on plugin with main class: "
                             + plugin.getClass().getName(), e);

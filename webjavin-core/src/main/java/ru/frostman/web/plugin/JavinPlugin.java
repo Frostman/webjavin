@@ -82,7 +82,7 @@ class JavinPlugin extends Plugin {
     }
 
     @Override
-    public List<InjectionRule> getCustomInjections() {
+    public List<InjectionRule> getInjections() {
         return injectionRules;
     }
 }

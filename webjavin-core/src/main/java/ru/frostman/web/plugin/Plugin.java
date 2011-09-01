@@ -57,11 +57,11 @@ public abstract class Plugin implements Comparable<Plugin> {
         return Lists.newLinkedList();
     }
 
-    public List<MethodInterceptor> getPluginsMethodInterceptors() {
+    public List<MethodInterceptor> getMethodInterceptors() {
         return Lists.newLinkedList();
     }
 
-    public List<InjectionRule> getCustomInjections() {
+    public List<InjectionRule> getInjections() {
         return Lists.newLinkedList();
     }
 

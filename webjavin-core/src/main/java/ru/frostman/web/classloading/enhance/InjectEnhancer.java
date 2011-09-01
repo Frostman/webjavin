@@ -81,7 +81,7 @@ public class InjectEnhancer {
 
     private static boolean resolveCustomInjections(Object[] annotationsArray, StringBuilder body
             , int idx, CtClass parameterType) throws ClassNotFoundException {
-        List<InjectionRule> injectionRules = JavinPlugins.get().getCustomInjections();
+        List<InjectionRule> injectionRules = JavinPlugins.get().getInjections();
 
         for (InjectionRule rule : injectionRules) {
             //todo THINK ABOUT RECURSIVE DEPENDENCIES
