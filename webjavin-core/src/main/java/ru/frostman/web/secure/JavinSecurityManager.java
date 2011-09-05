@@ -19,8 +19,9 @@
 package ru.frostman.web.secure;
 
 import com.google.common.collect.Maps;
+import ru.frostman.web.Javin;
+import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.secure.userdetails.UserDetails;
-import ru.frostman.web.secure.userdetails.UserService;
 import ru.frostman.web.secure.userdetails.UserServiceProvider;
 import ru.frostman.web.thr.JavinIllegalAccessException;
 import ru.frostman.web.thr.SecureCheckException;
@@ -36,30 +37,40 @@ public class JavinSecurityManager {
     private static final ThreadLocal<UserDetails> currentUser = new ThreadLocal<UserDetails>();
     private static final ThreadLocal<String> currentRole = new ThreadLocal<String>();
 
-    private final UserServiceProvider userServiceProvider = null;
+    private UserServiceProvider userServiceProvider = null;
 
     private final AtomicInteger counter = new AtomicInteger();
     private final Map<Integer, SecureExpression> expressions = Maps.newHashMap();
 
     public JavinSecurityManager() {
-        //todo fix me
-//        String userServiceProviderClassName = JavinConfig.get().getSecure().getUserServiceProvider();
-//        Class<?> userServiceProviderClass;
-//        try {
-//            userServiceProviderClass = Class.forName(userServiceProviderClassName);
-//        } catch (ClassNotFoundException e) {
-//            throw new SecurityException("Can't load UserServiceProvider impl: " + userServiceProviderClassName);
-//        }
-//
-//        try {
-//            userServiceProvider = (UserServiceProvider) userServiceProviderClass.newInstance();
-//        } catch (Exception e) {
-//            throw new SecurityException("Can't instantiate UserServiceProvider impl: " + userServiceProviderClassName);
-//        }
+        if (!isDisabled()) {
+
+            String userServiceProviderClassName = JavinConfig.get().getSecure().getUserServiceProvider();
+            Class<?> userServiceProviderClass;
+            try {
+                userServiceProviderClass = Class.forName(userServiceProviderClassName);
+            } catch (ClassNotFoundException e) {
+                throw new SecurityException("Can't load UserServiceProvider impl: " + userServiceProviderClassName);
+            }
+
+            try {
+                userServiceProvider = (UserServiceProvider) userServiceProviderClass.newInstance();
+            } catch (Exception e) {
+                throw new SecurityException("Can't instantiate UserServiceProvider impl: " + userServiceProviderClassName);
+            }
+        }
     }
 
-    public UserService getUserService() {
-        return userServiceProvider.get();
+    public static JavinSecurityManager get() {
+        return Javin.getClasses().getSecurityManager();
+    }
+
+    public static boolean isDisabled() {
+        return JavinConfig.get().getSecure().isDisabled();
+    }
+
+    public UserServiceProvider getUserServiceProvider() {
+        return userServiceProvider;
     }
 
     public int registerExpression(String expressionStr, List<String> paramClasses) {

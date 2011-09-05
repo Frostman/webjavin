@@ -23,7 +23,6 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import ru.frostman.web.annotation.Component;
 import ru.frostman.web.classloading.AppClass;
-import ru.frostman.web.classloading.enhance.InjectEnhancer;
 import ru.frostman.web.thr.ActionEnhancerException;
 import ru.frostman.web.thr.BytecodeManipulationException;
 

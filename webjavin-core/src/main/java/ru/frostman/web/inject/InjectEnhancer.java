@@ -16,7 +16,7 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.classloading.enhance;
+package ru.frostman.web.inject;
 
 import com.google.common.collect.Lists;
 import javassist.CtBehavior;
@@ -26,7 +26,7 @@ import ru.frostman.web.annotation.JsonParam;
 import ru.frostman.web.annotation.Named;
 import ru.frostman.web.annotation.Param;
 import ru.frostman.web.annotation.Pjax;
-import ru.frostman.web.inject.InjectionRule;
+import ru.frostman.web.classloading.enhance.EnhancerUtil;
 import ru.frostman.web.plugin.JavinPlugins;
 import ru.frostman.web.thr.ActionEnhancerException;
 

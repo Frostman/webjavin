@@ -16,23 +16,41 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.secure.userdetails;
+package ru.frostman.web.secure.impl;
 
-import ru.frostman.web.secure.thr.UsernameAlreadyTakenException;
+import com.google.common.collect.Sets;
+import ru.frostman.web.secure.userdetails.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Set;
 
 /**
  * @author slukjanov aka Frostman
  */
-public interface UserService {
+public class InMemoryUserServiceProvider implements UserServiceProvider {
+    private final UserService userService = new InMemoryUserService();
 
-    UserDetails extract(HttpServletRequest request, HttpServletResponse response);
+    @Override
+    public UserService get() {
+        return userService;
+    }
 
-    UserDetails getUser(String username);
+    @Override
+    public Class<? extends UserService> getUserServiceClass() {
+        return InMemoryUserService.class;
+    }
 
-    void addUser(UserDetails userDetails) throws UsernameAlreadyTakenException;
+    @Override
+    public Class<? extends UserDetails> getUserDetailsClass() {
+        return InMemoryUserDetails.class;
+    }
 
-    UserDetails authenticate(Credentials credentials);
+    @Override
+    public Class<? extends Role> getRoleClass() {
+        return InMemoryRole.class;
+    }
+
+    @Override
+    public Set<Class<? extends Credentials>> getCredentialsClasses() {
+        return Sets.newHashSet();
+    }
 }

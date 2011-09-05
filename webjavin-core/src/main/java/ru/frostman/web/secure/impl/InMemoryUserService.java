@@ -16,23 +16,52 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.secure.userdetails;
+package ru.frostman.web.secure.impl;
 
+import com.google.common.collect.MapMaker;
 import ru.frostman.web.secure.thr.UsernameAlreadyTakenException;
+import ru.frostman.web.secure.userdetails.Credentials;
+import ru.frostman.web.secure.userdetails.UserDetails;
+import ru.frostman.web.secure.userdetails.UserService;
+import ru.frostman.web.session.JavinSession;
+import ru.frostman.web.session.JavinSessions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public interface UserService {
+public class InMemoryUserService implements UserService {
+    private static final String USED_DETAILS_ATTR = "$$_webjavin_user_details";
 
-    UserDetails extract(HttpServletRequest request, HttpServletResponse response);
+    private final Map<String, UserDetails> users = new MapMaker().makeMap();
 
-    UserDetails getUser(String username);
+    @Override
+    public synchronized UserDetails extract(HttpServletRequest request, HttpServletResponse response) {
+        JavinSession session = JavinSessions.getSession(request, response);
+        return (UserDetails) session.getAttribute(USED_DETAILS_ATTR);
+    }
 
-    void addUser(UserDetails userDetails) throws UsernameAlreadyTakenException;
+    @Override
+    public synchronized UserDetails getUser(String username) {
+        return users.get(username);
+    }
 
-    UserDetails authenticate(Credentials credentials);
+    @Override
+    public synchronized void addUser(UserDetails userDetails) throws UsernameAlreadyTakenException {
+        String username = userDetails.getUsername();
+        if (users.containsKey(username)) {
+            throw new UsernameAlreadyTakenException(username);
+        }
+
+        users.put(username, userDetails);
+    }
+
+    @Override
+    public synchronized UserDetails authenticate(Credentials credentials) {
+        //todo impl
+        return null;
+    }
 }

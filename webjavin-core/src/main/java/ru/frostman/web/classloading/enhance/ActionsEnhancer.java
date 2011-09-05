@@ -27,6 +27,7 @@ import ru.frostman.web.controller.Controllers;
 import ru.frostman.web.dispatch.ActionDefinition;
 import ru.frostman.web.dispatch.url.UrlPattern;
 import ru.frostman.web.dispatch.url.UrlPatternType;
+import ru.frostman.web.inject.InjectEnhancer;
 import ru.frostman.web.thr.ActionEnhancerException;
 import ru.frostman.web.util.HttpMethod;
 

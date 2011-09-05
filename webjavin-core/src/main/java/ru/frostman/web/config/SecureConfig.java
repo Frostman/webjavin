@@ -24,8 +24,16 @@ import com.google.common.base.Objects;
  * @author slukjanov aka Frostman
  */
 public class SecureConfig {
+    private boolean disabled = false;
     private String userServiceProvider = "ru.frostman.web.secure.impl.InMemoryUserServiceProvider";
 
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
 
     public String getUserServiceProvider() {
         return userServiceProvider;
@@ -40,7 +48,8 @@ public class SecureConfig {
         if (obj instanceof SecureConfig) {
             SecureConfig config = (SecureConfig) obj;
 
-            return Objects.equal(userServiceProvider, config.userServiceProvider);
+            return disabled == config.disabled
+                    && Objects.equal(userServiceProvider, config.userServiceProvider);
         }
 
         return false;
@@ -48,6 +57,9 @@ public class SecureConfig {
 
     @Override
     public int hashCode() {
-        return userServiceProvider != null ? userServiceProvider.hashCode() : 0;
+        int result = (disabled ? 1 : 0);
+        result = 31 * result + (userServiceProvider != null ? userServiceProvider.hashCode() : 0);
+
+        return result;
     }
 }

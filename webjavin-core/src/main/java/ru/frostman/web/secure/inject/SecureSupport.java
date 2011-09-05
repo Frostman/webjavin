@@ -16,23 +16,41 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.secure.userdetails;
+package ru.frostman.web.secure.inject;
 
-import ru.frostman.web.secure.thr.UsernameAlreadyTakenException;
+import com.google.common.collect.Lists;
+import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.inject.BaseInjection;
+import ru.frostman.web.inject.InjectionRule;
+import ru.frostman.web.secure.JavinSecurityManager;
+import ru.frostman.web.secure.userdetails.UserDetails;
+import ru.frostman.web.secure.userdetails.UserServiceProvider;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public interface UserService {
+public class SecureSupport {
+    public static final String SECURITY_MANAGER_GET = "ru.frostman.web.secure.JavinSecurityManager.get()";
 
-    UserDetails extract(HttpServletRequest request, HttpServletResponse response);
+    public static void buildSecureInjectionRules(Map<String, AppClass> classes, List<InjectionRule> injectionRules) {
+        UserServiceProvider provider = JavinSecurityManager.get().getUserServiceProvider();
 
-    UserDetails getUser(String username);
+        LinkedList<String> classNames = Lists.<String>newLinkedList();
+        classNames.add(UserDetails.class.getName());
+        classNames.add(provider.getUserDetailsClass().getName());
 
-    void addUser(UserDetails userDetails) throws UsernameAlreadyTakenException;
+        InjectionRule rule = new BaseInjection(
+                Lists.<String>newLinkedList(),
+                classNames,
+                "",
+                SECURITY_MANAGER_GET + ".getUserService().extract(request, response)",
+                ""
+        );
 
-    UserDetails authenticate(Credentials credentials);
+        injectionRules.add(rule);
+    }
 }

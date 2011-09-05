@@ -19,13 +19,16 @@
 package ru.frostman.web.plugin;
 
 import com.google.common.collect.Lists;
+import ru.frostman.web.aop.MethodInterceptor;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.inject.InjectionRule;
 
 import java.util.List;
 import java.util.Map;
 
+import static ru.frostman.web.cache.CacheSupport.findCacheDeclarations;
 import static ru.frostman.web.inject.InjectionSupport.findInjectionRules;
+import static ru.frostman.web.secure.inject.SecureSupport.buildSecureInjectionRules;
 
 /**
  * @author slukjanov aka Frostman
@@ -33,6 +36,7 @@ import static ru.frostman.web.inject.InjectionSupport.findInjectionRules;
 class JavinPlugin extends Plugin {
 
     private final List<InjectionRule> injectionRules = Lists.newLinkedList();
+    private final List<MethodInterceptor> methodInterceptors = Lists.newLinkedList();
 
     JavinPlugin() {
         super(0);
@@ -41,10 +45,17 @@ class JavinPlugin extends Plugin {
     @Override
     public void beforeClassesEnhance(Map<String, AppClass> classes) {
         findInjectionRules(classes, injectionRules);
+        findCacheDeclarations(classes, methodInterceptors);
+        buildSecureInjectionRules(classes, injectionRules);
     }
 
     @Override
     public List<InjectionRule> getInjections() {
         return injectionRules;
+    }
+
+    @Override
+    public List<MethodInterceptor> getMethodInterceptors() {
+        return methodInterceptors;
     }
 }

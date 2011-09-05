@@ -18,48 +18,43 @@
 
 package ru.frostman.web.cache;
 
+import javassist.CtClass;
 import javassist.CtMethod;
+import ru.frostman.web.annotation.CacheEvict;
 import ru.frostman.web.annotation.Cacheable;
 import ru.frostman.web.aop.MethodInterceptor;
-import ru.frostman.web.aop.MethodInvocation;
+import ru.frostman.web.classloading.AppClass;
+import ru.frostman.web.thr.BytecodeManipulationException;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class CacheableMethodInterceptor implements MethodInterceptor {
-    public static final String CACHEABLE_PREFIX = "webjavin-cacheable-";
+public class CacheSupport {
+    public static void findCacheDeclarations(Map<String, AppClass> classes, List<MethodInterceptor> methodInterceptors) {
+        for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
+            AppClass appClass = entry.getValue();
+            try {
+                CtClass ctClass = appClass.getCtClass();
 
-    private final String name;
-    private CtMethod method;
+                for (CtMethod method : ctClass.getDeclaredMethods()) {
+                    Cacheable cacheableAnn = (Cacheable) method.getAnnotation(Cacheable.class);
+                    CacheEvict cacheEvictAnn = (CacheEvict) method.getAnnotation(CacheEvict.class);
 
-    public CacheableMethodInterceptor(CtMethod method) {
-        this.method = method;
-        name = CACHEABLE_PREFIX + method.getLongName();
-    }
+                    if (cacheableAnn != null) {
+                        // todo create interceptor
+                    }
 
-    @Override
-    public Object invoke(MethodInvocation methodInvocation) {
-        return cacheable(methodInvocation);
-    }
+                    if (cacheEvictAnn != null) {
+                        // todo create interceptor
+                    }
+                }
 
-    @Override
-    public boolean matches(CtMethod method) {
-        return this.method.equals(method);
-    }
-
-    protected static Object cacheable(MethodInvocation methodInvocation) {
-        Cacheable cacheableAnn = methodInvocation.getMethod().getAnnotation(Cacheable.class);
-        String cacheName = cacheableAnn.value();
-        String cacheKey = cacheableAnn.key();
-        String cacheCondition = cacheableAnn.condition();
-        //todo we need cache it
-
-        //todo impl caching
-        return methodInvocation.proceed();
-    }
-
-    @Override
-    public String getName() {
-        return name;
+            } catch (Exception e) {
+                throw new BytecodeManipulationException("Exception while searching cache declarations in: " + appClass.getCtClass(), e);
+            }
+        }
     }
 }

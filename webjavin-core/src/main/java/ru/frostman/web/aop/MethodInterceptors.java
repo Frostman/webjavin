@@ -25,6 +25,7 @@ import javassist.CtMethod;
 import ru.frostman.web.aop.thr.AopException;
 import ru.frostman.web.classloading.AppClass;
 import ru.frostman.web.classloading.enhance.EnhancerUtil;
+import ru.frostman.web.plugin.JavinPlugins;
 import ru.frostman.web.thr.JavinRuntimeException;
 
 import java.util.List;
@@ -71,6 +72,11 @@ public class MethodInterceptors {
 
                     methodInterceptors.add(interceptor);
                 }
+            }
+
+            for (MethodInterceptor methodInterceptor : JavinPlugins.get().getMethodInterceptors()) {
+                interceptorsCache.put(methodInterceptor.getName(), methodInterceptor);
+                methodInterceptors.add(methodInterceptor);
             }
 
             return methodInterceptors;

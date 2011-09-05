@@ -19,7 +19,7 @@
 package ru.frostman.web.secure.userdetails;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author slukjanov aka Frostman
@@ -30,7 +30,7 @@ public interface UserDetails extends Comparable<UserDetails>, Serializable {
      */
     String getUsername();
 
-    List<Credentials> getCredentials();
+    Set<Credentials> getCredentials();
 
     boolean checkCredentials(Credentials credentials);
 
@@ -40,7 +40,7 @@ public interface UserDetails extends Comparable<UserDetails>, Serializable {
 
     boolean isEnabled();
 
-    List<Role> getRoles();
+    Set<Role> getRoles();
 
     boolean hasRole(Role role);
 

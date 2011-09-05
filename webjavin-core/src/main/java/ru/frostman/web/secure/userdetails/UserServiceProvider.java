@@ -18,11 +18,21 @@
 
 package ru.frostman.web.secure.userdetails;
 
+import java.util.Set;
+
 /**
  * @author slukjanov aka Frostman
  */
 public interface UserServiceProvider {
 
     UserService get();
+
+    Class<? extends UserService> getUserServiceClass();
+
+    Class<? extends UserDetails> getUserDetailsClass();
+
+    Class<? extends Role> getRoleClass();
+
+    Set<Class<? extends Credentials>> getCredentialsClasses();
 
 }

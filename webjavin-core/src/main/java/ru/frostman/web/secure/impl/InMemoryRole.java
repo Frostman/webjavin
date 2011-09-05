@@ -16,23 +16,43 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.secure.userdetails;
+package ru.frostman.web.secure.impl;
 
-import ru.frostman.web.secure.thr.UsernameAlreadyTakenException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import ru.frostman.web.secure.userdetails.Role;
 
 /**
  * @author slukjanov aka Frostman
  */
-public interface UserService {
+public class InMemoryRole implements Role {
+    private int weight;
+    private String name;
 
-    UserDetails extract(HttpServletRequest request, HttpServletResponse response);
+    public InMemoryRole() {
+    }
 
-    UserDetails getUser(String username);
+    public InMemoryRole(int weight, String name) {
+        this.weight = weight;
+        this.name = name;
+    }
 
-    void addUser(UserDetails userDetails) throws UsernameAlreadyTakenException;
+    @Override
+    public int compareTo(Role role) {
+        return weight - role.getWeight();
+    }
 
-    UserDetails authenticate(Credentials credentials);
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
