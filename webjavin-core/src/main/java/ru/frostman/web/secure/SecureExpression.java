@@ -19,6 +19,7 @@
 package ru.frostman.web.secure;
 
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Primitives;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
 import org.mvel2.compiler.ExecutableStatement;
@@ -33,6 +34,14 @@ import java.util.Map;
  * @author slukjanov aka Frostman
  */
 class SecureExpression {
+    private static final Map<String, Class> PRIMITIVES = Maps.newHashMap();
+
+    static {
+        for (Class clazz : Primitives.allPrimitiveTypes()) {
+            PRIMITIVES.put(clazz.getName(), clazz);
+        }
+    }
+
     private String expressionStr;
     private List<String> paramTypes;
     private ExecutableStatement expression;
@@ -52,7 +61,11 @@ class SecureExpression {
 
             int idx = 1;
             for (String paramType : paramTypes) {
-                context.addInput("param$" + idx, Javin.getClasses().getClassLoader().loadClass(paramType));
+                Class<?> type = PRIMITIVES.get(paramType);
+                if (type == null) {
+                    type = Javin.getClasses().getClassLoader().loadClass(paramType);
+                }
+                context.addInput("param$" + idx, type);
 
                 idx++;
             }
