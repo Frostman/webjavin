@@ -31,6 +31,9 @@ import ru.frostman.web.mongo.config.MongoConfig;
 public class MongoUserDao extends BasicDAO<MongoUser, ObjectId> {
     public MongoUserDao() {
         super(MongoUser.class, MongoPlugin.getMongo(), MongoPlugin.getMorphia(), MongoConfig.get().getDbName());
+
+        //todo think about this, it will be invoke each time constructor called, dao should be singleton
+        ensureIndexes();
     }
 
     public MongoUser getByName(String username) {
