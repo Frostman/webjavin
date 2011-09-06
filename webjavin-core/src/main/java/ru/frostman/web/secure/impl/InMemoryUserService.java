@@ -60,7 +60,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public synchronized UserDetails authenticate(Credentials credentials) {
+    public synchronized UserDetails authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) {
         //todo impl
         return null;
     }

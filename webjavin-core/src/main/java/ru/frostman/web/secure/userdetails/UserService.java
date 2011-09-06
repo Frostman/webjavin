@@ -34,5 +34,5 @@ public interface UserService {
 
     void addUser(UserDetails userDetails) throws UsernameAlreadyTakenException;
 
-    UserDetails authenticate(Credentials credentials);
+    UserDetails authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials);
 }

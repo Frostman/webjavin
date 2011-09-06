@@ -40,7 +40,14 @@ public class MongoUserService extends BaseEntity implements UserService {
 
     @Override
     public UserDetails extract(HttpServletRequest request, HttpServletResponse response) {
-        return (MongoUser) JavinSessions.getSession(request, response).getAttribute(JavinSecurityManager.USER_DETAILS_ATTR);
+        MongoUser mongoUser = (MongoUser) request.getAttribute(JavinSecurityManager.USER_DETAILS_ATTR);
+
+        if (mongoUser == null) {
+            mongoUser = (MongoUser) JavinSessions.getSession(request, response)
+                    .getAttribute(JavinSecurityManager.USER_DETAILS_ATTR);
+        }
+
+        return mongoUser;
     }
 
     @Override
@@ -62,8 +69,9 @@ public class MongoUserService extends BaseEntity implements UserService {
     }
 
     @Override
-    public UserDetails authenticate(Credentials credentials) {
+    public UserDetails authenticate(HttpServletRequest request, HttpServletResponse response, Credentials credentials) {
         //todo add to plugins 'customCredentialsSupport'
+        //todo setAttribute in session and in request
         return null;
     }
 }
