@@ -18,11 +18,9 @@
 
 package ru.frostman.web.mongo.secure;
 
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.Index;
-import com.google.code.morphia.annotations.Indexes;
-import com.google.code.morphia.annotations.Reference;
+import com.google.code.morphia.annotations.*;
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 import ru.frostman.web.mongo.BaseEntity;
 import ru.frostman.web.secure.userdetails.Credentials;
 import ru.frostman.web.secure.userdetails.Role;
@@ -53,6 +51,19 @@ public class MongoUser extends BaseEntity implements UserDetails {
     private Set<Role> roles;
 
     private Set<String> permissions;
+
+    @PostLoad
+    void postLoad() {
+        if (credentials == null) {
+            credentials = Sets.newHashSet();
+        }
+        if (roles == null) {
+            roles = Sets.newHashSet();
+        }
+        if (permissions == null) {
+            permissions = Sets.newHashSet();
+        }
+    }
 
     @Override
     public boolean checkCredentials(Credentials credentials) {
