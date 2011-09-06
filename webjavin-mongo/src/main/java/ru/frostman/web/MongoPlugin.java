@@ -57,13 +57,28 @@ public class MongoPlugin extends Plugin {
             firstLoad = false;
         }
 
-        return MongoConfig.update();
+        boolean changed = MongoConfig.update();
+
+        if (changed || mongo == null || morphia == null) {
+            try {
+                mongo = new Mongo(MongoConfig.get().getMongoReplicaSet());
+
+                String mongoVersion = mongo.getVersion();
+                log.debug("Successfully connected to MongoDB v." + mongoVersion);
+
+                morphia = new Morphia();
+            } catch (UnknownHostException e) {
+                throw new JavinRuntimeException("Can't connect to MongoDB", e);
+            }
+            log.info("Mongo plugin loaded successfully");
+        }
+
+        return changed;
     }
 
     @Override
     public void afterClassesEnhance(Map<String, AppClass> classes) {
         List<Class> morphiaClasses = Lists.newLinkedList();
-        Morphia morphia = new Morphia();
 
         for (Map.Entry<String, AppClass> entry : classes.entrySet()) {
             Class<?> clazz = entry.getValue().getJavaClass();
@@ -75,17 +90,7 @@ public class MongoPlugin extends Plugin {
             }
         }
 
-        try {
-            mongo = new Mongo(MongoConfig.get().getMongoReplicaSet());
-
-            String mongoVersion = mongo.getVersion();
-            log.debug("Successfully connected to MongoDB v." + mongoVersion);
-        } catch (UnknownHostException e) {
-            throw new JavinRuntimeException("Can't connect to MongoDB", e);
-        }
-        MongoPlugin.morphia = morphia;
-
-        log.info("Mongo plugin loaded successfully");
+        log.debug("All app classes successfully added to Morphia");
     }
 
     public static Mongo getMongo() {
@@ -94,5 +99,10 @@ public class MongoPlugin extends Plugin {
 
     public static Morphia getMorphia() {
         return morphia;
+    }
+
+    @Override
+    public List<String> getAppClassesPackages() {
+        return Lists.newArrayList("ru.frostman.web.mongo");
     }
 }
