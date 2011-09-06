@@ -23,7 +23,7 @@ import ru.frostman.web.secure.userdetails.Role;
 /**
  * @author slukjanov aka Frostman
  */
-public class InMemoryRole implements Role {
+public class InMemoryRole implements Role, Comparable<Role> {
     private int weight;
     private String name;
 

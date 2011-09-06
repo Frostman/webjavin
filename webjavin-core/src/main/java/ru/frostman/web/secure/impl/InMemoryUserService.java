@@ -19,6 +19,7 @@
 package ru.frostman.web.secure.impl;
 
 import com.google.common.collect.MapMaker;
+import ru.frostman.web.secure.JavinSecurityManager;
 import ru.frostman.web.secure.thr.UsernameAlreadyTakenException;
 import ru.frostman.web.secure.userdetails.Credentials;
 import ru.frostman.web.secure.userdetails.UserDetails;
@@ -34,14 +35,13 @@ import java.util.Map;
  * @author slukjanov aka Frostman
  */
 public class InMemoryUserService implements UserService {
-    private static final String USED_DETAILS_ATTR = "$$_webjavin_user_details";
 
     private final Map<String, UserDetails> users = new MapMaker().makeMap();
 
     @Override
     public synchronized UserDetails extract(HttpServletRequest request, HttpServletResponse response) {
         JavinSession session = JavinSessions.getSession(request, response);
-        return (UserDetails) session.getAttribute(USED_DETAILS_ATTR);
+        return (UserDetails) session.getAttribute(JavinSecurityManager.USER_DETAILS_ATTR);
     }
 
     @Override
