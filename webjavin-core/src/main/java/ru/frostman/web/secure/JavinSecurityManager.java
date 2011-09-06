@@ -24,6 +24,7 @@ import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.secure.userdetails.UserDetails;
 import ru.frostman.web.secure.userdetails.UserServiceProvider;
 import ru.frostman.web.thr.JavinIllegalAccessException;
+import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.SecureCheckException;
 
 import java.util.List;
@@ -34,6 +35,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author slukjanov aka Frostman
  */
 public class JavinSecurityManager {
+    public static final String USER_DETAILS_ATTR = "$$_webjavin_user_details";
+
     private static final ThreadLocal<UserDetails> currentUser = new ThreadLocal<UserDetails>();
     private static final ThreadLocal<String> currentRole = new ThreadLocal<String>();
 
@@ -50,13 +53,13 @@ public class JavinSecurityManager {
             try {
                 userServiceProviderClass = Class.forName(userServiceProviderClassName);
             } catch (ClassNotFoundException e) {
-                throw new SecurityException("Can't load UserServiceProvider impl: " + userServiceProviderClassName);
+                throw new JavinRuntimeException("Can't load UserServiceProvider impl: " + userServiceProviderClassName, e);
             }
 
             try {
                 userServiceProvider = (UserServiceProvider) userServiceProviderClass.newInstance();
             } catch (Exception e) {
-                throw new SecurityException("Can't instantiate UserServiceProvider impl: " + userServiceProviderClassName);
+                throw new JavinRuntimeException("Can't instantiate UserServiceProvider impl: " + userServiceProviderClassName, e);
             }
         }
     }
