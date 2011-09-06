@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * @author slukjanov aka Frostman
  */
-public interface Role extends Comparable<Role>, Serializable {
+public interface Role extends Serializable {
 
     int getWeight();
 
