@@ -19,10 +19,7 @@
 package ru.frostman.web.test;
 
 import ru.frostman.web.Javin;
-import ru.frostman.web.annotation.Action;
-import ru.frostman.web.annotation.Controller;
-import ru.frostman.web.annotation.CsrfProtected;
-import ru.frostman.web.annotation.Param;
+import ru.frostman.web.annotation.*;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.i18n.I18n;
@@ -35,6 +32,7 @@ import static ru.frostman.web.controller.Controllers.view;
 @Controller
 public class TestController {
 
+    @Secure("true")
     @Action("/test")
     public View test(Model model, @Param(value = "verified", required = false) boolean verified, TestComponent comp) {
         model.put("page", "test" + comp.g() + "<br>"
