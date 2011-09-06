@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.secure.userdetails.UserDetails;
+import ru.frostman.web.secure.userdetails.UserService;
 import ru.frostman.web.secure.userdetails.UserServiceProvider;
 import ru.frostman.web.thr.JavinIllegalAccessException;
 import ru.frostman.web.thr.JavinRuntimeException;
@@ -74,6 +75,10 @@ public class JavinSecurityManager {
 
     public UserServiceProvider getUserServiceProvider() {
         return userServiceProvider;
+    }
+
+    public UserService getUserService() {
+        return userServiceProvider.get();
     }
 
     public int registerExpression(String expressionStr, List<String> paramClasses) {

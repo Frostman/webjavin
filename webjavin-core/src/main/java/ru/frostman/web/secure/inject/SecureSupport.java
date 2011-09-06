@@ -24,9 +24,9 @@ import ru.frostman.web.inject.BaseInjection;
 import ru.frostman.web.inject.InjectionRule;
 import ru.frostman.web.secure.JavinSecurityManager;
 import ru.frostman.web.secure.userdetails.UserDetails;
+import ru.frostman.web.secure.userdetails.UserService;
 import ru.frostman.web.secure.userdetails.UserServiceProvider;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +39,28 @@ public class SecureSupport {
     public static void buildSecureInjectionRules(Map<String, AppClass> classes, List<InjectionRule> injectionRules) {
         UserServiceProvider provider = JavinSecurityManager.get().getUserServiceProvider();
 
-        LinkedList<String> classNames = Lists.<String>newLinkedList();
+        buildUserServiceInjection(injectionRules, provider);
+        buildUserDetailsInjection(injectionRules, provider);
+    }
+
+    private static void buildUserServiceInjection(List<InjectionRule> injectionRules, UserServiceProvider provider) {
+        List<String> classNames = Lists.newLinkedList();
+        classNames.add(UserService.class.getName());
+        classNames.add(provider.getUserServiceClass().getName());
+
+        InjectionRule rule = new BaseInjection(
+                Lists.<String>newLinkedList(),
+                classNames,
+                "",
+                SECURITY_MANAGER_GET + ".getUserService()",
+                ""
+        );
+
+        injectionRules.add(rule);
+    }
+
+    private static void buildUserDetailsInjection(List<InjectionRule> injectionRules, UserServiceProvider provider) {
+        List<String> classNames = Lists.newLinkedList();
         classNames.add(UserDetails.class.getName());
         classNames.add(provider.getUserDetailsClass().getName());
 
