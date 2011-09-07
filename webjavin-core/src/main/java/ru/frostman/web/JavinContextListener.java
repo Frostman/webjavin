@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import ru.frostman.web.classloading.AppClasses;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.thr.FastRuntimeException;
+import ru.frostman.web.util.Invoker;
 import ru.frostman.web.view.AppViews;
 
 import javax.servlet.ServletContext;
@@ -70,6 +71,12 @@ public class JavinContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        Invoker invoker = Javin.getInvoker();
+        if (invoker != null) {
+            //todo ignore non executed tasks
+            invoker.shutdownNow();
+        }
+
         log.info("Javin context destroyed successfully");
     }
 
