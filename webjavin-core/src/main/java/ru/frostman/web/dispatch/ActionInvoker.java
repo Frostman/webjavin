@@ -62,7 +62,9 @@ public abstract class ActionInvoker implements Runnable {
         int asyncQueueLength = JavinConfig.get().getApp().getAsyncQueueLength();
 
         if (async && Javin.isAsyncApiSupported() && invoker.getQueueSize() < asyncQueueLength) {
-            asyncContext = request.startAsync(request, response);
+            if (asyncContext == null) {
+                asyncContext = request.startAsync(request, response);
+            }
 
             invoker.schedule(this, delay, timeUnit);
         } else {
@@ -90,6 +92,7 @@ public abstract class ActionInvoker implements Runnable {
                 doInvoke(e.getDelay(), e.getTimeUnit());
                 return;
             } catch (ActionException e) {
+                //todo think about more info in response about exception, use Throwables.
                 catchError(e.getCause());
             }
 

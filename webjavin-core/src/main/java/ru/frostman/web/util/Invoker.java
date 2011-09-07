@@ -87,6 +87,14 @@ public class Invoker {
         return executor.invokeAll(tasks, timeout, unit);
     }
 
+    public List<Runnable> shutdownNow() {
+        return executor.shutdownNow();
+    }
+
+    public void shutdown() {
+        executor.shutdown();
+    }
+
     public int getQueueSize() {
         return executor.getQueue().size();
     }

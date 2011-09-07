@@ -192,8 +192,13 @@ class ActionsEnhancer {
             throw new ActionEnhancerException("Action method can't return specified type: " + actionMethod.getLongName());
         }
 
+        // ignore AsyncSuspendEvent
+        body.append("} catch(").append(ASYNC_SUSPEND_EVENT).append(" e) {if(!isAsync()) {"
+                + "throw new " + ACTION_EXCEPTION + "(\"Suspend method invoked in non async action\");"
+                + "} throw e;} ");
+
         // append catch section with ActionException
-        body.append("}catch(Throwable th){throw new " + ACTION_EXCEPTION + "(th);}");
+        body.append("catch(Throwable th) {throw new " + ACTION_EXCEPTION + "(th);}");
 
         method.setBody(body.append("}").toString());
 

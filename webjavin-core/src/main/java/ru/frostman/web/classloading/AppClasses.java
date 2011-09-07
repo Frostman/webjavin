@@ -39,6 +39,7 @@ import ru.frostman.web.secure.JavinSecurityManager;
 import ru.frostman.web.session.JavinSession;
 import ru.frostman.web.session.JavinSessions;
 import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.util.Invoker;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -222,6 +223,14 @@ public class AppClasses {
                 if (log.isInfoEnabled()) {
                     start = System.currentTimeMillis();
                 }
+
+                // restart invoker
+                Invoker invoker = Javin.getInvoker();
+                if (invoker != null) {
+                    //todo think about returned tasks
+                    invoker.shutdownNow();
+                }
+                Javin.setInvoker(new Invoker());
 
                 // prepare classes (creates CtClasses)
                 Enhancer.prepareClasses(classes);

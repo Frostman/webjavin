@@ -43,4 +43,5 @@ public class ClassConstants {
     public static final String JAVIN_SESSIONS = "ru.frostman.web.session.JavinSessions";
     public static final String CSRF_PROTECTOR = "ru.frostman.web.secure.CsrfProtector";
     public static final String CSRF_TOKEN_EXCEPTION = "ru.frostman.web.thr.CsrfTokenNotValidException";
+    public static final String ASYNC_SUSPEND_EVENT = "ru.frostman.web.thr.AsyncSuspendEvent";
 }
