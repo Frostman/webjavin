@@ -95,6 +95,10 @@ public class Invoker {
         executor.shutdown();
     }
 
+    public boolean remove(Runnable task) {
+        return executor.remove(task);
+    }
+
     public int getQueueSize() {
         return executor.getQueue().size();
     }
