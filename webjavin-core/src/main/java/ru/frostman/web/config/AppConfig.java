@@ -30,7 +30,7 @@ public class AppConfig {
     private static final String RANDOM_SECRET = UUID.randomUUID().toString();
 
     private String secret = RANDOM_SECRET;
-    private int asyncQueueLength = 100;
+    private int asyncQueueLength = 1000;
     private int maxForwardsCount = 5;
     private String serverHeader = "WebJavin";
     private String sessionManager = "ru.frostman.web.session.impl.ServletSessionManager";
