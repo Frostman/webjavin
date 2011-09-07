@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit;
  * @author slukjanov aka Frostman
  */
 public class PoolConfig {
-    private int corePoolSize = Runtime.getRuntime().availableProcessors() - 1;
-    private int maximumPoolSize = Runtime.getRuntime().availableProcessors() - 1;
-    private long keepAliveTime = 10;
+    private int corePoolSize = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+    private int maximumPoolSize = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+    private long keepAliveTime = 2;
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     public int getCorePoolSize() {
