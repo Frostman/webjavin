@@ -22,10 +22,8 @@ import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.controller.ModelAndView;
 import ru.frostman.web.controller.View;
-import ru.frostman.web.thr.CsrfTokenNotValidException;
-import ru.frostman.web.thr.JavinRuntimeException;
-import ru.frostman.web.thr.NotFoundException;
-import ru.frostman.web.thr.ParameterRequiredException;
+import ru.frostman.web.thr.*;
+import ru.frostman.web.util.Invoker;
 import ru.frostman.web.view.ForwardView;
 import ru.frostman.web.view.RedirectView;
 
@@ -33,6 +31,7 @@ import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author slukjanov aka Frostman
@@ -42,7 +41,10 @@ public abstract class ActionInvoker implements Runnable {
     protected final HttpServletResponse response;
     protected AsyncContext asyncContext;
     protected ModelAndView mav;
+
+    // async part
     protected boolean async = isAsync();
+    protected boolean firstRun = true;
 
     public ActionInvoker(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
@@ -52,10 +54,19 @@ public abstract class ActionInvoker implements Runnable {
     }
 
     public void invoke() {
-        if (async && Javin.isAsyncApiSupported() && Javin.getInvoker().getQueueSize() < JavinConfig.get().getApp().getAsyncQueueLength()) {
+        doInvoke(0, TimeUnit.NANOSECONDS);
+    }
+
+    private void doInvoke(long delay, TimeUnit timeUnit) {
+        Invoker invoker = Javin.getInvoker();
+        int asyncQueueLength = JavinConfig.get().getApp().getAsyncQueueLength();
+
+        if (async && Javin.isAsyncApiSupported() && invoker.getQueueSize() < asyncQueueLength) {
             asyncContext = request.startAsync(request, response);
-            Javin.getInvoker().execute(this);
+
+            invoker.schedule(this, delay, timeUnit);
         } else {
+            //todo think about delay
             async = false;
             run();
         }
@@ -66,10 +77,18 @@ public abstract class ActionInvoker implements Runnable {
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
         try {
-            before();
+            if (firstRun) {
+                before();
+                firstRun = false;
+            }
 
+            //todo think about actions resuming, not only suspending, see http://docs.codehaus.org/display/JETTY/Continuations
             try {
                 action();
+            } catch (AsyncSuspendEvent e) {
+                //todo think about this
+                doInvoke(e.getDelay(), e.getTimeUnit());
+                return;
             } catch (ActionException e) {
                 catchError(e.getCause());
             }
@@ -84,6 +103,7 @@ public abstract class ActionInvoker implements Runnable {
         } catch (Throwable th) {
             throw new JavinRuntimeException("Exception while executing action", th);
         }
+        //todo we need to handle ALL exceptions at this level
 
         if (async) {
             asyncContext.complete();
@@ -125,4 +145,7 @@ public abstract class ActionInvoker implements Runnable {
 
     protected abstract boolean isAsync();
 
+    public boolean isFirstRun() {
+        return firstRun;
+    }
 }

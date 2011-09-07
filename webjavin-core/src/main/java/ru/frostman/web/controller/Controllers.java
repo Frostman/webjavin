@@ -20,11 +20,15 @@ package ru.frostman.web.controller;
 
 import ru.frostman.web.Javin;
 import ru.frostman.web.config.JavinConfig;
+import ru.frostman.web.thr.AsyncSuspendEvent;
+import ru.frostman.web.view.CompleteRequestView;
 import ru.frostman.web.view.ForwardView;
 import ru.frostman.web.view.RedirectView;
 import ru.frostman.web.view.json.JsonModelView;
 import ru.frostman.web.view.json.JsonValueView;
 import ru.frostman.web.view.json.JsonpValueView;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helper class that provides some methods to work with Views, Models,
@@ -142,5 +146,45 @@ public class Controllers {
      */
     public static String urlFull(String relativeUrl) {
         return JavinConfig.get().getAddress() + url(relativeUrl);
+    }
+
+    /**
+     * Suspends processing of the current request and associated ServletResponse.
+     * It is an equivalent of moving request to the end of processing queue.
+     */
+    public static void suspend() {
+        suspend(0, TimeUnit.NANOSECONDS);
+    }
+
+    /**
+     * Suspends processing of the current request and associated ServletResponse
+     * for specified delay in milliseconds.
+     *
+     * @param delay to suspend
+     */
+    public static void suspend(long delay) {
+        suspend(delay, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Suspends processing of the current request and associated ServletResponse
+     * for specified delay in specified TimeUnit.
+     *
+     * @param delay    to suspend
+     * @param timeUnit of the delay
+     */
+    public static void suspend(long delay, TimeUnit timeUnit) {
+        if (delay == 0) {
+            throw AsyncSuspendEvent.SUSPEND_WITHOUT_DELAY;
+        }
+
+        throw new AsyncSuspendEvent(delay, timeUnit);
+    }
+
+    /**
+     * @return view that will complete current request and response processing
+     */
+    public static View complete() {
+        return new CompleteRequestView();
     }
 }
