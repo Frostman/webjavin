@@ -19,22 +19,34 @@
 package ru.frostman.web.test;
 
 import ru.frostman.web.Javin;
-import ru.frostman.web.annotation.*;
+import ru.frostman.web.annotation.Action;
+import ru.frostman.web.annotation.Controller;
+import ru.frostman.web.annotation.Param;
+import ru.frostman.web.annotation.Secure;
 import ru.frostman.web.controller.Model;
 import ru.frostman.web.controller.View;
 import ru.frostman.web.i18n.I18n;
+import ru.frostman.web.secure.userdetails.UserDetails;
+import ru.frostman.web.secure.userdetails.UserService;
 
-import static ru.frostman.web.controller.Controllers.view;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
+
+import static ru.frostman.web.controller.Controllers.*;
 
 /**
  * @author slukjanov aka Frostman
  */
 @Controller
 public class TestController {
+    private int idx = 0;
 
     @Secure("true")
     @Action("/test")
-    public View test(Model model, @Param(value = "verified", required = false) boolean verified, TestComponent comp) {
+    public View test(Model model, @Param(value = "verified", required = false) boolean verified, TestComponent comp
+            , UserService userService, UserDetails userDetails) {
         model.put("page", "test" + comp.g() + "<br>"
                 + I18n.get("ru", "test")
         ).put("verified", verified).put("version", Javin.getVersion());
@@ -42,18 +54,29 @@ public class TestController {
         return view("test.ftl");
     }
 
-    @CsrfProtected
-    @Action("/qwe")
-    public View qwe(Model model) {
-        model.put("page", "qwe");
+    private boolean firstTime = true;
 
-        return view("test.ftl");
-    }
+    @Action(value = "/async", async = true)
+    public View async(HttpServletResponse response) throws IOException {
+        PrintWriter printWriter = response.getWriter();
+        if (firstTime) {
+            printWriter.print("<html><head></head><body>");
+        }
+        printWriter.print("<script type='text/javascript'>console.log(");
+        printWriter.print("'" + (idx++) + ": " + new Date().toString() + "'");
+        printWriter.println(");</script>");
+        if (firstTime) {
+            printWriter.println("</body></html>");
+        }
+        firstTime = false;
+        printWriter.flush();
 
-    @Action("/indigo")
-    public View indigo(Model model) {
-        model.put("page", "qwe");
-        return view("/indigo/auth.ftl");
+        if (idx < 10) {
+            //todo test it!!!
+            suspend(1000);
+        }
+
+        return complete();
     }
 
 }

@@ -14,5 +14,11 @@ test<br>
 WebJavin version: ${version!} <br>
 [/#if]
 
+<br/>
+
+<script type="text/javascript" src="${url('/static/test.js')}"></script>
+
+<iframe src="${url('/async')}">iframes is not supported</iframe>
+
 
 
