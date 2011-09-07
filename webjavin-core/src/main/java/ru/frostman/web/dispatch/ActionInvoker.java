@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class ActionInvoker implements Runnable {
+public abstract class ActionInvoker implements Runnable, AsyncActionInvoker {
     protected final HttpServletRequest request;
     protected final HttpServletResponse response;
     protected AsyncContext asyncContext;
@@ -72,6 +72,13 @@ public abstract class ActionInvoker implements Runnable {
             async = false;
             run();
         }
+    }
+
+    @Override
+    public void resume() {
+        Javin.getInvoker().remove(this);
+        invoke();
+        //todo think about synchronization of run method
     }
 
     @Override
