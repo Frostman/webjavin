@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.session.JavinSessions;
 import ru.frostman.web.util.HttpMethod;
+import ru.frostman.web.view.ContentTypes;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -42,6 +43,10 @@ public class DispatcherServlet extends HttpServlet {
         try {
             //response.setHeader("Transfer-Encoding", "chunked");
             response.setHeader("Server", JavinConfig.get().getApp().getServerHeader());
+
+            // default values
+            response.setContentType(ContentTypes.TEXT_HTML);
+            response.setCharacterEncoding("UTF-8");
 
             if (Javin.getMode().isDevelopmentMode()) {
                 Javin.getClasses().update();
