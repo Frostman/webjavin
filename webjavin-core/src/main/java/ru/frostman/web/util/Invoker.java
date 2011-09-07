@@ -19,38 +19,72 @@
 package ru.frostman.web.util;
 
 import ru.frostman.web.config.JavinConfig;
+import ru.frostman.web.config.PoolConfig;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * @author slukjanov aka Frostman
  */
 public class Invoker {
-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
+    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(
             JavinConfig.get().getApp().getPool().getCorePoolSize(),
-            JavinConfig.get().getApp().getPool().getMaximumPoolSize(),
-            JavinConfig.get().getApp().getPool().getKeepAliveTime(),
-            JavinConfig.get().getApp().getPool().getTimeUnit(),
-            new LinkedBlockingQueue<Runnable>(), new JavinThreadFactory("javin-executor")
+            new JavinThreadFactory("javin-executor")
     );
 
-    public void execute(Runnable command) {
-        executor.execute(command);
+    //todo we should shutdown executor in servlet context listener
+
+    public Invoker() {
+        PoolConfig poolConfig = JavinConfig.get().getApp().getPool();
+
+        executor.setKeepAliveTime(poolConfig.getKeepAliveTime(), poolConfig.getTimeUnit());
+        executor.setMaximumPoolSize(poolConfig.getMaximumPoolSize());
+        executor.setRejectedExecutionHandler(new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
+
+            }
+        });
     }
 
-    public Future<?> submit(Runnable task) {
-        return executor.submit(task);
+    public ScheduledFuture<?> submit(Runnable task) {
+        return schedule(task, 0, TimeUnit.NANOSECONDS);
+    }
+
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+        return executor.schedule(command, delay, unit);
+    }
+
+    public <T> ScheduledFuture<T> submit(Callable<T> task) {
+        return schedule(task, 0, TimeUnit.NANOSECONDS);
     }
 
     public <T> Future<T> submit(Runnable task, T result) {
-        return executor.submit(task, result);
+        return schedule(Executors.callable(task, result), 0, TimeUnit.NANOSECONDS);
     }
 
-    public <T> Future<T> submit(Callable<T> task) {
-        return executor.submit(task);
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+        return executor.schedule(callable, delay, unit);
+    }
+
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+        return executor.invokeAny(tasks);
+    }
+
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        return executor.invokeAny(tasks, timeout, unit);
+    }
+
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+        return executor.invokeAll(tasks);
+    }
+
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+            throws InterruptedException {
+        return executor.invokeAll(tasks, timeout, unit);
     }
 
     public int getQueueSize() {
