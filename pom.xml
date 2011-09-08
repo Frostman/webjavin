@@ -30,6 +30,7 @@
         <module>webjavin-indigo</module>
 
         <module>webjavin-test</module>
+        <module>webjavin-itest</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -63,6 +64,7 @@
         <webjavin.version>0.3-SNAPSHOT</webjavin.version>
 
         <groovy.version>1.8.1</groovy.version>
+        <jetty.version>8.0.0.v20110901</jetty.version>
     </properties>
 
     <dependencies>
@@ -107,9 +109,15 @@
         <!--Unit Testing-->
         <dependency>
             <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <artifactId>junit-dep</artifactId>
             <version>4.9</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Groovy support for tests -->
@@ -129,8 +137,8 @@
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <version>1.2.1</version>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -234,7 +242,6 @@
                     <defaultScriptExtension>.groovy</defaultScriptExtension>
                     <providerSelection>1.7</providerSelection>
                 </configuration>
-
             </plugin>
         </plugins>
 
