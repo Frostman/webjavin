@@ -1,0 +1,15 @@
+mode: DEV
+
+context: itest
+address: http://localhost:10888/
+
+classes:
+      packages: [
+          "ru.frostman.web.itest"
+      ]
+
+statics: {
+      "/static/": {
+            "target": "/static"
+      }
+}
