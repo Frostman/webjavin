@@ -26,11 +26,6 @@
 
     <modules>
         <module>webjavin-core</module>
-        <module>webjavin-mongo</module>
-        <module>webjavin-indigo</module>
-
-        <module>webjavin-test</module>
-        <module>webjavin-itest</module>
     </modules>
 
     <packaging>pom</packaging>
