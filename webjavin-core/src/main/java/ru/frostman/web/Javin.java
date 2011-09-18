@@ -23,10 +23,13 @@ import com.google.common.io.InputSupplier;
 import ru.frostman.web.config.JavinConfig;
 import ru.frostman.web.thr.InitializationException;
 import ru.frostman.web.util.Resource;
+import ru.frostman.web.util.UserFriendly;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.sql.Date;
 
 /**
  * @author slukjanov aka Frostman
@@ -35,54 +38,75 @@ public class Javin {
     private static final String VERSION_FILENAME = "version";
     private static final String VERSION = calculateVersion();
 
+    private static boolean initialized = false;
     private static boolean started = false;
     private static boolean asyncSupported = false;
     private static JavinConfig config = new JavinConfig(false);
 
     static synchronized void init(boolean asyncSupported) {
+        if (initialized) {
+            return;
+        }
+
         Javin.asyncSupported = asyncSupported;
 
         try {
             freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
-
-            if (config.getMode().isProdMode()) {
-                refresh();
-            }
-        } catch (Throwable th) {
-            //todo change it
-            System.err.println("BABABABABABAHHHH!!!!!!");
-            th.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            handleError("Error while setting logger for freemarker", e);
+            return;
         }
+
+        if (config.getMode().isProdMode()) {
+            refresh();
+        }
+
+        initialized = true;
     }
 
     static synchronized void destroy() {
+        if (!initialized) {
+            return;
+        }
+
         stop();
 
         //todo clean some other parts
     }
 
     static synchronized void refresh() {
-        if (started && config.getMode().isProdMode()) {
+        if (!initialized || started && config.getMode().isProdMode()) {
             return;
         }
 
-        if (detectChanges()) {
-            start();
+        try {
+            if (detectChanges()) {
+                start();
+            }
+        } catch (Throwable th) {
+            handleError("Error while refreshing application", th);
         }
     }
 
     private static synchronized void start() {
+        if (!initialized) {
+            return;
+        }
         if (started) {
             stop();
         }
 
+
+        started = true;
     }
 
     private static synchronized void stop() {
-        if (!started) {
+        if (!initialized || !started) {
             return;
         }
 
+
+        started = false;
     }
 
     private static synchronized boolean detectChanges() {
@@ -95,6 +119,23 @@ public class Javin {
         //todo impl
         // detect changes in classes
         return false;
+    }
+
+    public static void handleError(Throwable th) {
+        handleError(null, th);
+    }
+
+    public static void handleError(@Nullable String message, Throwable th) {
+        if (th == null) {
+            return;
+        }
+
+        //todo write to log
+        System.err.println("-------------------------------\n"
+                + new Date(System.currentTimeMillis()).toString() + " JAVIN :: "
+                + UserFriendly.convert(message, th)
+                + "\n-------------------------------"
+        );
     }
 
     private static String calculateVersion() {
