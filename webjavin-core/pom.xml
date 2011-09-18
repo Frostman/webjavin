@@ -105,6 +105,14 @@
             <version>2.0.19</version>
         </dependency>
 
+        <!-- Dependency Injection -->
+        <!--todo think about no aop-->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0</version>
+        </dependency>
+
         <!-- Yaml -->
         <dependency>
             <groupId>org.yaml</groupId>
