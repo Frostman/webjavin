@@ -20,7 +20,7 @@ package ru.frostman.web.config;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import ru.frostman.web.thr.JavinRuntimeException;
+import ru.frostman.web.thr.FastRuntimeException;
 import ru.frostman.web.util.Resource;
 
 import java.io.File;
@@ -32,9 +32,11 @@ import java.io.FileInputStream;
 public class JavinConfig {
     private static File configFile;
 
-    private long creationTime;
+    private long creationTime = 0;
 
-    private JavinMode mode;
+    private JavinMode mode = JavinMode.DEV;
+
+    private PluginsConfig plugins;
 
     public JavinConfig() {
         this(true);
@@ -47,24 +49,36 @@ public class JavinConfig {
     }
 
     public static JavinConfig load() {
-        if (configFile == null) {
-            configFile = Resource.getAsFile("javin.yml");
-            if (configFile == null || !configFile.exists()) {
-                //todo notify user
-            }
-        }
+        ensureConfigFile();
 
         try {
             Yaml yaml = new Yaml(new Constructor(JavinConfig.class));
-            return (JavinConfig) yaml.load(new FileInputStream(configFile));
+            JavinConfig config = (JavinConfig) yaml.load(new FileInputStream(configFile));
+
+            if (config == null) {
+                //todo warn user
+                config = new JavinConfig();
+            }
+
+            return config;
         } catch (Exception e) {
-            //todo impl
-            throw new JavinRuntimeException("Can't load framework configuration", e);
+            throw new FastRuntimeException("Error while loading WebJavin configuration (file: javin.yml)", e);
         }
     }
 
     public static boolean changed(JavinConfig config) {
+        ensureConfigFile();
+
         return config.getCreationTime() < configFile.lastModified();
+    }
+
+    private static void ensureConfigFile() {
+        if (configFile == null) {
+            configFile = Resource.getAsFile("javin.yml");
+            if (configFile == null || !configFile.exists()) {
+                throw new FastRuntimeException("Configuration file is not found (file: javin.yml)");
+            }
+        }
     }
 
     public long getCreationTime() {
@@ -77,5 +91,13 @@ public class JavinConfig {
 
     public void setMode(JavinMode mode) {
         this.mode = mode;
+    }
+
+    public PluginsConfig getPlugins() {
+        return plugins;
+    }
+
+    public void setPlugins(PluginsConfig plugins) {
+        this.plugins = plugins;
     }
 }
