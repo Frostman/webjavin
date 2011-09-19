@@ -18,6 +18,7 @@
 
 package ru.frostman.web.util;
 
+import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.MembersInjector;
 import com.google.inject.TypeLiteral;
@@ -27,8 +28,10 @@ import com.google.inject.spi.TypeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.annotation.InjectLogger;
+import ru.frostman.web.thr.FastRuntimeException;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
@@ -41,12 +44,15 @@ public class UtilModule extends AbstractModule {
 
         //todo scan for all app classes and requestStaticInjection
         //todo bind request, response, etc
+
+        //todo take list of classes that required to static inject
+        List<Class> classes = Lists.newLinkedList();
+        requestStaticInjection(classes.toArray(new Class[classes.size()]));
     }
 
     static class Slf4JTypeListener implements TypeListener {
         public <T> void hear(TypeLiteral<T> typeLiteral, TypeEncounter<T> typeEncounter) {
             for (Field field : typeLiteral.getRawType().getDeclaredFields()) {
-                //todo think about this
                 field.setAccessible(true);
                 if (field.getType() == Logger.class && field.isAnnotationPresent(InjectLogger.class)) {
                     typeEncounter.register(new Slf4JMembersInjector<T>(field));
@@ -69,8 +75,8 @@ public class UtilModule extends AbstractModule {
             try {
                 field.set(t, logger);
             } catch (IllegalAccessException e) {
-                //todo think about this
-                throw new RuntimeException(e);
+                throw new FastRuntimeException("Error while injecting slf4j logger into the member of class: '"
+                        + t.getClass() + "'", e);
             }
         }
     }

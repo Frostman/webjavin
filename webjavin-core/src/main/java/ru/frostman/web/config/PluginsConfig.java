@@ -31,7 +31,7 @@ public class PluginsConfig {
     private List<String> list = Lists.newArrayList();
     private Map<String, Object> config = Maps.newHashMap();
 
-    public PluginsConfig() {
+    PluginsConfig() {
     }
 
     public List<String> getList() {

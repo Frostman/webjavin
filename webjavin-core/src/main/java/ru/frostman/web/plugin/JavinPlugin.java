@@ -19,9 +19,13 @@
 package ru.frostman.web.plugin;
 
 import com.google.common.base.Preconditions;
+import javassist.CtClass;
+import javassist.CtField;
 import ru.frostman.web.Javin;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
+import java.lang.reflect.Modifier;
 
 /**
  * @author slukjanov aka Frostman
@@ -43,6 +47,18 @@ public abstract class JavinPlugin<C> {
         }
 
         return Javin.getConfig().getPluginConfig(pluginName, pluginConfigClass);
+    }
+
+    //todo extract it to CorePlugin
+    public boolean needStaticInjection(CtClass ctClass) throws Exception {
+        for (CtField field : ctClass.getDeclaredFields()) {
+            //todo check for other Guice annotations like javax.inject.Inject, com.google.inject.Inject, custom annotations, etc
+            if (Modifier.isStatic(field.getModifiers()) && field.getAnnotation(Inject.class) != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public String getPluginName() {
