@@ -18,9 +18,11 @@
 
 package ru.frostman.web.config;
 
+import com.google.common.base.Preconditions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import ru.frostman.web.thr.FastRuntimeException;
+import ru.frostman.web.util.ObjectMapping;
 import ru.frostman.web.util.Resource;
 
 import java.io.File;
@@ -36,7 +38,7 @@ public class JavinConfig {
 
     private JavinMode mode = JavinMode.DEV;
 
-    private PluginsConfig plugins;
+    private PluginsConfig plugins = new PluginsConfig();
 
     public JavinConfig() {
         this(true);
@@ -63,6 +65,24 @@ public class JavinConfig {
             return config;
         } catch (Exception e) {
             throw new FastRuntimeException("Error while loading WebJavin configuration (file: javin.yml)", e);
+        }
+    }
+
+    public <T> T getPluginConfig(String pluginName, Class<T> pluginConfigClass) {
+        Preconditions.checkNotNull(pluginName, "plugin name can't be null");
+        Preconditions.checkNotNull(pluginConfigClass, "plugin config class can't be null");
+
+        //todo think about caching plugins config
+        try {
+            Object pluginConfig = plugins.getConfig().get(pluginName);
+            if (pluginConfig == null) {
+                //todo warn
+                return pluginConfigClass.newInstance();
+            }
+
+            return ObjectMapping.convert(pluginConfig, pluginConfigClass);
+        } catch (Throwable th) {
+            throw new FastRuntimeException("Error while getting configuration for plugin: '" + pluginName + "'", th);
         }
     }
 
