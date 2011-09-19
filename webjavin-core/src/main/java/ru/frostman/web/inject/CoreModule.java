@@ -16,7 +16,7 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.util;
+package ru.frostman.web.inject;
 
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.frostman.web.annotation.InjectLogger;
 import ru.frostman.web.thr.FastRuntimeException;
+import ru.frostman.web.util.Log;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.List;
 /**
  * @author slukjanov aka Frostman
  */
-public class UtilModule extends AbstractModule {
+public class CoreModule extends AbstractModule {
 
     @Override
     protected void configure() {
@@ -67,7 +68,7 @@ public class UtilModule extends AbstractModule {
 
         Slf4JMembersInjector(Field field) {
             this.field = field;
-            logger = LoggerFactory.getLogger(field.getDeclaringClass());
+            logger = LoggerFactory.getLogger(Log.minifyName(field.getDeclaringClass()));
             field.setAccessible(true);
         }
 
