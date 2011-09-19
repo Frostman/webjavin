@@ -20,7 +20,11 @@ package ru.frostman.web;
 
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Stage;
 import ru.frostman.web.config.JavinConfig;
+import ru.frostman.web.inject.CoreModule;
 import ru.frostman.web.thr.InitializationException;
 import ru.frostman.web.util.Resource;
 import ru.frostman.web.util.UserFriendly;
@@ -42,6 +46,7 @@ public class Javin {
     private static boolean started = false;
     private static boolean asyncSupported = false;
     private static JavinConfig config = new JavinConfig(false);
+    private static Injector injector;
 
     static synchronized void init(boolean asyncSupported) {
         if (initialized) {
@@ -96,6 +101,10 @@ public class Javin {
             stop();
         }
 
+        //todo make enhance, scan, load classes, etc
+        injector = Guice.createInjector(resolveGuiceStage(), new CoreModule());
+
+        //todo request static injections
 
         started = true;
     }
@@ -104,6 +113,11 @@ public class Javin {
         if (!initialized || !started) {
             return;
         }
+
+        //todo make some cleanings, etc
+
+        //todo need to write in docs to not store reference to injector in your code
+        injector = null;
 
 
         started = false;
@@ -152,6 +166,10 @@ public class Javin {
         }
     }
 
+    private static Stage resolveGuiceStage() {
+        return config.getMode().isProdMode() ? Stage.PRODUCTION : Stage.DEVELOPMENT;
+    }
+
     public static String getVersion() {
         return VERSION;
     }
@@ -166,5 +184,10 @@ public class Javin {
 
     public static JavinConfig getConfig() {
         return config;
+    }
+
+    @Nullable
+    public static Injector getInjector() {
+        return injector;
     }
 }
