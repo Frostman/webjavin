@@ -43,8 +43,7 @@ public class UtilModule extends AbstractModule {
         //todo bind request, response, etc
     }
 
-
-    private static class Slf4JTypeListener implements TypeListener {
+    static class Slf4JTypeListener implements TypeListener {
         public <T> void hear(TypeLiteral<T> typeLiteral, TypeEncounter<T> typeEncounter) {
             for (Field field : typeLiteral.getRawType().getDeclaredFields()) {
                 //todo think about this
@@ -56,7 +55,7 @@ public class UtilModule extends AbstractModule {
         }
     }
 
-    private static class Slf4JMembersInjector<T> implements MembersInjector<T> {
+    static class Slf4JMembersInjector<T> implements MembersInjector<T> {
         private final Field field;
         private final Logger logger;
 
