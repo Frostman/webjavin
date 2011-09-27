@@ -28,29 +28,28 @@ import org.mvel2.templates.util.TemplateOutputStream;
 /**
  * @author slukjanov aka Frostman
  */
-public class CompiledEscapeTag extends Node {
+public class CompiledNestedTag extends Node {
+    public static final String NESTED_NODE_VAR = "$$_nested_node";
 
     private ExecutableStatement compiledExpr;
 
-    public CompiledEscapeTag() {
+    public CompiledNestedTag() {
     }
 
-    public CompiledEscapeTag(int begin, String name, char[] template, int start, int end) {
+    public CompiledNestedTag(int begin, String name, char[] template, int start, int end) {
         super(begin, name, template, start, end);
 
         init();
     }
 
-    public CompiledEscapeTag(int begin, String name, char[] template, int start, int end, Node next) {
+    public CompiledNestedTag(int begin, String name, char[] template, int start, int end, Node next) {
         super(begin, name, template, start, end);
 
         init();
     }
 
     public Object eval(TemplateRuntime runtime, TemplateOutputStream appender, Object ctx, VariableResolverFactory factory) {
-        String result = String.valueOf(MVEL.executeExpression(compiledExpr, ctx, factory));
-        //todo escape
-        appender.append(result);
+        MVEL.executeExpression(compiledExpr, ctx, factory);
 
         return next != null ? next.eval(runtime, appender, ctx, factory) : null;
     }
@@ -60,7 +59,7 @@ public class CompiledEscapeTag extends Node {
     }
 
     private void init() {
-        compiledExpr = (ExecutableStatement) MVEL.compileExpression(this.contents);
+        compiledExpr = (ExecutableStatement) MVEL.compileExpression(NESTED_NODE_VAR + ".eval()");
     }
 
     @Override

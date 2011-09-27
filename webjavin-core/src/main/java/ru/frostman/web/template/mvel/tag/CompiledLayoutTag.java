@@ -18,62 +18,77 @@
 
 package ru.frostman.web.template.mvel.tag;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.mvel2.MVEL;
-import org.mvel2.compiler.ExecutableStatement;
+import com.google.common.collect.Maps;
+import org.mvel2.CompileException;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.templates.TemplateRuntime;
+import org.mvel2.templates.res.EndNode;
 import org.mvel2.templates.res.Node;
+import org.mvel2.templates.res.TerminalNode;
 import org.mvel2.templates.util.TemplateOutputStream;
+import ru.frostman.web.template.Template;
+import ru.frostman.web.template.mvel.MvelTemplate;
 
-import static org.mvel2.util.ParseTools.subset;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
 public class CompiledLayoutTag extends Node {
-
-    private ExecutableStatement compiledExpression;
+    private Node nestedNode;
 
     public CompiledLayoutTag() {
+        init();
     }
 
     public CompiledLayoutTag(int begin, String name, char[] template, int start, int end) {
-        this.begin = begin;
-        this.name = name;
-        this.contents = subset(template, this.cStart = start, (this.end = this.cEnd = end) - start - 1);
+        super(begin, name, template, start, end);
 
-        compileExpression();
+        init();
     }
 
     public CompiledLayoutTag(int begin, String name, char[] template, int start, int end, Node next) {
-        this.name = name;
-        this.begin = begin;
-        this.next = next;
-        this.contents = subset(template, this.cStart = start, (this.end = this.cEnd = end) - start - 1);
+        super(begin, name, template, start, end, next);
 
-        compileExpression();
+        init();
     }
 
     public Object eval(TemplateRuntime runtime, TemplateOutputStream appender, Object ctx, VariableResolverFactory factory) {
-        String result = String.valueOf(MVEL.executeExpression(compiledExpression, ctx, factory));
-        appender.append(StringEscapeUtils.escapeHtml4(StringEscapeUtils.escapeEcmaScript(result)));
+        if (nestedNode != null) {
+            Map<String, Object> map = Maps.newHashMap();
+            map.put(CompiledNestedTag.NESTED_NODE_VAR, new NodeEvaluator(nestedNode, runtime, appender, ctx, factory));
+            //todo ask javin for TemplatesManager, cache template from demarcate method
+            Template template = new MvelTemplate(new String(contents));
+            if (template instanceof MvelTemplate) {
+                ((MvelTemplate) template).render(map, appender);
+            } else {
+                throw new CompileException("Layout should be an mvel template, but found non mvel");
+            }
+        }
 
         return next != null ? next.eval(runtime, appender, ctx, factory) : null;
     }
 
     public boolean demarcate(Node terminatingNode, char[] template) {
+        Node n = nestedNode = next;
+
+        while (n.getNext() != null) {
+            n = n.next;
+        }
+
+        n.next = new EndNode();
+        next = terminus;
+
         return false;
     }
 
-    private void compileExpression() {
-        compiledExpression = (ExecutableStatement) MVEL.compileExpression(this.contents);
+    private void init() {
+        setTerminus(new TerminalNode());
     }
 
     @Override
-    public void setContents(char[] contents) {
-        super.setContents(contents);
-        compileExpression();
+    public boolean isOpenNode() {
+        return true;
     }
 
     public String toString() {

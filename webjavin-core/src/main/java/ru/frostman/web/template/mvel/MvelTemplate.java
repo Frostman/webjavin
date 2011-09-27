@@ -30,6 +30,8 @@ import org.mvel2.templates.res.Node;
 import org.mvel2.templates.util.TemplateOutputStream;
 import ru.frostman.web.template.Template;
 import ru.frostman.web.template.mvel.tag.CompiledEscapeTag;
+import ru.frostman.web.template.mvel.tag.CompiledLayoutTag;
+import ru.frostman.web.template.mvel.tag.CompiledNestedTag;
 import ru.frostman.web.thr.JavinRuntimeException;
 import ru.frostman.web.thr.TemplateNotFoundException;
 import ru.frostman.web.util.Resource;
@@ -62,8 +64,11 @@ public class MvelTemplate implements Template {
 
     @Override
     public Template compile() {
+        //todo cache this map
         Map<String, Class<? extends Node>> nodes = Maps.newHashMap();
         nodes.put("escape", CompiledEscapeTag.class);
+        nodes.put("layout", CompiledLayoutTag.class);
+        nodes.put("nested", CompiledNestedTag.class);
 
         compiledTemplate = new TemplateCompiler(template, nodes, true).compile();
 
@@ -78,6 +83,17 @@ public class MvelTemplate implements Template {
     @Override
     public OutputStream render(Map<String, Object> args, OutputStream outputStream) {
         render(args, new PrintWriter(outputStream, true));
+
+        return outputStream;
+    }
+
+    public TemplateOutputStream render(Map<String, Object> args, TemplateOutputStream outputStream) {
+        if (compiledTemplate == null) {
+            compile();
+        }
+
+        //todo think about context and null args
+        TemplateRuntime.execute(compiledTemplate, args, null, null, outputStream);
 
         return outputStream;
     }

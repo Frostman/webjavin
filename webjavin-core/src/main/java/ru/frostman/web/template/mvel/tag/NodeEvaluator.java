@@ -18,62 +18,32 @@
 
 package ru.frostman.web.template.mvel.tag;
 
-import org.mvel2.MVEL;
-import org.mvel2.compiler.ExecutableStatement;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.templates.TemplateRuntime;
 import org.mvel2.templates.res.Node;
 import org.mvel2.templates.util.TemplateOutputStream;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author slukjanov aka Frostman
  */
-public class CompiledEscapeTag extends Node {
+public class NodeEvaluator {
+    private final Node node;
+    private final TemplateRuntime runtime;
+    private final TemplateOutputStream appender;
+    private final Object ctx;
+    private final VariableResolverFactory factory;
 
-    private ExecutableStatement compiledExpr;
-
-    public CompiledEscapeTag() {
+    public NodeEvaluator(Node node, TemplateRuntime runtime, TemplateOutputStream appender, Object ctx, VariableResolverFactory factory) {
+        this.node = checkNotNull(node);
+        this.runtime = checkNotNull(runtime);
+        this.appender = checkNotNull(appender);
+        this.ctx = ctx;
+        this.factory = factory;
     }
 
-    public CompiledEscapeTag(int begin, String name, char[] template, int start, int end) {
-        super(begin, name, template, start, end);
-
-        init();
-    }
-
-    public CompiledEscapeTag(int begin, String name, char[] template, int start, int end, Node next) {
-        super(begin, name, template, start, end);
-
-        init();
-    }
-
-    public Object eval(TemplateRuntime runtime, TemplateOutputStream appender, Object ctx, VariableResolverFactory factory) {
-        String result = String.valueOf(MVEL.executeExpression(compiledExpr, ctx, factory));
-        //todo escape
-        appender.append(result);
-
-        return next != null ? next.eval(runtime, appender, ctx, factory) : null;
-    }
-
-    public boolean demarcate(Node terminatingNode, char[] template) {
-        return false;
-    }
-
-    private void init() {
-        compiledExpr = (ExecutableStatement) MVEL.compileExpression(this.contents);
-    }
-
-    @Override
-    public void setContents(char[] contents) {
-        super.setContents(contents);
-        init();
-    }
-
-    public String toString() {
-        //todo replace with toStringHelper
-        return "EscapeNode:" + name + "{"
-                + (contents == null ? "" : new String(contents))
-                + "}" +
-                " (start=" + begin + ";end=" + end + ")";
+    public void eval() {
+        node.eval(runtime, appender, ctx, factory);
     }
 }
