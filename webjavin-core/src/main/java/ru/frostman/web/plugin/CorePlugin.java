@@ -18,53 +18,37 @@
 
 package ru.frostman.web.plugin;
 
-import com.google.common.base.Preconditions;
-import javassist.CtClass;
+import com.google.common.collect.Lists;
 import ru.frostman.web.Javin;
+import ru.frostman.web.config.Config;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class JavinPlugin<C> {
-    protected final String pluginName;
-    protected final String pluginVersion;
-    protected final Class<C> pluginConfigClass;
+public class CorePlugin extends JavinPlugin<Config> {
+    private final List<JavinPlugin<?>> plugins = Lists.newLinkedList();
 
-    protected JavinPlugin(String pluginName, String pluginVersion, @Nullable Class<C> pluginConfigClass) {
-        Preconditions.checkNotNull(pluginName, "Plugin name can't be null");
-        Preconditions.checkNotNull(pluginVersion, "Plugin version can't be null");
-
-        this.pluginName = pluginName;
-        this.pluginVersion = pluginVersion;
-        this.pluginConfigClass = pluginConfigClass;
+    public CorePlugin(List<JavinPlugin<?>> plugins) {
+        super("core", Javin.getVersion(), Config.class);
+        //todo add system plugins this.plugins.add()
+        this.plugins.addAll(plugins);
     }
 
-    public C getConfig() {
-        if (pluginConfigClass == null) {
-            return null;
+    @Override
+    public Config getConfig() {
+        return Javin.getConfig();
+    }
+
+    @Override
+    public boolean changed() {
+        for (JavinPlugin<?> plugin : plugins) {
+            if (plugin.changed()) {
+                return true;
+            }
         }
 
-        return Javin.getConfig().getPluginConfig(pluginName, pluginConfigClass);
-    }
-
-    public boolean changed() {
         return false;
     }
-
-    public List<CtClass> needStaticInjection(CtClass ctClass) throws Exception {
-        //todo need to think about this and impl in CorePlugin
-        return null;
-    }
-
-    public String getPluginName() {
-        return pluginName;
-    }
-
-    public Class<C> getPluginConfigClass() {
-        return pluginConfigClass;
-    }
-
 }

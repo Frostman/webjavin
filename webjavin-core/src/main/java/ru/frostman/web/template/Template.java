@@ -16,10 +16,22 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.thr;
+package ru.frostman.web.template;
+
+import java.io.OutputStream;
+import java.io.Writer;
+import java.util.Map;
 
 /**
  * @author slukjanov aka Frostman
  */
-public class UserFriendlyMessage {
+public interface Template {
+
+    Template compile();
+
+    String render(Map<String, Object> args);
+
+    OutputStream render(Map<String, Object> args, OutputStream output);
+
+    Writer render(Map<String, Object> args, Writer writer);
 }

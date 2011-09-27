@@ -18,53 +18,52 @@
 
 package ru.frostman.web.plugin;
 
-import com.google.common.base.Preconditions;
-import javassist.CtClass;
-import ru.frostman.web.Javin;
+import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class JavinPlugin<C> {
-    protected final String pluginName;
-    protected final String pluginVersion;
-    protected final Class<C> pluginConfigClass;
+public class DependenciesInfo {
+    private Set<String> before = Sets.newHashSet();
+    private Set<String> after = Sets.newHashSet();
+    private Set<String> exists = Sets.newHashSet();
 
-    protected JavinPlugin(String pluginName, String pluginVersion, @Nullable Class<C> pluginConfigClass) {
-        Preconditions.checkNotNull(pluginName, "Plugin name can't be null");
-        Preconditions.checkNotNull(pluginVersion, "Plugin version can't be null");
-
-        this.pluginName = pluginName;
-        this.pluginVersion = pluginVersion;
-        this.pluginConfigClass = pluginConfigClass;
+    public DependenciesInfo() {
     }
 
-    public C getConfig() {
-        if (pluginConfigClass == null) {
-            return null;
-        }
-
-        return Javin.getConfig().getPluginConfig(pluginName, pluginConfigClass);
+    public Set<String> getBefore() {
+        return before;
     }
 
-    public boolean changed() {
-        return false;
+    public void setBefore(Set<String> before) {
+        this.before = before;
     }
 
-    public List<CtClass> needStaticInjection(CtClass ctClass) throws Exception {
-        //todo need to think about this and impl in CorePlugin
-        return null;
+    public Set<String> getAfter() {
+        return after;
     }
 
-    public String getPluginName() {
-        return pluginName;
+    public void setAfter(Set<String> after) {
+        this.after = after;
     }
 
-    public Class<C> getPluginConfigClass() {
-        return pluginConfigClass;
+    public Set<String> getExists() {
+        return exists;
     }
 
+    public void setExists(Set<String> exists) {
+        this.exists = exists;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+                .add("before", before)
+                .add("after", after)
+                .add("exists", exists)
+                .toString();
+    }
 }

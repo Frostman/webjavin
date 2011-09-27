@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
  */
 public class UserFriendly {
 
+    // todo impl all and move to util.Log
     public static String convert(Throwable th) {
         return convert(null, th);
     }

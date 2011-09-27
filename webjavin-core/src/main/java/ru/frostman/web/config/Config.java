@@ -18,7 +18,6 @@
 
 package ru.frostman.web.config;
 
-import com.google.common.base.Preconditions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import ru.frostman.web.thr.FastRuntimeException;
@@ -28,10 +27,12 @@ import ru.frostman.web.util.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author slukjanov aka Frostman
  */
-public class JavinConfig {
+public class Config {
     private static File configFile;
 
     private long creationTime = 0;
@@ -40,26 +41,26 @@ public class JavinConfig {
 
     private PluginsConfig plugins = new PluginsConfig();
 
-    public JavinConfig() {
+    public Config() {
         this(true);
     }
 
-    public JavinConfig(boolean storeCreationTime) {
+    public Config(boolean storeCreationTime) {
         if (storeCreationTime) {
             creationTime = System.currentTimeMillis();
         }
     }
 
-    public static JavinConfig load() {
+    public static Config load() {
         ensureConfigFile();
 
         try {
-            Yaml yaml = new Yaml(new Constructor(JavinConfig.class));
-            JavinConfig config = (JavinConfig) yaml.load(new FileInputStream(configFile));
+            Yaml yaml = new Yaml(new Constructor(Config.class));
+            Config config = (Config) yaml.load(new FileInputStream(configFile));
 
             if (config == null) {
                 //todo warn user
-                config = new JavinConfig();
+                config = new Config();
             }
 
             return config;
@@ -69,8 +70,8 @@ public class JavinConfig {
     }
 
     public <T> T getPluginConfig(String pluginName, Class<T> pluginConfigClass) {
-        Preconditions.checkNotNull(pluginName, "plugin name can't be null");
-        Preconditions.checkNotNull(pluginConfigClass, "plugin config class can't be null");
+        checkNotNull(pluginName, "plugin name can't be null");
+        checkNotNull(pluginConfigClass, "plugin config class can't be null");
 
         //todo think about caching plugins config
         try {
@@ -86,10 +87,17 @@ public class JavinConfig {
         }
     }
 
-    public static boolean changed(JavinConfig config) {
+    public static boolean changed(Config config) {
+        checkNotNull(config);
         ensureConfigFile();
 
-        return config.getCreationTime() < configFile.lastModified();
+        if (config.getCreationTime() < configFile.lastModified()) {
+            Config newConfig = load();
+
+            return !config.equals(newConfig);
+        }
+
+        return false;
     }
 
     private static void ensureConfigFile() {

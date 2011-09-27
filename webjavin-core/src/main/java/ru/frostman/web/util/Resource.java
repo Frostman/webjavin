@@ -18,13 +18,14 @@
 
 package ru.frostman.web.util;
 
+import com.google.common.collect.Lists;
 import ru.frostman.web.Javin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Main class of Javin framework
@@ -48,6 +49,20 @@ public class Resource {
             try {
                 // avoid caching in getResourceAsStream(...)
                 return url.openStream();
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    public static Reader getAsReader(String name) {
+        InputStream inputStream = getAsStream(name);
+
+        if (inputStream != null) {
+            try {
+                return new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             } catch (IOException e) {
                 return null;
             }
@@ -86,4 +101,26 @@ public class Resource {
     public static URL get(String name) {
         return MAIN_CLASS_LOADER.getResource(name);
     }
+
+    public static List<InputStream> getAllAsStreams(String name) {
+        List<InputStream> result = Lists.newLinkedList();
+        for (URL url : getAll(name)) {
+            try {
+                result.add(url.openStream());
+            } catch (IOException e) {
+                //no operations
+            }
+        }
+
+        return result;
+    }
+
+    public static List<URL> getAll(String name) {
+        try {
+            return Collections.list(MAIN_CLASS_LOADER.getResources(name));
+        } catch (IOException e) {
+            return Lists.newLinkedList();
+        }
+    }
+
 }

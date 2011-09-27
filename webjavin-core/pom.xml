@@ -53,7 +53,7 @@
     </licenses>
 
     <dependencies>
-        <!-- JSON -->
+        <!-- JSON Support -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
@@ -72,33 +72,7 @@
             <version>3.15.0-GA</version>
         </dependency>
 
-        <!-- Templates -->
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.18</version>
-        </dependency>
-
-        <!-- Caching -->
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>2.4.5</version>
-            <type>pom</type>
-            <exclusions>
-                <!--todo think about this and write in docs-->
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache-terracotta</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.terracotta</groupId>
-                    <artifactId>terracotta-toolkit-1.3-runtime</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- Expression Language -->
+        <!-- Templates && Expression Language -->
         <dependency>
             <groupId>org.mvel</groupId>
             <artifactId>mvel2</artifactId>
@@ -113,7 +87,7 @@
             <version>3.0</version>
         </dependency>
 
-        <!-- Yaml -->
+        <!-- Yaml Support-->
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>

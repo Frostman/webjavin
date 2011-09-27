@@ -20,18 +20,20 @@ package ru.frostman.web.util;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import static com.google.common.base.Throwables.propagate;
+
 /**
  * @author slukjanov aka Frostman
  */
 public class ObjectMapping {
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static <T> T convert(Object fromValue, Class<T> toClass) {
+    public static <T> T convert(Object fromValue, Class<T> toClass) throws RuntimeException {
         try {
             return mapper.convertValue(fromValue, toClass);
-        } catch (Throwable th) {
+        } catch (Exception e) {
             //todo handle it
-            throw new RuntimeException(th);
+            throw propagate(e);
         }
     }
 

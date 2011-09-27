@@ -16,55 +16,17 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.plugin;
-
-import com.google.common.base.Preconditions;
-import javassist.CtClass;
-import ru.frostman.web.Javin;
-
-import javax.annotation.Nullable;
-import java.util.List;
+package ru.frostman.web.template;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class JavinPlugin<C> {
-    protected final String pluginName;
-    protected final String pluginVersion;
-    protected final Class<C> pluginConfigClass;
+public abstract class TemplatesManager {
 
-    protected JavinPlugin(String pluginName, String pluginVersion, @Nullable Class<C> pluginConfigClass) {
-        Preconditions.checkNotNull(pluginName, "Plugin name can't be null");
-        Preconditions.checkNotNull(pluginVersion, "Plugin version can't be null");
+    public abstract Template get(String name);
 
-        this.pluginName = pluginName;
-        this.pluginVersion = pluginVersion;
-        this.pluginConfigClass = pluginConfigClass;
-    }
-
-    public C getConfig() {
-        if (pluginConfigClass == null) {
-            return null;
-        }
-
-        return Javin.getConfig().getPluginConfig(pluginName, pluginConfigClass);
-    }
-
-    public boolean changed() {
-        return false;
-    }
-
-    public List<CtClass> needStaticInjection(CtClass ctClass) throws Exception {
-        //todo need to think about this and impl in CorePlugin
-        return null;
-    }
-
-    public String getPluginName() {
-        return pluginName;
-    }
-
-    public Class<C> getPluginConfigClass() {
-        return pluginConfigClass;
+    public Template compile(String name) {
+        return get(name).compile();
     }
 
 }

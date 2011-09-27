@@ -23,8 +23,10 @@ import com.google.common.io.InputSupplier;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Stage;
-import ru.frostman.web.config.JavinConfig;
+import ru.frostman.web.config.Config;
 import ru.frostman.web.inject.CoreModule;
+import ru.frostman.web.plugin.JavinPlugin;
+import ru.frostman.web.plugin.Plugins;
 import ru.frostman.web.thr.InitializationException;
 import ru.frostman.web.util.Resource;
 import ru.frostman.web.util.UserFriendly;
@@ -45,8 +47,9 @@ public class Javin {
     private static boolean initialized = false;
     private static boolean started = false;
     private static boolean asyncSupported = false;
-    private static JavinConfig config = new JavinConfig(false);
+    private static Config config = new Config(false);
     private static Injector injector;
+    private static JavinPlugin plugins;
 
     static synchronized void init(boolean asyncSupported) {
         if (initialized) {
@@ -55,15 +58,17 @@ public class Javin {
 
         Javin.asyncSupported = asyncSupported;
 
-        try {
-            freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
-        } catch (ClassNotFoundException e) {
-            handleError("Error while setting logger for freemarker", e);
-            return;
-        }
+        //todo
+//        try {
+//            freemarker.log.Logger.selectLoggerLibrary(freemarker.log.Logger.LIBRARY_SLF4J);
+//        } catch (ClassNotFoundException e) {
+//            handleError("Error while setting logger for freemarker", e);
+//            return;
+//        }
 
+        detectChanges();
         if (config.getMode().isProdMode()) {
-            refresh();
+            start();
         }
 
         initialized = true;
@@ -101,7 +106,7 @@ public class Javin {
             stop();
         }
 
-        //todo make enhance, scan, load classes, etc
+        //todo start all plugins, load all classes, start all services
         injector = Guice.createInjector(resolveGuiceStage(), new CoreModule());
 
         //todo request static injections
@@ -124,15 +129,22 @@ public class Javin {
     }
 
     private static synchronized boolean detectChanges() {
-        if (JavinConfig.changed(config)) {
-            config = JavinConfig.load();
-
-            return true;
+        boolean changed = false;
+        if (Config.changed(config)) {
+            config = Config.load();
+            changed = true;
         }
 
-        //todo impl
-        // detect changes in classes
-        return false;
+        if (changed || plugins == null || plugins.changed()) {
+            plugins = Plugins.load();
+            changed = true;
+        }
+
+        //if(changed || Classes.changed()) {
+        //todo it should only load updated bytecode
+        //}
+
+        return changed;
     }
 
     public static void handleError(Throwable th) {
@@ -182,7 +194,7 @@ public class Javin {
         return asyncSupported;
     }
 
-    public static JavinConfig getConfig() {
+    public static Config getConfig() {
         return config;
     }
 
