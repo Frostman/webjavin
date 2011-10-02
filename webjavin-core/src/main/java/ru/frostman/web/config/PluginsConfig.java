@@ -18,6 +18,7 @@
 
 package ru.frostman.web.config;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -48,5 +49,25 @@ public class PluginsConfig {
 
     public void setConfig(Map<String, Object> config) {
         this.config = config;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        PluginsConfig that = (PluginsConfig) obj;
+
+        return Objects.equal(list, that.list)
+                && Objects.equal(config, that.config);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(list, config);
     }
 }

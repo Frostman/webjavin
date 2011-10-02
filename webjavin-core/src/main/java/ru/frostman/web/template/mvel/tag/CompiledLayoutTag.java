@@ -26,6 +26,7 @@ import org.mvel2.templates.res.EndNode;
 import org.mvel2.templates.res.Node;
 import org.mvel2.templates.res.TerminalNode;
 import org.mvel2.templates.util.TemplateOutputStream;
+import ru.frostman.web.Javin;
 import ru.frostman.web.template.Template;
 import ru.frostman.web.template.mvel.MvelTemplate;
 
@@ -36,6 +37,7 @@ import java.util.Map;
  */
 public class CompiledLayoutTag extends Node {
     private Node nestedNode;
+    private MvelTemplate template;
 
     public CompiledLayoutTag() {
         init();
@@ -57,19 +59,13 @@ public class CompiledLayoutTag extends Node {
         if (nestedNode != null) {
             Map<String, Object> map = Maps.newHashMap();
             map.put(CompiledNestedTag.NESTED_NODE_VAR, new NodeEvaluator(nestedNode, runtime, appender, ctx, factory));
-            //todo ask javin for TemplatesManager, cache template from demarcate method
-            Template template = new MvelTemplate(new String(contents));
-            if (template instanceof MvelTemplate) {
-                ((MvelTemplate) template).render(map, appender);
-            } else {
-                throw new CompileException("Layout should be an mvel template, but found non mvel");
-            }
+            template.render(map, appender);
         }
 
         return next != null ? next.eval(runtime, appender, ctx, factory) : null;
     }
 
-    public boolean demarcate(Node terminatingNode, char[] template) {
+    public boolean demarcate(Node terminatingNode, char[] tmpl) {
         Node n = nestedNode = next;
 
         while (n.getNext() != null) {
@@ -78,6 +74,14 @@ public class CompiledLayoutTag extends Node {
 
         n.next = new EndNode();
         next = terminus;
+
+        String templateName = new String(contents);
+        Template template = Javin.getTemplatesManager().get(templateName);
+        if (template instanceof MvelTemplate) {
+            this.template = (MvelTemplate) template;
+        } else {
+            throw new CompileException("Layout should be an mvel template, but found non mvel template: " + templateName);
+        }
 
         return false;
     }

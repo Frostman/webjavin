@@ -18,6 +18,7 @@
 
 package ru.frostman.web.config;
 
+import com.google.common.base.Objects;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import ru.frostman.web.thr.FastRuntimeException;
@@ -41,6 +42,8 @@ public class Config {
 
     private PluginsConfig plugins = new PluginsConfig();
 
+    private TemplatesConfig templates = new TemplatesConfig();
+
     public Config() {
         this(true);
     }
@@ -62,6 +65,16 @@ public class Config {
                 //todo warn user
                 config = new Config();
             }
+
+            //todo ensure some properties
+            String templatesPath = config.templates.getPath();
+            if (templatesPath.startsWith("/")) {
+                templatesPath = templatesPath.substring(1);
+            }
+            if (!templatesPath.endsWith("/")) {
+                templatesPath = templatesPath.substring(0, templatesPath.length() - 1);
+            }
+            config.templates.setPath(templatesPath);
 
             return config;
         } catch (Exception e) {
@@ -127,5 +140,30 @@ public class Config {
 
     public void setPlugins(PluginsConfig plugins) {
         this.plugins = plugins;
+    }
+
+    public TemplatesConfig getTemplates() {
+        return templates;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Config config = (Config) obj;
+
+        return mode == config.mode
+                && Objects.equal(plugins, config.plugins)
+                && Objects.equal(templates, config.templates);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(mode, plugins, templates);
     }
 }

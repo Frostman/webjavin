@@ -16,13 +16,53 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package ru.frostman.web.template;
+package ru.frostman.web.config;
+
+import com.google.common.base.Objects;
 
 /**
  * @author slukjanov aka Frostman
  */
-public abstract class TemplatesManager {
+public class TemplatesConfig {
 
-    public abstract Template get(String name);
+    private String path = "view/";
 
+    // in ms
+    private long updateInterval = 1000;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public long getUpdateInterval() {
+        return updateInterval;
+    }
+
+    public void setUpdateInterval(long updateInterval) {
+        this.updateInterval = updateInterval;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        TemplatesConfig config = (TemplatesConfig) obj;
+
+        return updateInterval == config.updateInterval
+                && Objects.equal(path, config.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(path, updateInterval);
+    }
 }

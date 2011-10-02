@@ -114,6 +114,10 @@ public class MvelTemplate implements Template {
         return writer;
     }
 
+    public String getName() {
+        return name;
+    }
+
     private static final class MvelTemplateOutputStream implements TemplateOutputStream {
 
         private final Writer writer;

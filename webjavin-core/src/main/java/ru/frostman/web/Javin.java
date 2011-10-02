@@ -27,6 +27,8 @@ import ru.frostman.web.config.Config;
 import ru.frostman.web.inject.CoreModule;
 import ru.frostman.web.plugin.JavinPlugin;
 import ru.frostman.web.plugin.Plugins;
+import ru.frostman.web.template.TemplatesManager;
+import ru.frostman.web.template.mvel.MvelTemplatesManager;
 import ru.frostman.web.thr.InitializationException;
 import ru.frostman.web.util.Resource;
 import ru.frostman.web.util.UserFriendly;
@@ -47,9 +49,15 @@ public class Javin {
     private static boolean initialized = false;
     private static boolean started = false;
     private static boolean asyncSupported = false;
+    private static boolean needRefresh = false;
+
+    // update in detect changes
     private static Config config = new Config(false);
     private static Injector injector;
     private static JavinPlugin plugins;
+
+    // updated on start
+    private static TemplatesManager templatesManager;
 
     static synchronized void init(boolean asyncSupported) {
         if (initialized) {
@@ -69,6 +77,8 @@ public class Javin {
         detectChanges();
         if (config.getMode().isProdMode()) {
             start();
+        } else {
+            needRefresh = true;
         }
 
         initialized = true;
@@ -90,7 +100,8 @@ public class Javin {
         }
 
         try {
-            if (detectChanges()) {
+            if (detectChanges() || needRefresh) {
+                needRefresh = false;
                 start();
             }
         } catch (Throwable th) {
@@ -108,6 +119,9 @@ public class Javin {
 
         //todo start all plugins, load all classes, start all services
         injector = Guice.createInjector(resolveGuiceStage(), new CoreModule());
+        //todo resolve by guice
+        templatesManager = new MvelTemplatesManager();
+
 
         //todo request static injections
 
@@ -123,6 +137,7 @@ public class Javin {
 
         //todo need to write in docs to not store reference to injector in your code
         injector = null;
+        templatesManager = null;
 
 
         started = false;
@@ -201,5 +216,13 @@ public class Javin {
     @Nullable
     public static Injector getInjector() {
         return injector;
+    }
+
+    public static JavinPlugin getPlugins() {
+        return plugins;
+    }
+
+    public static TemplatesManager getTemplatesManager() {
+        return templatesManager;
     }
 }
